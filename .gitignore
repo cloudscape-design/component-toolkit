@@ -1,0 +1,7 @@
+.cache
+coverage
+build
+lib
+node_modules
+tsconfig.tsbuildinfo
+.DS_Store
