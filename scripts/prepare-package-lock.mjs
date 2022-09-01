@@ -2,7 +2,9 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const fs = require('fs');
+import fs from 'fs';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
 /**
  * Remove specific @cloudscape-design/* packages where we should always use the latest minor release.
@@ -13,7 +15,7 @@ const packageLock = require(filename);
 
 Object.keys(packageLock.dependencies).forEach(dependencyName => {
   const dependency = packageLock.dependencies[dependencyName];
-  if (dependencyName.startsWith('@cloudscape-design/') || dependencyName.startsWith('@awsui/')) {
+  if (dependencyName.startsWith('@cloudscape-design/')) {
     delete packageLock.dependencies[dependencyName];
   } else if (dependency.resolved && dependency.resolved.indexOf('codeartifact.us-west-2.amazonaws.com') !== -1) {
     throw Error('package-lock.json file contains a reference to CodeArtifact. Use regular npm to update the packages.');
