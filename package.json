@@ -22,7 +22,7 @@
     "test:integ": "jest -c jest.integ.config.js",
     "test": "npm run test:unit && npm-run-all -r -p test-pages test:integ",
     "lint": "eslint --ignore-path .gitignore --ext ts,tsx,js .",
-    "prepublishOnly": "rimraf ./dist && npm run build",
+    "prepublishOnly": "./scripts/prepare-package-lock.mjs && rimraf ./dist && npm run build",
     "prepare": "husky install"
   },
   "engines": {
