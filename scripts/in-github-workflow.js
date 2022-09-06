@@ -3,5 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 if (process.env.GITHUB_WORKFLOW) {
-  require('./prepare-package-lock.js');
+  process.exit(0);
+} else {
+  process.exit(1);
 }
