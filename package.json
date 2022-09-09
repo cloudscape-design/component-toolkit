@@ -22,8 +22,8 @@
     "test:integ": "jest -c jest.integ.config.js",
     "test": "npm run test:unit && npm-run-all -r -p test-pages test:integ",
     "lint": "eslint --ignore-path .gitignore --ext ts,tsx,js .",
+    "preinstall": "node ./scripts/in-github-workflow.js && ./scripts/prepare-package-lock.js || :",
     "prepublishOnly": "rimraf ./dist && npm run build",
-    "preinstall": "./scripts/prepare-package-lock.js",
     "prepare": "husky install"
   },
   "engines": {
@@ -75,6 +75,9 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix"
+    ],
+    "package-lock.json": [
+      "./scripts/prepare-package-lock.js"
     ]
   }
 }
