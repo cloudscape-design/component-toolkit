@@ -2,13 +2,16 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+// only run this within the scope of this package
+if (process.env.npm_package_name && process.env.npm_package_name !== '@cloudscape-design/component-toolkit') {
+  return;
+}
+
 /**
  * Remove specific @cloudscape-design/* packages where we should always use the latest minor release.
  * Also checks for any dependencies that incorrectly use CodeArtifact instead of npm.
  */
-
 const fs = require('fs');
-
 const filename = require.resolve('../package-lock.json');
 const packageLock = require(filename);
 
