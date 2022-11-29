@@ -2,8 +2,7 @@
   "name": "@cloudscape-design/component-toolkit",
   "version": "1.0.0",
   "files": [
-    "lib",
-    "scripts"
+    "lib/*"
   ],
   "main": "./lib/index.js",
   "exports": {
@@ -23,7 +22,7 @@
     "test:integ": "jest -c jest.integ.config.js",
     "test": "npm run test:unit && npm-run-all -r -p test-pages test:integ",
     "lint": "eslint --ignore-path .gitignore --ext ts,tsx,js .",
-    "preinstall": "./scripts/prepare-package-lock.js",
+    "preinstall": "node ./scripts/in-github-workflow.js && ./scripts/prepare-package-lock.js || :",
     "prepublishOnly": "rimraf ./dist && npm run build",
     "prepare": "husky install"
   },
