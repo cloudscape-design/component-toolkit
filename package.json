@@ -26,9 +26,6 @@
     "prepublishOnly": "rimraf ./dist && npm run build",
     "prepare": "husky install"
   },
-  "engines": {
-    "node": ">= 14"
-  },
   "dependencies": {
     "@juggle/resize-observer": "^3.3.1"
   },
@@ -41,7 +38,7 @@
     "@cloudscape-design/jest-preset": "^2.0.0",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.7",
-    "@tsconfig/node12": "^1.0.9",
+    "@tsconfig/node16": "^1.0.3",
     "@types/jest": "^27.4.0",
     "@types/react": "^16.14.20",
     "@types/react-dom": "^16.9.14",
