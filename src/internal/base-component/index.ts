@@ -4,5 +4,4 @@
 export { useComponentMetadata, COMPONENT_METADATA_KEY } from './component-metadata';
 export { useComponentMetrics } from './component-metrics';
 export { initAwsUiVersions } from './init-awsui-versions';
-export { formatMajorVersionForMetricDetail, formatVersionForMetricName } from './metrics/formatters';
-export { Metrics, MetricsTestHelper } from './metrics/metrics';
+export { Metrics } from './metrics/metrics';
