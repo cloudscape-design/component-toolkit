@@ -7,7 +7,8 @@
   "main": "./lib/index.js",
   "exports": {
     ".": "./lib/index.js",
-    "./dom/.": "./lib/dom/index.js",
+    "./dom": "./lib/dom/index.js",
+    "./internal/base-component": "./lib/internal/base-component/index.js",
     "./package.json": "./package.json"
   },
   "repository": {
