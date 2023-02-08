@@ -8,6 +8,6 @@ const fs = require('fs');
 const publicExports = ['dom', 'internal'];
 
 publicExports.forEach(exportName => {
-  fs.writeFileSync(`${exportName}.js`, `module.exports = require('./lib/${exportName}')`);
+  fs.writeFileSync(`${exportName}.js`, `export * from './lib/${exportName}';`);
   fs.writeFileSync(`${exportName}.d.ts`, `export * from './lib/${exportName}';`);
 });
