@@ -2,6 +2,10 @@
 coverage
 build
 lib
+/dom.d.ts
+/dom.js
+/internal.js
+/internal.d.ts
 node_modules
 tsconfig.tsbuildinfo
 .DS_Store

@@ -2,13 +2,17 @@
   "name": "@cloudscape-design/component-toolkit",
   "version": "1.0.0-beta",
   "files": [
-    "lib/*"
+    "lib/*",
+    "dom.js",
+    "dom.d.ts",
+    "internal.js",
+    "internal.d.ts"
   ],
   "main": "./lib/index.js",
   "exports": {
     ".": "./lib/index.js",
     "./dom": "./lib/dom/index.js",
-    "./internal/base-component": "./lib/internal/base-component/index.js",
+    "./internal": "./lib/internal/index.js",
     "./package.json": "./package.json"
   },
   "repository": {
@@ -17,7 +21,7 @@
   },
   "homepage": "https://cloudscape.design",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node ./scripts/generate-exports.js",
     "test-pages": "vite --config ./test-pages/vite.config.ts",
     "test:unit": "jest -c jest.unit.config.js",
     "test:integ": "jest -c jest.integ.config.js",
