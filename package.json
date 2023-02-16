@@ -35,8 +35,7 @@
     "@juggle/resize-observer": "^3.3.1"
   },
   "peerDependencies": {
-    "react": "^16.8 || ^17 || ^18",
-    "react-dom": "^16.8 || ^17 || ^18"
+    "react": "^16.8 || ^17 || ^18"
   },
   "devDependencies": {
     "@cloudscape-design/browser-test-tools": "^3.0.0",
