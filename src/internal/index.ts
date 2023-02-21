@@ -5,3 +5,5 @@ export { useComponentMetadata, COMPONENT_METADATA_KEY } from './base-component/c
 export { useComponentMetrics } from './base-component/component-metrics';
 export { initAwsUiVersions } from './base-component/init-awsui-versions';
 export { Metrics } from './base-component/metrics/metrics';
+export { isDevelopment } from './is-development';
+export { warnOnce } from './logging';

@@ -3,8 +3,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import useStableCallback from '../stable-callback/use-stable-callback';
-import { IS_DEV } from '../util/is-development';
-import { warnOnce } from '../util/logging';
+import { isDevelopment } from '../internal/is-development';
+import { warnOnce } from '../internal/logging';
 import { PropertyDescriptions } from './interfaces';
 
 /**
@@ -60,7 +60,7 @@ export default function useControllable<ValueType, HandlerType extends (...args:
 
   // Most build tools will just strip this block from production builds, so we can
   // skip the conditional hook lint error.
-  if (IS_DEV) {
+  if (isDevelopment) {
     // Print a warning if a controlled property was passed in without a change handler.
     // This may fire every render if the change handler isn't memoized, but warnOnce
     // will dedupe the error messages.
