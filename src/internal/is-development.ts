@@ -18,4 +18,4 @@ declare const process: { env: { NODE_ENV?: string } };
  * Only use this in an if condition and on its own! This will help bundlers find
  * and remove the conditional statement for production bundles.
  */
-export const IS_DEV = process.env.NODE_ENV !== 'production';
+export const isDevelopment = process.env.NODE_ENV !== 'production';
