@@ -8,6 +8,7 @@ const cloudscapePreset = require('@cloudscape-design/jest-preset/jest-preset');
 module.exports = merge({}, tsPreset, cloudscapePreset, {
   verbose: true,
   testEnvironment: 'jsdom',
+  collectCoverage: process.env.CI === 'true',
   coveragePathIgnorePatterns: ['__tests__', '__integ__', '<rootDir>/test-pages'],
   globals: {
     'ts-jest': {
