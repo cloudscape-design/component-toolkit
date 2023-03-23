@@ -155,7 +155,7 @@ describe('PanoramaClient', () => {
   });
 
   it('prints error when the details are too long', () => {
-    const eventDetail = new Array(202).join('a');
+    const eventDetail = new Array(202).join('b');
     panorama.sendMetric({ eventType: 'custom', eventDetail });
 
     expect(window.panorama).not.toHaveBeenCalled();
