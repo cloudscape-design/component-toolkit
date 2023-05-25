@@ -61,7 +61,7 @@ describe('useControllableState', () => {
     expect(ref.current!.value).toBe(undefined);
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect(console.warn).toHaveBeenCalledWith(
-      "[MyComponent] A component tried to change controlled 'value' property to be uncontrolled. " +
+      "[AwsUi] [MyComponent] A component tried to change controlled 'value' property to be uncontrolled. " +
         'This is not supported. Properties should not switch from controlled to uncontrolled (or vice versa). ' +
         'Decide between using a controlled or uncontrolled mode for the lifetime of the component. ' +
         'More info: https://fb.me/react-controlled-components'
@@ -80,7 +80,7 @@ describe('useControllableState', () => {
     expect(ref.current!.value).toBe('the default value');
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect(console.warn).toHaveBeenCalledWith(
-      "[MyComponent] A component tried to change uncontrolled 'value' property to be controlled. " +
+      "[AwsUi] [MyComponent] A component tried to change uncontrolled 'value' property to be controlled. " +
         'This is not supported. Properties should not switch from uncontrolled to controlled (or vice versa). ' +
         'Decide between using a controlled or uncontrolled mode for the lifetime of the component. ' +
         'More info: https://fb.me/react-controlled-components'
@@ -94,7 +94,7 @@ describe('useControllableState', () => {
 
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect(console.warn).toHaveBeenCalledWith(
-      '[MyComponent] You provided a `value` prop without an `onChange` handler. This will render a non-interactive component.'
+      '[AwsUi] [MyComponent] You provided a `value` prop without an `onChange` handler. This will render a non-interactive component.'
     );
   });
 
