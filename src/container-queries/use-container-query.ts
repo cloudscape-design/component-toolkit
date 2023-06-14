@@ -35,7 +35,7 @@ import useResizeObserver from './use-resize-observer';
 export default function useContainerQuery<ObservedState>(
   mapFn: (entry: ContainerQueryEntry, prev: null | ObservedState) => ObservedState,
   deps: React.DependencyList = []
-): [null | ObservedState, React.Ref<any>] {
+): [null | ObservedState, React.RefObject<any>] {
   const elementRef = useRef<HTMLElement>(null);
   const [state, setState] = useState<null | ObservedState>(null);
 
