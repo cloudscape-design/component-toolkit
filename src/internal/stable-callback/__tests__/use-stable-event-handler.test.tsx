@@ -3,7 +3,7 @@
 
 import React, { useImperativeHandle, useRef, useEffect } from 'react';
 import { render, act, waitFor } from '@testing-library/react';
-import useStableEventHandler from '../use-stable-callback';
+import { useStableCallback } from '../index';
 
 interface Props {
   onChange: () => void;
@@ -15,7 +15,7 @@ interface Ref {
 }
 
 const Component = React.forwardRef(({ onChange }: Props, ref: React.Ref<Ref>) => {
-  const stableHandleChange = useStableEventHandler(onChange);
+  const stableHandleChange = useStableCallback(onChange);
   const effectRunsCount = useRef(0);
   const stableEffectRunsCount = useRef(0);
   useEffect(() => {
@@ -38,7 +38,7 @@ afterEach(() => {
   consoleWarnSpy?.mockRestore();
 });
 
-describe('useStableEventHandler', () => {
+describe('useStableCallback', () => {
   test('returns a stable handler (returned handler does not cause effects that have it as dependencies to run)', async () => {
     const ref = React.createRef<Ref>();
     const handleChange = jest.fn();

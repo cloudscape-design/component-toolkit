@@ -3,7 +3,7 @@
 
 import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
 import { useEffect, useLayoutEffect } from 'react';
-import useStableCallback from '../stable-callback/use-stable-callback';
+import { useStableCallback } from '../internal/stable-callback';
 import { ContainerQueryEntry, ElementReference } from './interfaces';
 
 /**
