@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useRef } from 'react';
-import { useCurrentMode, useDensityMode } from '../index';
+import { useCurrentMode, useDensityMode, isMotionDisabled, useReducedMotion } from '../index';
 import { render, screen } from '@testing-library/react';
 import { mutate } from './utils';
-
-jest.mock('../../../environment', () => ({ ALWAYS_VISUAL_REFRESH: false }), { virtual: true });
 
 describe('useCurrentMode', () => {
   function ModeRender() {
@@ -98,5 +96,75 @@ describe('useDensityMode', () => {
     expect(screen.getByTestId('current-mode')).toHaveTextContent('compact');
     await mutate(() => container.classList.remove('awsui-polaris-compact-mode'));
     expect(screen.getByTestId('current-mode')).toHaveTextContent('comfortable');
+  });
+});
+
+describe('isMotionDisabled', () => {
+  const originalMatchMedia = window.matchMedia;
+  let matchedMediaExpression = '';
+
+  beforeEach(() => {
+    matchedMediaExpression = '';
+    window.matchMedia = (expression: string) => {
+      if (expression === matchedMediaExpression) {
+        return { matches: true } as MediaQueryList;
+      }
+      return { matches: false } as MediaQueryList;
+    };
+  });
+
+  afterEach(() => {
+    window.matchMedia = originalMatchMedia;
+  });
+
+  test('returns true if "awsui-motion-disabled" class is set', () => {
+    render(
+      <div className="awsui-motion-disabled">
+        <div data-testid="target"></div>
+      </div>
+    );
+    expect(isMotionDisabled(screen.getByTestId('target'))).toBe(true);
+  });
+
+  test('returns true if media (prefers-reduced-motion: reduce) is set', () => {
+    matchedMediaExpression = '(prefers-reduced-motion: reduce)';
+    render(
+      <div>
+        <div data-testid="target"></div>
+      </div>
+    );
+    expect(isMotionDisabled(screen.getByTestId('target'))).toBe(true);
+  });
+
+  test('returns false if no class or media set', () => {
+    render(
+      <div>
+        <div data-testid="target"></div>
+      </div>
+    );
+    expect(isMotionDisabled(screen.getByTestId('target'))).toBe(false);
+  });
+});
+
+describe('useReducedMotion', () => {
+  function ModeRender() {
+    const ref = useRef(null);
+    const isReduced = useReducedMotion(ref);
+    return (
+      <div ref={ref} data-testid="target">
+        {isReduced ? 'reduced' : 'full'}
+      </div>
+    );
+  }
+
+  test('should detect motion modes', async () => {
+    const { container } = render(<ModeRender />);
+
+    expect(screen.getByTestId('target')).toHaveTextContent('full');
+
+    await mutate(() => container.classList.add('awsui-motion-disabled'));
+    expect(screen.getByTestId('target')).toHaveTextContent('reduced');
+    await mutate(() => container.classList.remove('awsui-motion-disabled'));
+    expect(screen.getByTestId('target')).toHaveTextContent('full');
   });
 });

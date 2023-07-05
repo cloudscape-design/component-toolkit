@@ -6,9 +6,12 @@ import { findUpUntil } from '../../dom';
 import { createSingletonHandler } from '../singleton-handler';
 import { useStableCallback } from '../stable-callback';
 
-export const isMotionDisabled = (element: HTMLElement): boolean =>
-  !!findUpUntil(element, node => node.classList.contains('awsui-motion-disabled')) ||
-  (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
+export function isMotionDisabled(element: HTMLElement): boolean {
+  return (
+    !!findUpUntil(element, node => node.classList.contains('awsui-motion-disabled')) ||
+    (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false)
+  );
+}
 
 // Note that this hook doesn't take into consideration @media print (unlike the dark mode CSS),
 // due to challenges with cross-browser implementations of media/print state change listeners.
