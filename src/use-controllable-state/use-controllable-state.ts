@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useState, useEffect, useCallback } from 'react';
-import useStableCallback from '../stable-callback/use-stable-callback';
+import { useStableCallback } from '../internal/stable-callback';
 import { isDevelopment } from '../internal/is-development';
 import { warnOnce } from '../internal/logging';
 import { PropertyDescriptions } from './interfaces';

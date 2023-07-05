@@ -28,7 +28,7 @@ import { useCallback, useEffect, useRef } from 'react';
  * @typeParam Callback The callback to be made stable
  * @returns Stable callback
  */
-export default function useStableCallback<Callback extends (...args: any[]) => any>(fn: Callback): Callback {
+export function useStableCallback<Callback extends (...args: any[]) => any>(fn: Callback): Callback {
   const ref = useRef<Callback>();
 
   useEffect(() => {
