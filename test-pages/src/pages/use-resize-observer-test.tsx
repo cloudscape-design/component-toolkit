@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import useResizeObserver from '../../../src/container-queries/use-resize-observer';
+import { useResizeObserver } from '../../../src/internal/container-queries/use-resize-observer';
 import { ContainerQueryEntry } from '../../../src';
 import React, { useState } from 'react';
 
