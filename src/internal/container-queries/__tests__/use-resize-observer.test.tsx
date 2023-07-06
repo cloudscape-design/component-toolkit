@@ -3,7 +3,7 @@
 
 import React, { useState, useRef } from 'react';
 import { render } from '@testing-library/react';
-import useResizeObserver from '../use-resize-observer';
+import { useResizeObserver } from '../use-resize-observer';
 import { ResizeObserver } from '@juggle/resize-observer';
 import { ContainerQueryEntry } from '../interfaces';
 
