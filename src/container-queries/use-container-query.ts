@@ -3,7 +3,7 @@
 
 import React, { useRef, useState, useCallback } from 'react';
 import { ContainerQueryEntry } from './interfaces';
-import useResizeObserver from './use-resize-observer';
+import { useResizeObserver } from '../internal/container-queries/use-resize-observer';
 
 /**
  * Attaches resize-observer to the referenced element and keeps last observation in state.

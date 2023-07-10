@@ -3,8 +3,8 @@
 
 import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
 import { useEffect, useLayoutEffect } from 'react';
-import { useStableCallback } from '../internal/stable-callback';
 import { ContainerQueryEntry, ElementReference } from './interfaces';
+import { useStableCallback } from '../stable-callback';
 
 /**
  * Attaches resize-observer to the referenced element.
@@ -31,10 +31,7 @@ import { ContainerQueryEntry, ElementReference } from './interfaces';
  * @param elementRef React reference or memoized getter for the target element
  * @param onObserve Function to fire when observation occurs
  */
-export default function useResizeObserver(
-  elementRef: ElementReference,
-  onObserve: (entry: ContainerQueryEntry) => void
-) {
+export function useResizeObserver(elementRef: ElementReference, onObserve: (entry: ContainerQueryEntry) => void) {
   const stableOnObserve = useStableCallback(onObserve);
 
   // This effect provides a synchronous update required to prevent flakiness when initial state and first observed state are different.
