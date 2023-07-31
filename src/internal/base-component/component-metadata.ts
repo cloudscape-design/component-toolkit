@@ -5,7 +5,11 @@ import { useEffect, useRef } from 'react';
 
 export const COMPONENT_METADATA_KEY = '__awsuiMetadata__';
 
-export function useComponentMetadata<T = any>(componentName: string, packageVersion: string) {
+export function useComponentMetadata<T = any>(
+  componentName: string,
+  packageVersion: string,
+  componentConfiguration?: Record<string, any>
+) {
   interface AwsUiMetadata {
     name: string;
     version: string;
@@ -20,7 +24,7 @@ export function useComponentMetadata<T = any>(componentName: string, packageVers
   useEffect(() => {
     if (elementRef.current && !Object.prototype.hasOwnProperty.call(elementRef.current, COMPONENT_METADATA_KEY)) {
       const node = elementRef.current as unknown as HTMLMetadataElement;
-      const metadata = { name: componentName, version: packageVersion };
+      const metadata = { componentConfiguration, name: componentName, version: packageVersion };
 
       Object.freeze(metadata);
       Object.defineProperty(node, COMPONENT_METADATA_KEY, { value: metadata, writable: false });
