@@ -13,6 +13,7 @@ export function useComponentMetadata<T = any>(
   interface AwsUiMetadata {
     name: string;
     version: string;
+    componentConfiguration?: Record<string, any>;
   }
 
   interface HTMLMetadataElement extends HTMLElement {
@@ -24,7 +25,7 @@ export function useComponentMetadata<T = any>(
   useEffect(() => {
     if (elementRef.current && !Object.prototype.hasOwnProperty.call(elementRef.current, COMPONENT_METADATA_KEY)) {
       const node = elementRef.current as unknown as HTMLMetadataElement;
-      const metadata = { componentConfiguration, name: componentName, version: packageVersion };
+      const metadata: AwsUiMetadata = { componentConfiguration, name: componentName, version: packageVersion };
 
       Object.freeze(metadata);
       Object.defineProperty(node, COMPONENT_METADATA_KEY, { value: metadata, writable: false });
