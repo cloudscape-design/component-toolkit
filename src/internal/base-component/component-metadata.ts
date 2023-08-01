@@ -23,17 +23,14 @@ export function useComponentMetadata<T = any>(
   const elementRef = useRef<T>(null);
 
   useEffect(() => {
-    if (elementRef.current && !Object.prototype.hasOwnProperty.call(elementRef.current, COMPONENT_METADATA_KEY)) {
+    if (elementRef.current) {
       const node = elementRef.current as unknown as HTMLMetadataElement;
       const metadata: AwsUiMetadata = { componentConfiguration, name: componentName, version: packageVersion };
 
       Object.freeze(metadata);
-      Object.defineProperty(node, COMPONENT_METADATA_KEY, { value: metadata, writable: false });
+      Object.defineProperty(node, COMPONENT_METADATA_KEY, { value: metadata, writable: false, configurable: true });
     }
-    // Some component refs change dynamically. E.g. The Modal component where
-    // the content gets rendered conditionally inside a Portal.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [elementRef.current]);
+  });
 
   return elementRef;
 }
