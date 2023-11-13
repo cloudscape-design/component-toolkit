@@ -17,3 +17,5 @@ export {
 } from './visual-mode';
 export { isDevelopment } from './is-development';
 export { warnOnce } from './logging';
+export { trackEvent } from './base-component/analytics';
+export { useTrackPropertyEffect, useTrackPropertyLayoutEffect } from './base-component/analytics';

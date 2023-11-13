@@ -25,7 +25,7 @@ export function useComponentMetadata<T = any>(componentName: string, packageVers
       Object.freeze(metadata);
       Object.defineProperty(node, COMPONENT_METADATA_KEY, { value: metadata, writable: false, configurable: true });
     }
-  });
+  }, [componentName, packageVersion]);
 
   return elementRef;
 }
