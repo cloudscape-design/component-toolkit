@@ -1,28 +1,36 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-function track(event: CustomEvent) {
-  if (typeof (window as any).track === 'function') {
-    (window as any).track(event);
-  }
+interface TrackEvent {
+  element: HTMLElement;
+  eventName: string;
+  detail: any;
 }
 
-export const emitCustomEvent = (element: HTMLElement, eventName: string, detail: CustomEvent['detail']) => {
-  const customEvent = new CustomEvent(`awsui-component-${eventName}`.toLowerCase(), {
-    bubbles: true,
-    cancelable: false,
-    detail,
-  });
+interface BufferEvent {
+  event: TrackEvent;
+  domSnapshot: HTMLElement;
+}
 
-  track(customEvent);
-  element.dispatchEvent(customEvent);
+const analytics = {
+  eventBuffer: [] as BufferEvent[],
+  eventBufferMaxSize: 1000,
+  trackEvent: function (element: HTMLElement, eventName: string, detail: any) {
+    if (this.eventBuffer.length < this.eventBufferMaxSize) {
+      const domSnapshot = document.body.cloneNode(true) as HTMLElement;
+      this.eventBuffer.push({
+        event: {
+          element,
+          eventName,
+          detail,
+        },
+        domSnapshot,
+      });
+    }
+  },
 };
+(window as any).__awsui__ = (window as any).__awsui || { analytics };
 
-export const emitComponentCustomEvent = (
-  element: HTMLElement,
-  componentName: string,
-  eventName: string,
-  detail: CustomEvent['detail']
-) => {
-  emitCustomEvent(element, `${componentName}-${eventName}`, detail);
-};
+export function trackEvent(element: HTMLElement, eventName: string, detail: any) {
+  (window as any).__awsui__.analytics.trackEvent(element, eventName, detail);
+}

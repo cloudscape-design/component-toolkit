@@ -3,7 +3,7 @@
 
 import { RefObject, useEffect } from 'react';
 import { Metrics } from './metrics/metrics';
-import { emitComponentCustomEvent, emitCustomEvent } from '../custom-events';
+import { trackEvent } from '../custom-events';
 
 interface Settings {
   packageSource: string;
@@ -29,12 +29,10 @@ export function useComponentMetrics<T>(
 
     if (ref.current) {
       const node = ref.current as unknown as HTMLElement;
-      emitCustomEvent(node, 'mounted', { componentName, packageSource, packageVersion, theme });
-      emitComponentCustomEvent(node, componentName, 'mounted', {});
+      trackEvent(node, 'mounted', { componentName, packageSource, packageVersion, theme });
 
       return () => {
-        emitCustomEvent(node, 'unmounted', { componentName, packageSource, packageVersion, theme });
-        emitComponentCustomEvent(node, componentName, 'unmounted', {});
+        trackEvent(node, 'unmounted', { componentName, packageSource, packageVersion, theme });
       };
     }
 
