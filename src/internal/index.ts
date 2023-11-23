@@ -17,3 +17,4 @@ export {
 } from './visual-mode';
 export { isDevelopment } from './is-development';
 export { warnOnce } from './logging';
+export { emitComponentCustomEvent, emitCustomEvent } from './custom-events';

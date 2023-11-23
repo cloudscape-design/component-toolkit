@@ -3,6 +3,7 @@
 
 import { RefObject, useEffect } from 'react';
 import { Metrics } from './metrics/metrics';
+import { emitComponentCustomEvent, emitCustomEvent } from '../custom-events';
 
 interface Settings {
   packageSource: string;
@@ -28,20 +29,12 @@ export function useComponentMetrics<T>(
 
     if (ref.current) {
       const node = ref.current as unknown as HTMLElement;
-      const customEvent = new CustomEvent('awsui-component-mounted', {
-        bubbles: true,
-        cancelable: false,
-        detail: { componentName, packageSource, packageVersion, theme },
-      });
-      node.dispatchEvent(customEvent);
+      emitCustomEvent(node, 'mounted', { componentName, packageSource, packageVersion, theme });
+      emitComponentCustomEvent(node, componentName, 'mounted', {});
 
       return () => {
-        const customEvent = new CustomEvent('awsui-component-unmounted', {
-          bubbles: true,
-          cancelable: false,
-          detail: { componentName, packageSource, packageVersion, theme },
-        });
-        node.dispatchEvent(customEvent);
+        emitCustomEvent(node, 'unmounted', { componentName, packageSource, packageVersion, theme });
+        emitComponentCustomEvent(node, componentName, 'unmounted', {});
       };
     }
 
