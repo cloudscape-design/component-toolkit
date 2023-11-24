@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 interface TrackEvent {
-  element: HTMLElement;
+  target: HTMLElement;
   eventName: string;
   detail: any;
 }
@@ -15,12 +15,12 @@ interface BufferEvent {
 const analytics = {
   eventBuffer: [] as BufferEvent[],
   eventBufferMaxSize: 1000,
-  trackEvent: function (element: HTMLElement, eventName: string, detail: any) {
+  trackEvent: function (target: HTMLElement, eventName: string, detail: any) {
     if (this.eventBuffer.length < this.eventBufferMaxSize) {
       const domSnapshot = document.body.cloneNode(true) as HTMLElement;
       this.eventBuffer.push({
         event: {
-          element,
+          target,
           eventName,
           detail,
         },
