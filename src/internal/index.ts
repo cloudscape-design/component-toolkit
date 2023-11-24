@@ -18,3 +18,4 @@ export {
 export { isDevelopment } from './is-development';
 export { warnOnce } from './logging';
 export { trackEvent } from './custom-events';
+export { useTrackComponentProperty } from './custom-events/use-track-component-property';

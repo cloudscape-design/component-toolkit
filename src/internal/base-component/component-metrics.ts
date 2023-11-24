@@ -14,7 +14,8 @@ interface Settings {
 export function useComponentMetrics<T>(
   ref: RefObject<T>,
   componentName: string,
-  { packageSource, packageVersion, theme }: Settings
+  { packageSource, packageVersion, theme }: Settings,
+  componentConfiguration?: Record<string, any>
 ) {
   useEffect(() => {
     const metrics = new Metrics(packageSource, packageVersion);
@@ -29,10 +30,10 @@ export function useComponentMetrics<T>(
 
     if (ref.current) {
       const node = ref.current as unknown as HTMLElement;
-      trackEvent(node, 'mounted', { componentName, packageSource, packageVersion, theme });
+      trackEvent(node, 'mount', { componentName, packageSource, packageVersion, theme, componentConfiguration });
 
       return () => {
-        trackEvent(node, 'unmounted', { componentName, packageSource, packageVersion, theme });
+        trackEvent(node, 'unmount', { componentName, packageSource, packageVersion, theme, componentConfiguration });
       };
     }
 
