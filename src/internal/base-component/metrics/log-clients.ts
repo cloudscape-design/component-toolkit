@@ -23,6 +23,10 @@ export interface MetricsLogItem {
   version: string;
 }
 
+function validateLength(value: string | undefined, maxLength: number): boolean {
+  return !value || value.length <= maxLength;
+}
+
 /**
  * Console Platform's client logging JS API client.
  */
@@ -31,11 +35,15 @@ export class CLogClient {
    * Sends metric but only if Console Platform client logging JS API is present in the page.
    */
   sendMetric(metricName: string, value: number, detail?: string): void {
-    if (!metricName || !/^[a-zA-Z0-9_-]{1,32}$/.test(metricName)) {
+    if (!metricName || !/^[a-zA-Z0-9_-]+$/.test(metricName)) {
       console.error(`Invalid metric name: ${metricName}`);
       return;
     }
-    if (detail && detail.length > 200) {
+    if (!validateLength(metricName, 1000)) {
+      console.error(`Metric name ${metricName} is too long`);
+      return;
+    }
+    if (!validateLength(detail, 4000)) {
       console.error(`Detail for metric ${metricName} is too long: ${detail}`);
       return;
     }
@@ -75,12 +83,24 @@ export class PanoramaClient {
     if (typeof metric.eventDetail === 'object') {
       metric.eventDetail = JSON.stringify(metric.eventDetail);
     }
-    if (metric.eventDetail && metric.eventDetail.length > 200) {
-      console.error(`Detail for metric is too long: ${metric.eventDetail}`);
-      return;
-    }
     if (typeof metric.eventValue === 'object') {
       metric.eventValue = JSON.stringify(metric.eventValue);
+    }
+    if (!validateLength(metric.eventDetail, 4000)) {
+      console.error(`Event detail for metric is too long: ${metric.eventDetail}`);
+      return;
+    }
+    if (!validateLength(metric.eventValue, 4000)) {
+      console.error(`Event value for metric is too long: ${metric.eventValue}`);
+      return;
+    }
+    if (!validateLength(metric.eventContext, 4000)) {
+      console.error(`Event context for metric is too long: ${metric.eventContext}`);
+      return;
+    }
+    if (!validateLength(metric.eventType, 50)) {
+      console.error(`Event type for metric is too long: ${metric.eventType}`);
+      return;
     }
     const panorama = this.findPanorama(window);
     if (typeof panorama === 'function') {

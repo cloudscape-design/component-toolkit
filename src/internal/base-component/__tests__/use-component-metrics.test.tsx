@@ -6,13 +6,11 @@ import { render } from '@testing-library/react';
 import { MetricsTestHelper } from '../metrics/metrics';
 import { formatVersionForMetricName, formatMajorVersionForMetricDetail } from '../metrics/formatters';
 import { useComponentMetrics } from '../component-metrics';
-import { PanoramaClient } from '../metrics/log-clients';
 
 declare global {
   interface Window {
     AWSC?: any;
     AWSUI_METRIC_ORIGIN?: string;
-    panorama?: any;
   }
 }
 
@@ -120,45 +118,5 @@ describe('useComponentMetrics', () => {
         v: formatMajorVersionForMetricDetail('3.0.0'),
       })
     );
-  });
-});
-
-describe('PanoramaClient', () => {
-  const panorama = new PanoramaClient();
-  let consoleSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    window.panorama = jest.fn();
-    consoleSpy = jest.spyOn(console, 'error');
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('sends simple metrics', () => {
-    panorama.sendMetric({ eventType: 'custom', eventValue: 'value' });
-
-    expect(window.panorama).toHaveBeenCalledWith(
-      'trackCustomEvent',
-      expect.objectContaining({ eventType: 'custom', eventValue: 'value' })
-    );
-  });
-
-  it('converts objects to strings', () => {
-    panorama.sendMetric({ eventType: 'custom', eventValue: { test: 'value' }, eventDetail: { test: 'detail' } });
-
-    expect(window.panorama).toHaveBeenCalledWith(
-      'trackCustomEvent',
-      expect.objectContaining({ eventType: 'custom', eventValue: '{"test":"value"}', eventDetail: '{"test":"detail"}' })
-    );
-  });
-
-  it('prints error when the details are too long', () => {
-    const eventDetail = new Array(202).join('a');
-    panorama.sendMetric({ eventType: 'custom', eventDetail });
-
-    expect(window.panorama).not.toHaveBeenCalled();
-    expect(consoleSpy).toHaveBeenCalledWith(`Detail for metric is too long: ${eventDetail}`);
   });
 });
