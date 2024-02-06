@@ -3,13 +3,13 @@
 
 import { isDevelopment } from './is-development';
 
-const messageCache: Record<string, true | undefined> = {};
+const messageCache = new Set<string>();
 
 export function warnOnce(component: string, message: string): void {
   if (isDevelopment) {
     const warning = `[AwsUi] [${component}] ${message}`;
-    if (!messageCache[warning]) {
-      messageCache[warning] = true;
+    if (!messageCache.has(warning)) {
+      messageCache.add(warning);
       console.warn(warning);
     }
   }

@@ -4,7 +4,7 @@
 import { CLogClient, PanoramaClient, MetricsLogItem, MetricsV2EventItem } from './log-clients';
 import { buildMetricDetail, buildMetricHash, buildMetricName } from './formatters';
 
-const oneTimeMetrics: Record<string, boolean> = {};
+const oneTimeMetrics = new Set<string>();
 
 // In case we need to override the theme for VR.
 let theme = '';
@@ -56,9 +56,9 @@ export class Metrics {
 
   sendMetricObjectOnce(metric: MetricsLogItem, value: number): void {
     const metricHash = buildMetricHash(metric);
-    if (!oneTimeMetrics[metricHash]) {
+    if (!oneTimeMetrics.has(metricHash)) {
       this.sendMetricObject(metric, value);
-      oneTimeMetrics[metricHash] = true;
+      oneTimeMetrics.add(metricHash);
     }
   }
 
@@ -67,9 +67,9 @@ export class Metrics {
    * Subsequent calls with the same metricName are ignored.
    */
   sendMetricOnce(metricName: string, value: number, detail?: string): void {
-    if (!oneTimeMetrics[metricName]) {
+    if (!oneTimeMetrics.has(metricName)) {
       this.sendMetric(metricName, value, detail);
-      oneTimeMetrics[metricName] = true;
+      oneTimeMetrics.add(metricName);
     }
   }
 
@@ -101,8 +101,6 @@ export class Metrics {
 
 export class MetricsTestHelper {
   resetOneTimeMetricsCache() {
-    for (const prop in oneTimeMetrics) {
-      delete oneTimeMetrics[prop];
-    }
+    oneTimeMetrics.clear();
   }
 }
