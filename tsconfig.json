@@ -9,8 +9,7 @@
     "declaration": true,
     "jsx": "react",
     "rootDir": "src",
-    "outDir": "lib",
-    "incremental": true
+    "outDir": "lib"
   },
   "include": ["src"],
   "exclude": ["**/__tests__/**", "**/__integ__/**"]

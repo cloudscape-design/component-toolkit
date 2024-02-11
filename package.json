@@ -1,18 +1,11 @@
 {
   "name": "@cloudscape-design/component-toolkit",
   "version": "1.0.0-beta",
-  "files": [
-    "lib/*",
-    "dom.js",
-    "dom.d.ts",
-    "internal.js",
-    "internal.d.ts"
-  ],
   "main": "./lib/index.js",
   "exports": {
-    ".": "./lib/index.js",
-    "./dom": "./lib/dom/index.js",
-    "./internal": "./lib/internal/index.js",
+    ".": "./index.js",
+    "./dom": "./dom/index.js",
+    "./internal": "./internal/index.js",
     "./package.json": "./package.json"
   },
   "repository": {
@@ -21,15 +14,16 @@
   },
   "homepage": "https://cloudscape.design",
   "scripts": {
-    "build": "tsc && node ./scripts/generate-exports.js",
+    "prebuild": "rm -rf lib",
+    "build": "tsc",
+    "postbuild": "cp package.json README.md LICENSE lib",
     "test-pages": "vite --config ./test-pages/vite.config.ts",
     "test:unit": "jest -c jest.unit.config.js",
     "test:integ": "jest -c jest.integ.config.js",
     "test": "npm run test:unit && npm-run-all -r -p test-pages test:integ",
     "lint": "eslint --ignore-path .gitignore --ext ts,tsx,js .",
     "preinstall": "node ./scripts/in-github-workflow.js && ./scripts/prepare-package-lock.js || :",
-    "prepublishOnly": "rimraf ./dist && npm run build",
-    "prepare": "husky install"
+    "prepare": "husky install || exit 0"
   },
   "dependencies": {
     "@juggle/resize-observer": "^3.3.1",
