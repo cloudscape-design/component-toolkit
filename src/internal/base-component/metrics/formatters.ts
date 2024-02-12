@@ -19,7 +19,19 @@ export function buildMetricDetail({ source, action, version, configuration }: Me
     v: formatMajorVersionForMetricDetail(version),
     c: configuration as MetricDetail['c'],
   };
-  return JSON.stringify(detailObject);
+  return jsonStringify(detailObject);
+}
+
+export function jsonStringify(detailObject: any) {
+  return JSON.stringify(detailObject, detailSerializer);
+}
+
+function detailSerializer(key: string, value: unknown) {
+  // Report NaN and Infinity as strings instead of `null` (default behavior)
+  if (typeof value === 'number' && !Number.isFinite(value)) {
+    return `${value}`;
+  }
+  return value;
 }
 
 export function buildMetricName({ source, version }: MetricsLogItem, theme: string): string {
