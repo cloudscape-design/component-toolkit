@@ -3,14 +3,13 @@
 
 import { useEffect } from 'react';
 import { Metrics } from './metrics/metrics';
+import { ComponentConfiguration, PackageSettings } from './metrics/interfaces';
 
-interface Settings {
-  packageSource: string;
-  packageVersion: string;
-  theme: string;
-}
-
-export function useComponentMetrics(componentName: string, { packageSource, packageVersion, theme }: Settings) {
+export function useComponentMetrics(
+  componentName: string,
+  { packageSource, packageVersion, theme }: PackageSettings,
+  configuration: ComponentConfiguration = { props: {} }
+) {
   useEffect(() => {
     const metrics = new Metrics(packageSource, packageVersion);
 
@@ -19,8 +18,8 @@ export function useComponentMetrics(componentName: string, { packageSource, pack
       metrics.sendMetricOnce('awsui-viewport-width', window.innerWidth || 0);
       metrics.sendMetricOnce('awsui-viewport-height', window.innerHeight || 0);
     }
-    metrics.logComponentLoaded();
-    metrics.logComponentUsed(componentName.toLowerCase());
+    metrics.logComponentsLoaded();
+    metrics.logComponentUsed(componentName.toLowerCase(), configuration);
     // Components do not change the name dynamically. Explicit empty array to prevent accidental double metrics
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MetricsTestHelper, Metrics } from '../metrics/metrics';
+import { MetricDetail } from '../metrics/interfaces';
 
 declare global {
   interface Window {
@@ -25,15 +26,7 @@ function mockConsoleError() {
 describe('Client Metrics support', () => {
   const metrics = new Metrics('dummy-package', '1.0');
 
-  const checkMetric = (metricName: string, detail: string[]) => {
-    const detailObject = {
-      o: detail[0],
-      s: detail[1],
-      t: detail[2],
-      a: detail[3],
-      f: detail[4],
-      v: detail[5],
-    };
+  const checkMetric = (metricName: string, detailObject: MetricDetail) => {
     expect(window.AWSC.Clog.log).toHaveBeenCalledWith(metricName, 1, JSON.stringify(detailObject));
     expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(1);
   };
@@ -190,7 +183,15 @@ describe('Client Metrics support', () => {
           },
           1
         );
-        checkMetric('awsui_pkg_d50', ['main', 'pkg', 'default', 'used', 'react', '5.0']);
+        checkMetric('awsui_pkg_d50', {
+          o: 'main',
+          s: 'pkg',
+          t: 'default',
+          a: 'used',
+          f: 'react',
+          v: '5.0',
+          c: undefined,
+        });
       });
 
       const versionTestCases = [
@@ -212,17 +213,25 @@ describe('Client Metrics support', () => {
             },
             1
           );
-          checkMetric(`awsui_pkg_d${testCase[1][0]}`, ['main', 'pkg', 'default', 'used', 'react', testCase[1][1]]);
+          checkMetric(`awsui_pkg_d${testCase[1][0]}`, {
+            o: 'main',
+            s: 'pkg',
+            t: 'default',
+            a: 'used',
+            f: 'react',
+            v: testCase[1][1],
+            c: undefined,
+          });
         });
       });
     });
   });
 
   describe('sendMetricObjectOnce', () => {
-    test('logs a metric only once if same source and action', () => {
+    test('logs a metric only once if it is the same object', () => {
       const metricObj = {
         source: 'pkg',
-        action: 'used',
+        action: 'used' as const,
         version: '5.0',
       };
 
@@ -230,7 +239,7 @@ describe('Client Metrics support', () => {
       metrics.sendMetricObjectOnce(metricObj, 1);
       expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(1);
     });
-    test('logs a metric only once if same source and action but different versions', () => {
+    test('logs metric for each different version if same source and action', () => {
       metrics.sendMetricObjectOnce(
         {
           source: 'pkg1',
@@ -247,7 +256,7 @@ describe('Client Metrics support', () => {
         },
         1
       );
-      expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(1);
+      expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(2);
     });
     test('logs a metric multiple times if same source but different actions', () => {
       metrics.sendMetricObjectOnce(
@@ -284,21 +293,58 @@ describe('Client Metrics support', () => {
         },
         1
       );
-      checkMetric(`awsui_pkg_d50`, ['main', 'pkg', 'dummy-theme', 'used', 'react', '5.0']);
+      checkMetric(`awsui_pkg_d50`, {
+        o: 'main',
+        s: 'pkg',
+        t: 'dummy-theme',
+        a: 'used',
+        f: 'react',
+        v: '5.0',
+        c: undefined,
+      });
     });
   });
 
   describe('logComponentUsed', () => {
-    test('logs the usage of the given component name', () => {
-      metrics.logComponentUsed('DummyComponentName');
-      checkMetric(`awsui_DummyComponentName_d10`, ['main', 'DummyComponentName', 'default', 'used', 'react', '1.0']);
+    test('logs the usage of the given component', () => {
+      metrics.logComponentUsed('DummyComponentName', { props: {} });
+      checkMetric(`awsui_DummyComponentName_d10`, {
+        o: 'main',
+        s: 'DummyComponentName',
+        t: 'default',
+        a: 'used',
+        f: 'react',
+        v: '1.0',
+        c: { props: {} },
+      });
+    });
+
+    test('logs the usage of the given component with additional props', () => {
+      metrics.logComponentUsed('DummyComponentName', { props: { variant: 'primary' } });
+      checkMetric(`awsui_DummyComponentName_d10`, {
+        o: 'main',
+        s: 'DummyComponentName',
+        t: 'default',
+        a: 'used',
+        f: 'react',
+        v: '1.0',
+        c: { props: { variant: 'primary' } },
+      });
     });
   });
 
-  describe('logComponentLoaded', () => {
-    test('logs the component loaded metric', () => {
-      metrics.logComponentLoaded();
-      checkMetric(`awsui_dummy-package_d10`, ['main', 'dummy-package', 'default', 'loaded', 'react', '1.0']);
+  describe('logComponentsLoaded', () => {
+    test('logs the components package loaded metric', () => {
+      metrics.logComponentsLoaded();
+      checkMetric(`awsui_dummy-package_d10`, {
+        o: 'main',
+        s: 'dummy-package',
+        t: 'default',
+        a: 'loaded',
+        f: 'react',
+        v: '1.0',
+        c: undefined,
+      });
     });
   });
 

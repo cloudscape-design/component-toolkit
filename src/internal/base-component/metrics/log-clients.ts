@@ -17,12 +17,6 @@ export interface MetricsV2EventItem {
   eventValue?: string | Record<string, string | number | boolean>;
 }
 
-export interface MetricsLogItem {
-  source: string;
-  action: string;
-  version: string;
-}
-
 function validateLength(value: string | undefined, maxLength: number): boolean {
   return !value || value.length <= maxLength;
 }

@@ -1,8 +1,9 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { CLogClient, PanoramaClient, MetricsLogItem, MetricsV2EventItem } from './log-clients';
-import { buildMetricDetail, buildMetricHash, buildMetricName } from './formatters';
+import { CLogClient, PanoramaClient, MetricsV2EventItem } from './log-clients';
+import { buildMetricDetail, buildMetricName } from './formatters';
+import { ComponentConfiguration, MetricsLogItem } from './interfaces';
 
 const oneTimeMetrics = new Set<string>();
 
@@ -55,10 +56,10 @@ export class Metrics {
   }
 
   sendMetricObjectOnce(metric: MetricsLogItem, value: number): void {
-    const metricHash = buildMetricHash(metric);
-    if (!oneTimeMetrics.has(metricHash)) {
+    const metricKey = JSON.stringify(metric);
+    if (!oneTimeMetrics.has(metricKey)) {
       this.sendMetricObject(metric, value);
-      oneTimeMetrics.add(metricHash);
+      oneTimeMetrics.add(metricKey);
     }
   }
 
@@ -78,7 +79,7 @@ export class Metrics {
    * component was loaded. The component load event will only be reported as used to client logging
    * service once per page view.
    */
-  logComponentLoaded() {
+  logComponentsLoaded() {
     this.sendMetricObjectOnce({ source: this.source, action: 'loaded', version: this.packageVersion }, 1);
   }
 
@@ -87,12 +88,13 @@ export class Metrics {
    * component was used in the page.  A component will only be reported as used to client logging
    * service once per page view.
    */
-  logComponentUsed(componentName: string) {
+  logComponentUsed(componentName: string, configuration: ComponentConfiguration) {
     this.sendMetricObjectOnce(
       {
         source: componentName,
         action: 'used',
         version: this.packageVersion,
+        configuration,
       },
       1
     );
