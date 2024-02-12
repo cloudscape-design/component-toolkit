@@ -22,6 +22,20 @@ function TestComponent2() {
   useComponentMetrics('test-component-2', { packageSource: 'toolkit', packageVersion: '3.0.0', theme: 'test' });
   return <div>Test 2</div>;
 }
+function TestComponentWithProps({ variant }: { variant: string }) {
+  useComponentMetrics(
+    'test-component-with-props',
+    {
+      packageSource: 'toolkit',
+      packageVersion: '3.0.0',
+      theme: 'test',
+    },
+    {
+      props: { variant },
+    }
+  );
+  return <div>Dummy content</div>;
+}
 
 function verifyMetricsAreLoggedOnlyOnce() {
   const callCount = window.AWSC.Clog.log.mock.calls.length;
@@ -74,6 +88,7 @@ describe('useComponentMetrics', () => {
         a: 'used',
         f: 'react',
         v: formatMajorVersionForMetricDetail('3.0.0'),
+        c: { props: {} },
       })
     );
 
@@ -99,8 +114,43 @@ describe('useComponentMetrics', () => {
         a: 'used',
         f: 'react',
         v: formatMajorVersionForMetricDetail('3.0.0'),
+        c: { props: {} },
       })
     );
+  });
+
+  test('reports metric for different component props', () => {
+    // render another component to report one-time metrics
+    render(<TestComponent1 />);
+    window.AWSC.Clog.log.mockClear();
+
+    // render the actual component for testing
+    render(<TestComponentWithProps variant="primary" />);
+    const metricName = getExpectedMetricName('test-component-with-props');
+    const commonDetails = {
+      o: 'main',
+      s: 'test-component-with-props',
+      t: 'test',
+      a: 'used',
+      f: 'react',
+      v: formatMajorVersionForMetricDetail('3.0.0'),
+    };
+    expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(1);
+    expect(window.AWSC.Clog.log).toHaveBeenCalledWith(
+      metricName,
+      1,
+      JSON.stringify({ ...commonDetails, c: { props: { variant: 'primary' } } })
+    );
+    render(<TestComponentWithProps variant="secondary" />);
+    expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(2);
+    expect(window.AWSC.Clog.log).toHaveBeenCalledWith(
+      metricName,
+      1,
+      JSON.stringify({ ...commonDetails, c: { props: { variant: 'secondary' } } })
+    );
+    // this render does not report metrics because this variant was already reported
+    render(<TestComponentWithProps variant="primary" />);
+    expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(2);
   });
 
   test('supports custom origin', () => {
@@ -116,6 +166,7 @@ describe('useComponentMetrics', () => {
         a: 'used',
         f: 'react',
         v: formatMajorVersionForMetricDetail('3.0.0'),
+        c: { props: {} },
       })
     );
   });

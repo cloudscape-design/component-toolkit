@@ -1,26 +1,23 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { MetricsLogItem } from './log-clients';
+import { MetricDetail, MetricsLogItem } from './interfaces';
 
 declare const AWSUI_METRIC_ORIGIN: string | undefined;
 
 // React is the only framework we're using.
 const framework = 'react';
 
-export function buildMetricHash({ source, action }: MetricsLogItem): string {
-  return [`src${source}`, `action${action}`].join('_');
-}
-
-export function buildMetricDetail({ source, action, version }: MetricsLogItem, theme: string): string {
+export function buildMetricDetail({ source, action, version, configuration }: MetricsLogItem, theme: string): string {
   const metricOrigin = typeof AWSUI_METRIC_ORIGIN !== 'undefined' ? AWSUI_METRIC_ORIGIN : 'main';
-  const detailObject = {
+  const detailObject: MetricDetail = {
     o: metricOrigin,
     s: source,
     t: theme,
     a: action,
     f: framework,
     v: formatMajorVersionForMetricDetail(version),
+    c: configuration as MetricDetail['c'],
   };
   return JSON.stringify(detailObject);
 }
