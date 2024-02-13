@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { CLogClient, PanoramaClient, MetricsV2EventItem } from './log-clients';
-import { buildMetricDetail, buildMetricName } from './formatters';
+import { buildMetricDetail, buildMetricName, jsonStringify } from './formatters';
 import { ComponentConfiguration, MetricsLogItem } from './interfaces';
 
 const oneTimeMetrics = new Set<string>();
@@ -56,7 +56,7 @@ export class Metrics {
   }
 
   sendMetricObjectOnce(metric: MetricsLogItem, value: number): void {
-    const metricKey = JSON.stringify(metric);
+    const metricKey = jsonStringify(metric);
     if (!oneTimeMetrics.has(metricKey)) {
       this.sendMetricObject(metric, value);
       oneTimeMetrics.add(metricKey);

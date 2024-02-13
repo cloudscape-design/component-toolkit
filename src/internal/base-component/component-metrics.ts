@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { Metrics } from './metrics/metrics';
 import { ComponentConfiguration, PackageSettings } from './metrics/interfaces';
 
+export { ComponentConfiguration };
+
 export function useComponentMetrics(
   componentName: string,
   { packageSource, packageVersion, theme }: PackageSettings,

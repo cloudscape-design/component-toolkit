@@ -331,6 +331,21 @@ describe('Client Metrics support', () => {
         c: { props: { variant: 'primary' } },
       });
     });
+
+    test('reports numbers and non-finite numbers', () => {
+      metrics.logComponentUsed('DummyComponentName', {
+        props: { count: 123, notANumber: NaN, maxSize: Number.POSITIVE_INFINITY },
+      });
+      checkMetric(`awsui_DummyComponentName_d10`, {
+        o: 'main',
+        s: 'DummyComponentName',
+        t: 'default',
+        a: 'used',
+        f: 'react',
+        v: '1.0',
+        c: { props: { count: 123, notANumber: 'NaN', maxSize: 'Infinity' } },
+      });
+    });
   });
 
   describe('logComponentsLoaded', () => {
