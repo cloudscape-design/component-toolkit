@@ -1,11 +1,11 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-export interface AWSC {
+interface AWSC {
   Clog: any;
 }
 
-export interface MetricsWindow extends Window {
+interface MetricsWindow extends Window {
   AWSC?: AWSC;
   panorama?: any;
 }
