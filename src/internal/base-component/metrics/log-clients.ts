@@ -15,6 +15,7 @@ export interface MetricsV2EventItem {
   eventContext?: string;
   eventDetail?: string | Record<string, string | number | boolean>;
   eventValue?: string | Record<string, string | number | boolean>;
+  timestamp?: number;
 }
 
 function validateLength(value: string | undefined, maxLength: number): boolean {
@@ -98,7 +99,7 @@ export class PanoramaClient {
     }
     const panorama = this.findPanorama(window);
     if (typeof panorama === 'function') {
-      panorama('trackCustomEvent', { ...metric, timestamp: Date.now() });
+      panorama('trackCustomEvent', { timestamp: Date.now(), ...metric });
     }
   }
 
