@@ -71,4 +71,9 @@ describe('PanoramaClient', () => {
     expect(window.panorama).not.toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalledWith(`Event context for metric is too long: ${eventContext}`);
   });
+
+  test('forwards custom timestamps', () => {
+    panorama.sendMetric({ timestamp: 15 });
+    expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', expect.objectContaining({ timestamp: 15 }));
+  });
 });
