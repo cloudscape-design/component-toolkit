@@ -5,20 +5,18 @@ import { RefObject, useEffect } from 'react';
 import { ComponentConfiguration } from './metrics/interfaces';
 import { trackEvent } from './analytics';
 
-export { ComponentConfiguration };
-
 export function useComponentAnalytics<T>(
   ref: RefObject<T>,
   componentName: string,
-  configuration: ComponentConfiguration = { props: {} }
+  props?: ComponentConfiguration['props']
 ) {
   useEffect(() => {
     if (ref.current) {
       const node = ref.current as unknown as HTMLElement;
-      trackEvent(node, 'mount', { componentName, configuration });
+      trackEvent(node, 'mount', { componentName, ...props });
 
       return () => {
-        trackEvent(node, 'unmount', { componentName, configuration });
+        trackEvent(node, 'unmount', { componentName, ...props });
       };
     }
 

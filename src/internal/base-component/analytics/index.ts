@@ -2,10 +2,24 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MutableRefObject, useEffect, useLayoutEffect } from 'react';
-import { TrackComponentPropertyDetail } from './interfaces';
+import { Handler, TrackEventDetail } from './interfaces';
+import { kebabCaseToCamelCase } from './helpers';
 
-export function trackEvent(element: HTMLElement, eventName: string, detail: any) {
-  (window as any).__awsui__.analytics.trackEvent(element, eventName, detail);
+import * as handlers from './handlers';
+
+export function trackEvent(target: HTMLElement, eventName: string, detail: TrackEventDetail) {
+  const normalizedEventName = kebabCaseToCamelCase(eventName);
+
+  const componentHandlers = (handlers as any)[detail.componentName] || handlers.fallback;
+  if (componentHandlers) {
+    const componentHandler: Handler =
+      componentHandlers[normalizedEventName] || (handlers.fallback as any)[normalizedEventName];
+    if (componentHandler) {
+      componentHandler({ target, eventName, detail });
+    } else {
+      console.warn(`Handler for event '${normalizedEventName}' not found in '${detail.componentName}' handlers.`);
+    }
+  }
 }
 
 export function useTrackPropertyLayoutEffect(
@@ -21,7 +35,7 @@ export function useTrackPropertyLayoutEffect(
         detail: {
           [propertyName]: propertyValue,
         },
-      } as TrackComponentPropertyDetail);
+      } as TrackEventDetail);
   }, [ref, propertyValue, propertyName, componentName]);
 }
 
@@ -38,6 +52,6 @@ export function useTrackPropertyEffect(
         detail: {
           [propertyName]: propertyValue,
         },
-      } as TrackComponentPropertyDetail);
+      } as TrackEventDetail);
   }, [ref, propertyValue, propertyName, componentName]);
 }

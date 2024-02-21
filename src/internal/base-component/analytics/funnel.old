@@ -1,0 +1,361 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+import { FunnelMetrics } from './client';
+
+import {
+  FunnelConfig,
+  FunnelStepConfig,
+  FunnelSubStepConfig,
+  FunnelLinkInteractionProps,
+  FunnelStartProps,
+  FunnelStepCompleteProps,
+  FunnelStepErrorProps,
+  FunnelStepStartProps,
+  AnalyticsElement,
+} from './interfaces';
+
+const PACKAGE_VERSION = '3.0.0';
+const THEME = 'light';
+
+export class FunnelSubstep {
+  private state: 'intitial' | 'started' | 'completed' | 'error' = 'intitial';
+  private errors: string[] = [];
+
+  constructor(public config: FunnelSubStepConfig) {}
+
+  start() {
+    if (this.state === 'started') {
+      return;
+    }
+
+    // const funnelSubstepProps = this._getFunnelMetricsProps();
+    // FunnelMetrics.funnelSubStepStart(funnelSubstepProps);
+    console.log('funnelSubStepStart');
+    this.state = 'started';
+  }
+
+  complete() {
+    // if (this.state === 'completed') {
+    //   return;
+    // }
+    // const funnelSubstepProps = this._getFunnelMetricsProps();
+    // FunnelMetrics.funnelSubStepComplete(funnelSubstepProps);
+    // console.log('funnelSubStepComplete', funnelSubstepProps);
+    // this.state = 'completed';
+  }
+
+  error() {
+    // this.errors.push(fieldLabel);
+    // if (this.state === 'error' || this.scope.state === 'submitting') {
+    //   return;
+    // }
+    // this.state = 'error';
+    // const funnelSubstepProps = this._getFunnelMetricsProps();
+    // FunnelMetrics.funnelSubStepError({ ...funnelSubstepProps, additional: { fieldLabel, fieldError } } as any);
+    // console.log('funnelSubStepError', { ...funnelSubstepProps, additional: { fieldLabel, fieldError } });
+  }
+
+  clearError() {
+    // if (this.scope.state === 'submitting' || this.scope.state === 'error') {
+    //   return;
+    // }
+    // const index = this.errors.indexOf(fieldLabel);
+    // if (index > -1) {
+    //   this.errors.splice(index, 1);
+    // }
+    // if (this.errors.length > 0) {
+    //   return;
+    // }
+    // this.state === 'started';
+    // const funnelSubstepProps = this._getFunnelMetricsProps();
+    // console.log('funnelSubStepErrorCleared', { ...funnelSubstepProps, additional: { fieldLabel, fieldError } });
+  }
+
+  _getFunnelMetricsProps() {
+    // const funnelSubstepProps: FunnelSubStepProps = {
+    //   stepNameSelector: '',
+    //   subStepNameSelector: '',
+    //   subStepSelector: '',
+    //   subStepAllSelector: '',
+    //   funnelInteractionId: this.scope.interactionId!,
+    //   stepNumber: parseInt(this.config.stepNumber),
+    //   stepName: this.config.stepName,
+    //   subStepNumber: parseInt(this.config.subStepNumber),
+    //   subStepName: this.config.subStepName,
+    // };
+    // return funnelSubstepProps;
+  }
+}
+
+export class FunnelStep {
+  private state: 'intitial' | 'started' | 'completed' | 'error' = 'intitial';
+  private _substeps: FunnelSubstep[] = [];
+
+  public substeps: WeakMap<HTMLElement, FunnelSubstep> = new WeakMap();
+  public activeSubstep: FunnelSubstep | null = null;
+
+  constructor(public config: FunnelStepConfig) {}
+
+  setActiveSubstep(substep: FunnelSubstep) {
+    if (substep === this.activeSubstep) {
+      return;
+    }
+
+    this.activeSubstep?.complete();
+    this.activeSubstep = substep;
+    this.activeSubstep.start();
+  }
+
+  start() {
+    if (this.state === 'started') {
+      return;
+    }
+
+    this.state = 'started';
+    // const funnelStepStartProps: FunnelStepStartProps = {
+    //   funnelInteractionId: this.scope.interactionId!,
+    //   stepNumber: parseInt(this.config.stepNumber),
+    //   stepName: this.config.stepName,
+    //   subStepConfiguration: this._substeps.map(substep => ({
+    //     name: substep.config.name,
+    //     number: parseInt(substep.config.number),
+    //   })),
+    //   totalSubSteps: Object.values(this._substeps).length,
+    //   stepNameSelector: '',
+    //   subStepAllSelector: '',
+    // };
+
+    // FunnelMetrics.funnelStepStart(funnelStepStartProps);
+    console.log('funnelStepStart');
+  }
+
+  complete() {
+    if (this.state === 'completed') {
+      return;
+    }
+
+    this.activeSubstep?.complete();
+    this.state = 'completed';
+
+    // const funnelStepComplete: FunnelStepCompleteProps = {
+    //   funnelInteractionId: this.scope.interactionId!,
+    //   stepNumber: parseInt(this.config.stepNumber),
+    //   stepName: this.config.stepName,
+    //   stepNameSelector: '',
+    //   subStepAllSelector: '',
+    // };
+
+    // FunnelMetrics.funnelStepComplete(funnelStepComplete);
+    console.log('funnelStepComplete');
+  }
+
+  error() {
+    if (this.state === 'error') {
+      return;
+    }
+
+    this.state = 'error';
+    // const funnelStepError: FunnelStepErrorProps = {
+    //   funnelInteractionId: this.scope.interactionId!,
+    //   stepNumber: parseInt(this.config.stepNumber),
+    //   stepName: this.config.stepName,
+    //   stepNameSelector: '',
+    //   subStepAllSelector: '',
+    //   stepErrorSelector: '',
+    // };
+
+    // FunnelMetrics.funnelStepError({ ...funnelStepError, additional: { errorText } } as any);
+    console.log('funnelStepError');
+  }
+}
+
+export class Funnel {
+  private _version = '2.0';
+  private _steps: Record<string, FunnelStep> = {};
+
+  public interactionId: string | undefined;
+  public state: 'intitial' | 'started' | 'submitting' | 'error' | 'completed' = 'intitial';
+  public activeStep: FunnelStep | null = null;
+
+  constructor(private config: FunnelConfig, private rootElement: AnalyticsElement) {}
+
+  setActiveStep(stepNumber: string) {
+    const newActiveStep = this._steps[stepNumber] ?? null;
+    if (newActiveStep === this.activeStep) {
+      return;
+    }
+
+    if (!newActiveStep) {
+      console.error('Could not find step', stepNumber);
+      return;
+    }
+
+    this.activeStep?.complete();
+    this.activeStep = newActiveStep;
+    this.activeStep.start();
+  }
+
+  updateStepConfig(stepConfigs: FunnelStepConfig[]) {
+    this._steps = {};
+    stepConfigs.forEach(stepConfig => {
+      const funnelStep = new FunnelStep(this, stepConfig);
+      this._steps[stepConfig.stepNumber] = funnelStep;
+    });
+
+    console.log('stepFunnelConfigurationChanged', stepConfigs);
+  }
+
+  start() {
+    const funnelStartProps: FunnelStartProps = {
+      funnelType: this.config.funnelType as any,
+      funnelVersion: this._version,
+      componentVersion: PACKAGE_VERSION,
+      theme: THEME,
+      funnelNameSelector: this.config.selectors.funnelName,
+      optionalStepNumbers: this.config.optionalSteps.map(stepNumber => parseInt(stepNumber, 10)),
+      totalFunnelSteps: this.config.steps.length,
+      stepConfiguration: this.config.steps.map(step => ({
+        name: step.stepName || '',
+        number: parseInt(step.stepNumber),
+        isOptional: step.isOptional,
+      })),
+    };
+
+    this.interactionId = FunnelMetrics.funnelStart({ ...funnelStartProps, funnelName: this.config.funnelName } as any);
+    this.state = 'started';
+    console.log('funnelStart', funnelStartProps, this.interactionId);
+
+    this.activeStep?.start();
+
+    (this.rootElement as any).__analytics__ = this;
+  }
+
+  complete() {
+    if (!this.interactionId) {
+      console.error('No interaction id for funnel to complete.');
+      return;
+    }
+
+    this.activeStep?.complete();
+
+    FunnelMetrics.funnelComplete({ funnelInteractionId: this.interactionId });
+    console.log('funnelComplete', { funnelInteractionId: this.interactionId });
+
+    if (this.state === 'submitting') {
+      FunnelMetrics.funnelSuccessful({ funnelInteractionId: this.interactionId });
+      console.log('funnelSuccessful', { funnelInteractionId: this.interactionId });
+    } else {
+      FunnelMetrics.funnelCancelled({ funnelInteractionId: this.interactionId });
+      console.log('funnelCancelled', { funnelInteractionId: this.interactionId });
+    }
+
+    this.state = 'completed';
+  }
+
+  submit() {
+    if (!this.interactionId) {
+      console.error('No interaction id for funnel to complete.');
+      return;
+    }
+
+    this.state = 'submitting';
+    console.log('funnelSubmitting', { funnelInteractionId: this.interactionId });
+  }
+
+  error(errorText: string) {
+    if (!this.interactionId) {
+      console.error('No interaction id for funnel to complete.');
+      return;
+    }
+
+    this.state = 'error';
+    FunnelMetrics.funnelError({ funnelInteractionId: this.interactionId, additional: { errorText } } as any);
+    console.log('funnelError', { funnelInteractionId: this.interactionId, additional: { errorText } });
+  }
+
+  externalLinkInteraction() {
+    if (!this.interactionId) {
+      console.warn('No interaction id for funnel.');
+      return;
+    }
+
+    if (!this.activeStep) {
+      console.warn('No active step for funnel.');
+      return;
+    }
+
+    const funnelExternalLinkInteractionProps: FunnelLinkInteractionProps = {
+      funnelInteractionId: this.interactionId,
+      stepNumber: parseInt(this.activeStep.config.stepNumber),
+      stepName: this.activeStep.config.stepName,
+      subStepName: this.activeStep.activeSubstep?.config.name,
+      subStepNameSelector: '',
+      elementSelector: '',
+      subStepAllSelector: '',
+      stepNameSelector: '',
+      subStepSelector: '',
+    };
+
+    FunnelMetrics.externalLinkInteracted(funnelExternalLinkInteractionProps);
+    console.log('funnelExternalLinkInteraction', funnelExternalLinkInteractionProps);
+  }
+
+  infoLinkInteraction() {
+    if (!this.interactionId) {
+      console.warn('No interaction id for funnel.');
+      return;
+    }
+
+    if (!this.activeStep) {
+      console.warn('No active step for funnel.');
+      return;
+    }
+
+    const funnelInfoLinkInteractionProps: FunnelLinkInteractionProps = {
+      funnelInteractionId: this.interactionId,
+      stepNumber: parseInt(this.activeStep.config.stepNumber),
+      stepName: this.activeStep.config.stepName,
+      subStepName: this.activeStep.activeSubstep?.config.name,
+      subStepNameSelector: '',
+      elementSelector: '',
+      subStepAllSelector: '',
+      stepNameSelector: '',
+      subStepSelector: '',
+    };
+
+    FunnelMetrics.helpPanelInteracted(funnelInfoLinkInteractionProps);
+    console.log('funnelInfoLinkInteraction', funnelInfoLinkInteractionProps);
+  }
+}
+
+const funnels: Funnel[] = [];
+const funnelElementMap = new WeakMap<HTMLElement, Funnel>();
+
+export const createFunnel = (funnelConfig: FunnelConfig, rootElement: HTMLElement) => {
+  const funnel = new Funnel(funnelConfig, rootElement);
+  funnels.push(funnel);
+  funnelElementMap.set(rootElement, funnel);
+
+  return funnel;
+};
+
+export const deleteFunnel = (rootElement: HTMLElement) => {
+  const funnel = funnelElementMap.get(rootElement);
+  if (!funnel) {
+    return;
+  }
+
+  const index = funnels.indexOf(funnel);
+  if (index > -1) {
+    funnels.splice(index, 1);
+  }
+};
+
+export const getFunnel = (rootElement: HTMLElement) => {
+  return funnelElementMap.get(rootElement);
+};
+
+export const getFunnels = () => {
+  return funnels;
+};
