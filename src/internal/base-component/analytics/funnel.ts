@@ -1,18 +1,20 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { FunnelConfig, FunnelStepConfig, FunnelSubStepConfig, FunnelType } from './interfaces';
+import { AnalyticsElement, FunnelConfig, FunnelStepConfig, FunnelSubStepConfig, FunnelType } from './interfaces';
 
 type FunnelState = 'not-started' | 'in-progress' | 'submitting' | 'completed' | 'error' | 'cancelled';
 
 export class FunnelSubstep {
+  private element: AnalyticsElement;
   public name: string | undefined;
   public state: FunnelState = 'not-started';
   public scope: FunnelStep | undefined;
   public number: number | undefined;
 
-  constructor(config: FunnelSubStepConfig) {
+  constructor(element: AnalyticsElement, config: FunnelSubStepConfig) {
     this.name = config.name;
+    this.element = element;
   }
 
   start() {
@@ -26,6 +28,7 @@ export class FunnelSubstep {
       `Scope: ${this.scope?.name}, ${this.scope?.number}]`
     );
     this.state = 'in-progress';
+    this.element.__analytics__ = this;
   }
 
   complete() {
@@ -39,11 +42,13 @@ export class FunnelSubstep {
       `Scope: ${this.scope?.name}, ${this.scope?.number}]`
     );
     this.state = 'completed';
+    this.element.__analytics__ = this;
   }
 
   setScope(funnelStep: FunnelStep, number: number) {
     this.scope = funnelStep;
     this.number = number;
+    this.element.__analytics__ = this;
   }
 }
 

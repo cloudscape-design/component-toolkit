@@ -2,29 +2,29 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AnalyticsElement, Handler } from '../interfaces';
-import { isInComponent } from '../utils/browser';
+import { findUp } from '../utils/browser';
 import { getSubStepName } from '../utils/funnel';
 import { FunnelSubstep } from '../funnel';
 
 export const mount: Handler = event => {
   // Ignore if container is nested in another container
-  if (isInComponent(event.target, 'Container') || isInComponent(event.target, 'ExpandableSection')) {
+  if (findUp('Container', event.target)) {
     return;
   }
 
-  const AnalyticsElement = event.target as AnalyticsElement;
-  const substep = new FunnelSubstep({
-    name: getSubStepName(event.target) || 'Unknown Substep',
-  });
+  const element = event.target as AnalyticsElement;
+  const name = getSubStepName(event.target) || 'Unknown Substep';
+  const substep = new FunnelSubstep(element, { name });
 
-  AnalyticsElement.__analytics__ = substep;
-  AnalyticsElement.setAttribute('data-analytics-node', 'substep');
+  element.__analytics__ = substep;
+  element.setAttribute('data-analytics-node', 'substep');
 };
 
-export const unmount: Handler = () => {
-  // const funnel = getFunnelFromParentNode(event.target);
-  // if (!funnel) {
-  //   return;
-  // }
-  // funnel.activeStep?.unregisterSubStep(event.target);
+export const unmount: Handler = event => {
+  const substep = (event.target as AnalyticsElement).__analytics__ as FunnelSubstep;
+  if (!substep) {
+    return;
+  }
+
+  substep.scope?.substeps.splice(substep.scope.substeps.indexOf(substep), 1);
 };

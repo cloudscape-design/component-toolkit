@@ -30,5 +30,5 @@ export function useComponentMetadata<T = any>(
       Object.freeze(metadata);
       Object.defineProperty(node, COMPONENT_METADATA_KEY, { value: metadata, writable: false, configurable: true });
     }
-  }, [componentName, packageVersion, config, elementRef]);
+  });
 }
