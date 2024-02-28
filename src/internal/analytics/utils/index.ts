@@ -1,22 +1,23 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { getContainerHeaderText, getLastBreadcrumbText, getModalHeaderText } from './page';
+export function kebabCaseToCamelCase(str: string) {
+  if (!str.includes('-')) {
+    return str;
+  }
 
-export function getModalFunnelName() {
-  return getModalHeaderText();
-}
+  const camelCase = str
+    .split('-')
+    .map((word, index) => {
+      // Capitalize all words except the first one
+      if (index === 0) {
+        return word.toLowerCase();
+      }
 
-export function getSinglePageFunnelName() {
-  return getLastBreadcrumbText();
-}
-
-export function getMultiPageFunnelName() {
-  return getLastBreadcrumbText();
-}
-
-export function getSubStepName(target: HTMLElement) {
-  return getContainerHeaderText(target);
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join('');
+  return camelCase;
 }
 
 export function generateUUID() {

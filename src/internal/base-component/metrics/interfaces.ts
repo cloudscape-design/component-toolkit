@@ -14,7 +14,8 @@ export interface PackageSettings {
 }
 
 export interface ComponentConfiguration {
-  props: Record<string, JSONValue>;
+  props?: Record<string, JSONValue>;
+  analytics?: Record<string, any>;
 }
 
 export interface MetricsLogItem {

@@ -3,21 +3,19 @@
 
 import { MutableRefObject, useEffect, useLayoutEffect } from 'react';
 import { Handler, TrackEventDetail } from './interfaces';
-import { kebabCaseToCamelCase } from './helpers';
+import { kebabCaseToCamelCase } from './utils';
 
-import * as handlers from './handlers';
+import handlers from './handlers';
 
-export function trackEvent(target: HTMLElement, eventName: string, detail: TrackEventDetail) {
+export function trackEvent(target: HTMLElement, eventName: string, { componentName, detail = {} }: TrackEventDetail) {
   const normalizedEventName = kebabCaseToCamelCase(eventName);
 
-  const componentHandlers = (handlers as any)[detail.componentName] || handlers.fallback;
+  const componentHandlers = (handlers as any)[componentName] || handlers.fallback;
   if (componentHandlers) {
     const componentHandler: Handler =
       componentHandlers[normalizedEventName] || (handlers.fallback as any)[normalizedEventName];
     if (componentHandler) {
-      componentHandler({ target, eventName, detail });
-    } else {
-      console.warn(`Handler for event '${normalizedEventName}' not found in '${detail.componentName}' handlers.`);
+      componentHandler({ target, eventName, componentName, detail });
     }
   }
 }
@@ -50,7 +48,8 @@ export function useTrackPropertyEffect(
       trackEvent(ref.current, 'property-change', {
         componentName,
         detail: {
-          [propertyName]: propertyValue,
+          name: propertyName,
+          value: propertyValue,
         },
       } as TrackEventDetail);
   }, [ref, propertyValue, propertyName, componentName]);

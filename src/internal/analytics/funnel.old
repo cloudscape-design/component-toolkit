@@ -359,3 +359,37 @@ export const getFunnel = (rootElement: HTMLElement) => {
 export const getFunnels = () => {
   return funnels;
 };
+
+import { Funnel, FunnelSubstep } from '../funnel';
+import { AnalyticsElement } from '../interfaces';
+import { getContainerHeaderText, getLastBreadcrumbText } from './page';
+
+export function getSubstepNodes(element: HTMLElement): AnalyticsElement[] {
+  return Array.from(element.querySelectorAll('[data-analytics-node="substep"]')) as AnalyticsElement[];
+}
+
+export function getFunnelSubsteps(element: HTMLElement): FunnelSubstep[] {
+  return getSubstepNodes(element).map(substep => substep.__analytics__ as FunnelSubstep);
+}
+
+export function getMultiPageFunnelName() {
+  return getLastBreadcrumbText();
+}
+
+export function getSubStepName(target: HTMLElement) {
+  return getContainerHeaderText(target);
+}
+
+export function getFunnelFromParentNode(element: HTMLElement) {
+  const parentFunnelNode = element.closest('[data-analytics-node="funnel"]') as AnalyticsElement;
+  if (!parentFunnelNode) {
+    return null;
+  }
+
+  return (parentFunnelNode as AnalyticsElement).__analytics__ as Funnel;
+}
+
+export function getFunnelSubstepForElement(element: HTMLElement) {
+  const parentSubstep = element.closest('[data-analytics-node="substep"]') as AnalyticsElement;
+  return parentSubstep?.__analytics__ as FunnelSubstep;
+}

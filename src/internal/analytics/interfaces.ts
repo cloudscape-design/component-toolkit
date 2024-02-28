@@ -1,29 +1,36 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { AwsUiMetadata } from '../component-metadata';
+import { ComponentConfiguration } from '../base-component/component-metrics';
+
+export interface AwsUiMetadata {
+  name: string;
+  version: string;
+  props?: ComponentConfiguration['props'];
+}
 
 export interface AwsUiNode extends HTMLElement {
   __awsuiMetadata__: AwsUiMetadata;
 }
 
 export interface AnalyticsElement extends HTMLElement {
-  __analytics__: any;
+  __analytics__: FunnelConfig | FunnelStepConfig | FunnelSubStepConfig;
 }
 
-export interface TrackEventDetail {
+export interface TrackEventDetail<T = { [key: string]: any }> {
   componentName: string;
-  detail?: Record<string, any>;
+  detail?: T;
 }
 
-export interface TrackEvent {
+export interface TrackEvent<T> {
   target: HTMLElement;
   eventName: string;
-  detail: TrackEventDetail;
+  componentName: string;
+  detail: TrackEventDetail<T>['detail'];
 }
 
-export interface BufferEvent {
-  event: TrackEvent;
+export interface BufferEvent<T> {
+  event: TrackEvent<T>;
   domSnapshot: HTMLElement;
 }
 
@@ -35,21 +42,23 @@ export interface FunnelStepConfig {
 
 export interface FunnelSubStepConfig {
   name: string;
+  number?: number;
 }
 
 export type FunnelType = 'single-page' | 'multi-page' | 'modal' | undefined;
 export type FunnelState = 'initial' | 'started' | 'completed' | 'submitting' | 'error';
 export interface FunnelConfig {
-  funnelName: string;
-  funnelType: FunnelType;
+  name: string;
+  type: FunnelType;
+  stepConfiguration: FunnelStepConfig[];
 }
 
-export type Handler = (event: TrackEvent) => void;
+export type Handler<T = { [key: string]: any }> = (event: TrackEvent<T>) => void;
 export interface Handlers {
-  [key: string]: Handler;
+  [key: string]: Handler<any>;
 }
 
-export type CreateHandlersFactory = (handlers: Handlers) => Handler;
+export type CreateHandlersFactory = (handlers: Handlers) => Handler<any>;
 
 // Funnel Interfaces
 // export type FunnelType = 'single-page' | 'multi-page';
@@ -175,4 +184,32 @@ export interface IFunnelMetrics {
 
   helpPanelInteracted: FunnelMethod<FunnelLinkInteractionProps>;
   externalLinkInteracted: FunnelMethod<FunnelLinkInteractionProps>;
+}
+
+export interface FormFieldErrorDetail {
+  fieldLabel: string;
+  fieldError: string;
+}
+
+export interface LinkDetail {
+  external: boolean;
+  variant: string;
+}
+
+export interface ModalPropertyChangeDetail {
+  visible: boolean;
+}
+
+export interface WizardMountDetail {
+  config: WizardMountConfig;
+}
+
+export interface WizardMountConfig {
+  stepConfiguration: FunnelStepConfig[];
+  activeStepIndex: number;
+}
+
+export interface PropertyChangeDetail {
+  name: string;
+  value: any;
 }

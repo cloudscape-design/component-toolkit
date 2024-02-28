@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { AwsUiNode } from '../interfaces';
+import { AnalyticsElement, AwsUiNode } from '../interfaces';
 
 const isAwsUiNode = (node: HTMLElement) => '__awsuiMetadata__' in node;
 
@@ -42,6 +42,22 @@ export function findDown(componentName: string, element: HTMLElement): HTMLEleme
   return null;
 }
 
+export function isInDialog(element: HTMLElement): boolean {
+  return !!element.closest('[role="dialog"]');
+}
+
 export function isInComponent(element: HTMLElement, componentName: string): boolean {
-  return !!findUp(componentName, element);
+  return !!findUp(componentName, element.parentElement as HTMLElement);
+}
+
+export function getParentSubStepElement(element: HTMLElement): AnalyticsElement | null {
+  return element.closest<AnalyticsElement>('[data-analytics-node="substep"]');
+}
+
+export function getFunnelSubsteps(element: HTMLElement) {
+  return Array.from(element.querySelectorAll<AnalyticsElement>('[data-analytics-node="substep"]'));
+}
+
+export function getParentFunnelElement(element: HTMLElement): AnalyticsElement | null {
+  return element.closest<AnalyticsElement>('[data-analytics-node="funnel"]');
 }

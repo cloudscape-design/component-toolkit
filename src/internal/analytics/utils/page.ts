@@ -3,6 +3,10 @@
 
 export function getLastBreadcrumbText() {
   const breadcrumbs = document.querySelectorAll('[data-analytics-selector="breadcrumb-item"]');
+  if (breadcrumbs.length === 0) {
+    return '';
+  }
+
   return breadcrumbs[breadcrumbs.length - 1].textContent;
 }
 
@@ -22,7 +26,8 @@ export function getFormHeaderText() {
 }
 
 export function getModalHeaderText() {
-  return '';
+  const modalHeader = document.querySelector('[data-analytics-selector="modal-header"]');
+  return modalHeader?.textContent;
 }
 
 export function getContainerHeaderText(target: HTMLElement) {

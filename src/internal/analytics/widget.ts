@@ -1,18 +1,19 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { BufferEvent } from './interfaces';
+import { BufferEvent, TrackEventDetail } from './interfaces';
 
 const analytics = {
-  eventBuffer: [] as BufferEvent[],
+  eventBuffer: [] as BufferEvent<any>[],
   eventBufferMaxSize: 1000,
-  trackEvent: function (target: HTMLElement, eventName: string, detail: any) {
+  trackEvent: function (target: HTMLElement, eventName: string, { detail, componentName }: TrackEventDetail<any>) {
     if (this.eventBuffer.length < this.eventBufferMaxSize) {
       const domSnapshot = document.body.cloneNode(true) as HTMLElement;
       this.eventBuffer.push({
         event: {
           target,
           eventName,
+          componentName,
           detail,
         },
         domSnapshot,

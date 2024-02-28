@@ -3,7 +3,7 @@
 
 import { RefObject, useEffect } from 'react';
 import { ComponentConfiguration } from './metrics/interfaces';
-import { trackEvent } from './analytics';
+import { trackEvent } from '../analytics';
 
 export function useComponentAnalytics<T>(
   ref: RefObject<T>,
