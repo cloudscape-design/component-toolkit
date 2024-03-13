@@ -22,6 +22,14 @@ function TestComponent2() {
   useComponentMetrics('test-component-2', { packageSource: 'toolkit', packageVersion: '3.0.0', theme: 'test' });
   return <div>Test 2</div>;
 }
+function TestComponent3() {
+  useComponentMetrics(
+    'test-component-3',
+    { packageSource: 'toolkit', packageVersion: '3.0.0', theme: 'test' },
+    { props: {}, analytics: { instanceId: '123' } }
+  );
+  return <div>Test 3</div>;
+}
 function TestComponentWithProps({ variant }: { variant: string }) {
   useComponentMetrics(
     'test-component-with-props',
@@ -64,6 +72,7 @@ describe('useComponentMetrics', () => {
   });
 
   afterEach(() => {
+    window.AWSUI_METRIC_ORIGIN = undefined;
     jest.clearAllMocks();
     new MetricsTestHelper().resetOneTimeMetricsCache();
   });
@@ -162,6 +171,23 @@ describe('useComponentMetrics', () => {
       JSON.stringify({
         o: 'custom',
         s: 'test-component-1',
+        t: 'test',
+        a: 'used',
+        f: 'react',
+        v: formatMajorVersionForMetricDetail('3.0.0'),
+        c: { props: {} },
+      })
+    );
+  });
+
+  test('does not send analytics in the metrics', () => {
+    render(<TestComponent3 />);
+    expect(window.AWSC.Clog.log).toHaveBeenLastCalledWith(
+      getExpectedMetricName('test-component-3'),
+      1,
+      JSON.stringify({
+        o: 'main',
+        s: 'test-component-3',
         t: 'test',
         a: 'used',
         f: 'react',
