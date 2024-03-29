@@ -1,7 +1,16 @@
 {
   "name": "@cloudscape-design/component-toolkit",
   "version": "1.0.0-beta",
-  "main": "./lib/index.js",
+  "files": [
+    "container-queries",
+    "dom",
+    "internal",
+    "internal",
+    "use-controllable-state",
+    "*.js",
+    "*.d.ts"
+  ],
+  "main": "./index.js",
   "exports": {
     ".": "./index.js",
     "./dom": "./dom/index.js",
