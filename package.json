@@ -5,7 +5,6 @@
     "container-queries",
     "dom",
     "internal",
-    "internal",
     "use-controllable-state",
     "*.js",
     "*.d.ts"
