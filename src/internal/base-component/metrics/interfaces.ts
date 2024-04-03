@@ -17,6 +17,8 @@ export interface ComponentConfiguration {
   props: Record<string, JSONValue>;
 }
 
+export type AnalyticsMetadata = Record<string, JSONValue>;
+
 export interface MetricsLogItem {
   source: string;
   // Currently logged actions
