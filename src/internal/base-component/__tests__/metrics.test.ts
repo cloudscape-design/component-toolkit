@@ -320,7 +320,7 @@ describe('Client Metrics support', () => {
     });
 
     test('logs the usage of the given component with additional props', () => {
-      metrics.logComponentUsed('DummyComponentName', { props: { variant: 'primary' } });
+      metrics.logComponentUsed('DummyComponentName', { props: { variant: 'primary' }, metadata: { isMobile: true } });
       checkMetric(`awsui_DummyComponentName_d10`, {
         o: 'main',
         s: 'DummyComponentName',
@@ -328,7 +328,7 @@ describe('Client Metrics support', () => {
         a: 'used',
         f: 'react',
         v: '1.0',
-        c: { props: { variant: 'primary' } },
+        c: { props: { variant: 'primary' }, metadata: { isMobile: true } },
       });
     });
 
