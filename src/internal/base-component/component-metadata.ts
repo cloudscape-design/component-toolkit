@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useEffect, useRef } from 'react';
-import { type AnalyticsMetadata } from './metrics/interfaces';
+import { AnalyticsMetadata } from './metrics/interfaces';
 
 export const COMPONENT_METADATA_KEY = '__awsuiMetadata__';
 
