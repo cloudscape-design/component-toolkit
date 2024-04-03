@@ -15,6 +15,7 @@ export interface PackageSettings {
 
 export interface ComponentConfiguration {
   props: Record<string, JSONValue>;
+  metadata?: Record<string, JSONValue>;
 }
 
 export type AnalyticsMetadata = Record<string, JSONValue>;
