@@ -3,6 +3,7 @@
 
 import React, { useImperativeHandle } from 'react';
 import { render, act } from '@testing-library/react';
+import { clearMessageCache } from '../../internal/logging';
 import useControllableState from '../use-controllable-state';
 
 interface Props {
@@ -46,6 +47,7 @@ function renderHook(props: Props) {
 let consoleWarnSpy: jest.SpyInstance;
 afterEach(() => {
   consoleWarnSpy?.mockRestore();
+  clearMessageCache();
 });
 
 describe('useControllableState', () => {

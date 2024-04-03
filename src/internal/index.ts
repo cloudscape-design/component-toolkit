@@ -16,4 +16,4 @@ export {
   useRuntimeVisualRefresh,
 } from './visual-mode';
 export { isDevelopment } from './is-development';
-export { warnOnce } from './logging';
+export { warnOnce, clearMessageCache } from './logging';

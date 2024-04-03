@@ -14,3 +14,7 @@ export function warnOnce(component: string, message: string): void {
     }
   }
 }
+
+export function clearMessageCache(): void {
+  messageCache.clear();
+}
