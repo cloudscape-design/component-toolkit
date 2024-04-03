@@ -18,7 +18,10 @@ export interface ComponentConfiguration {
   metadata?: Record<string, JSONValue>;
 }
 
-export type AnalyticsMetadata = Record<string, JSONValue>;
+export interface AnalyticsMetadata {
+  instanceId?: string;
+  flowType?: 'create' | 'edit';
+}
 
 export interface MetricsLogItem {
   source: string;
