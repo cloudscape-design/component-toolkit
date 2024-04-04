@@ -4,6 +4,7 @@
 import React from 'react';
 import { useRuntimeVisualRefresh, clearVisualRefreshState } from '../index';
 import { render, screen } from '@testing-library/react';
+import { clearMessageCache } from '../../logging';
 
 const awsuiVisualRefreshFlag = Symbol.for('awsui-visual-refresh-flag');
 interface ExtendedWindow extends Window {
@@ -19,7 +20,10 @@ describe('useVisualRefresh', () => {
 
   beforeEach(() => clearVisualRefreshState());
   afterEach(() => document.body.classList.remove('awsui-visual-refresh'));
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => {
+    clearMessageCache();
+    jest.restoreAllMocks();
+  });
 
   test('should return false when class name is not present', () => {
     render(<App />);
