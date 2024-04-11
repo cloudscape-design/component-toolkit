@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-type JSONValue = string | number | boolean | undefined;
+type JSONValue = string | number | boolean | null | undefined;
 
 interface JSONObject {
   [key: string]: JSONObject | JSONValue;
