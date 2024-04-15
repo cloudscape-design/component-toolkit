@@ -4,6 +4,8 @@
 import { useEffect, useRef } from 'react';
 import { AnalyticsMetadata } from './metrics/interfaces';
 
+export { AnalyticsMetadata };
+
 export const COMPONENT_METADATA_KEY = '__awsuiMetadata__';
 
 interface AwsUiMetadata {

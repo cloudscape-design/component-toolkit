@@ -19,8 +19,9 @@ export interface ComponentConfiguration {
 }
 
 export interface AnalyticsMetadata {
-  instanceId?: string;
+  instanceIdentifier?: string;
   flowType?: 'create' | 'edit';
+  errorContext?: string;
 }
 
 export interface MetricsLogItem {
