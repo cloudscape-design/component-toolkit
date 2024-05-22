@@ -3,18 +3,16 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
-import { getIsRtl, getLogicalBoundingClientRect, getScrollInlineStart } from '../index';
+import { getIsRtl, getOffsetInlineStart, getLogicalBoundingClientRect, getScrollInlineStart } from '../index';
 
 describe('getIsRtl utility function', () => {
   test('detects direction of an ltr element', () => {
     const { container } = render(<div id="test-element">Content</div>);
-
     expect(getIsRtl(container)).toEqual(false);
   });
 
   test('detects direction of an rtl element', () => {
     const { container } = render(<div id="test-element">Content</div>);
-
     container.style.direction = 'rtl';
     expect(getIsRtl(container)).toEqual(true);
   });
@@ -24,39 +22,45 @@ describe('getIsRtl utility function', () => {
   });
 });
 
-/*
 describe('getOffsetInlineStart utility function', () => {
+  test('computes correct offsetInlineStart of an ltr element', () => {
+    const { container } = render(<div id="test-element">Content</div>);
+
+    Object.defineProperty(container, 'offsetLeft', {
+      value: 999,
+    });
+
+    expect(getOffsetInlineStart(container)).toEqual(999);
+  });
+
+  test('computes correct offsetInlineStart of an rtl element', () => {
+    const { container } = render(<div id="test-element">Content</div>);
+    container.style.direction = 'rtl';
+
+    Object.defineProperty(container, 'offsetWidth', {
+      value: 1000,
+    });
+
+    Object.defineProperty(container, 'offsetLeft', {
+      value: 500,
+    });
+
+    expect(getOffsetInlineStart(container)).toEqual(-1500);
+  });
 });
-*/
 
 describe('getScrollInlineStart utility function', () => {
   test('computes correct scrollInlineStart in ltr', () => {
-    const { container } = render(
-      <div id="container" style={{ width: '100px', overflowX: 'scroll' }}>
-        <div id="content" style={{ width: '400px' }}>
-          This is really really really really really really really really really really long content.
-        </div>
-      </div>
-    );
-
-    const element = container.querySelector('#content') as HTMLElement;
-    element.scrollLeft = 100;
-    expect(getScrollInlineStart(element)).toEqual(100);
+    const { container } = render(<div id="test-element">Content</div>);
+    container.scrollLeft = 100;
+    expect(getScrollInlineStart(container)).toEqual(100);
   });
 
   test('computes correct scrollInlineStart in rtl', () => {
-    const { container } = render(
-      <div id="container" style={{ width: '100px', overflowX: 'scroll' }}>
-        <div id="content" style={{ width: '400px' }}>
-          This is really really really really really really really really really really long content.
-        </div>
-      </div>
-    );
-
-    const element = container.querySelector('#content') as HTMLElement;
-    element.style.direction = 'rtl';
-    element.scrollLeft = 100;
-    expect(getScrollInlineStart(element)).toEqual(-100);
+    const { container } = render(<div id="test-element">Content</div>);
+    container.style.direction = 'rtl';
+    container.scrollLeft = 100;
+    expect(getScrollInlineStart(container)).toEqual(-100);
   });
 });
 
@@ -66,18 +70,10 @@ describe('getLogicalClientX utility function', () => {
 */
 
 describe('getLogicalBoundingClientRect utility function', () => {
-  test('computes correct logical bounding client rect in ltr', () => {
-    const { container } = render(
-      <div id="container" style={{ width: '100px', overflowX: 'scroll' }}>
-        <div id="content" style={{ width: '400px' }}>
-          This is really really really really really really really really really really long content.
-        </div>
-      </div>
-    );
+  test('computes correct logicalBoundingClientRect in ltr', () => {
+    const { container } = render(<div id="test-element">Content</div>);
 
-    const element = container.querySelector('#content') as HTMLElement;
-
-    jest.spyOn(element, 'getBoundingClientRect').mockReturnValue({
+    jest.spyOn(container, 'getBoundingClientRect').mockReturnValue({
       bottom: 123,
       height: 456,
       left: 789,
@@ -91,7 +87,7 @@ describe('getLogicalBoundingClientRect utility function', () => {
       y: 998,
     });
 
-    expect(getLogicalBoundingClientRect(element)).toEqual({
+    expect(getLogicalBoundingClientRect(container)).toEqual({
       blockSize: 456,
       inlineSize: 654,
       insetBlockEnd: 123,
@@ -101,19 +97,11 @@ describe('getLogicalBoundingClientRect utility function', () => {
     });
   });
 
-  test('computes correct logical bounding client rect in rtl', () => {
-    const { container } = render(
-      <div id="container" style={{ width: '100px', overflowX: 'scroll' }}>
-        <div id="content" style={{ width: '400px' }}>
-          This is really really really really really really really really really really long content.
-        </div>
-      </div>
-    );
+  test('computes correct logicalBoundingClientRect in rtl', () => {
+    const { container } = render(<div id="test-element">Content</div>);
+    container.style.direction = 'rtl';
 
-    const element = container.querySelector('#content') as HTMLElement;
-    element.style.direction = 'rtl';
-
-    jest.spyOn(element, 'getBoundingClientRect').mockReturnValue({
+    jest.spyOn(container, 'getBoundingClientRect').mockReturnValue({
       bottom: 123,
       height: 456,
       left: 789,
@@ -127,7 +115,7 @@ describe('getLogicalBoundingClientRect utility function', () => {
       y: 998,
     });
 
-    expect(getLogicalBoundingClientRect(element)).toEqual({
+    expect(getLogicalBoundingClientRect(container)).toEqual({
       blockSize: 456,
       inlineSize: 654,
       insetBlockEnd: 123,
