@@ -6,17 +6,21 @@ import { render } from '@testing-library/react';
 import { getIsRtl, getScrollInlineStart } from '../index';
 
 describe('getIsRtl utility function', () => {
-  test('detects an element direction is ltr', () => {
+  test('detects direction of an ltr element', () => {
     const { container } = render(<div id="test-element">Content</div>);
 
     expect(getIsRtl(container)).toEqual(false);
   });
 
-  test('detects an element direction is rtl', () => {
+  test('detects direction of an rtl element', () => {
     const { container } = render(<div id="test-element">Content</div>);
 
     container.style.direction = 'rtl';
     expect(getIsRtl(container)).toEqual(true);
+  });
+
+  test('detects direction of a null element', () => {
+    expect(getIsRtl(null)).toEqual(false);
   });
 });
 
