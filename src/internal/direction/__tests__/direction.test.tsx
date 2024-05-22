@@ -3,7 +3,13 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
-import { getIsRtl, getOffsetInlineStart, getLogicalBoundingClientRect, getScrollInlineStart } from '../index';
+import {
+  getIsRtl,
+  getOffsetInlineStart,
+  getLogicalBoundingClientRect,
+  getScrollInlineStart,
+  getLogicalPageX,
+} from '../index';
 
 describe('getIsRtl utility function', () => {
   test('detects direction of an ltr element', () => {
@@ -126,7 +132,34 @@ describe('getLogicalBoundingClientRect utility function', () => {
   });
 });
 
-/*
 describe('getLogicalPageX utility function', () => {
+  test('computes correct logicalPageX in ltr', () => {
+    const mouseEvent = new MouseEvent('pointermove', {});
+
+    Object.defineProperty(mouseEvent, 'pageX', {
+      value: 1000,
+    });
+
+    expect(getLogicalPageX(mouseEvent)).toEqual(1000);
+  });
+
+  test('computes correct logicalPageX in rtl', () => {
+    const { container } = render(<div id="test-element">Content</div>);
+    container.style.direction = 'rtl';
+
+    const callback = (event: MouseEvent) => {
+      Object.defineProperty(document.documentElement, 'clientWidth', {
+        value: 123,
+      });
+
+      Object.defineProperty(event, 'pageX', {
+        value: 1000,
+      });
+
+      expect(getLogicalPageX(event)).toEqual(-877);
+    };
+
+    container.addEventListener('click', callback);
+    container.click();
+  });
 });
-*/
