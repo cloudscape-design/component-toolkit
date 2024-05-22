@@ -8,6 +8,7 @@ import {
   getOffsetInlineStart,
   getLogicalBoundingClientRect,
   getScrollInlineStart,
+  getLogicalClientX,
   getLogicalPageX,
 } from '../index';
 
@@ -70,10 +71,27 @@ describe('getScrollInlineStart utility function', () => {
   });
 });
 
-/*
 describe('getLogicalClientX utility function', () => {
+  test('computes correct logicalClientX in ltr', () => {
+    const mouseEvent = new MouseEvent('pointermove', {}) as PointerEvent;
+
+    Object.defineProperty(mouseEvent, 'clientX', {
+      value: 1000,
+    });
+
+    expect(getLogicalClientX(mouseEvent, false)).toEqual(1000);
+  });
+
+  test('computes correct logicalClientX in rtl', () => {
+    const mouseEvent = new MouseEvent('pointermove', {}) as PointerEvent;
+
+    Object.defineProperty(mouseEvent, 'clientX', {
+      value: 1000,
+    });
+
+    expect(getLogicalClientX(mouseEvent, true)).toEqual(-1000);
+  });
 });
-*/
 
 describe('getLogicalBoundingClientRect utility function', () => {
   test('computes correct logicalBoundingClientRect in ltr', () => {
