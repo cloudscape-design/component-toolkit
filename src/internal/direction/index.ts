@@ -10,25 +10,32 @@ export function getIsRtl(element: null | HTMLElement | SVGElement): boolean {
   return getComputedStyle(element).direction === 'rtl';
 }
 
+/**
+ * The offsetLeft property is relative to the left of the offsetParent
+ * regardless of the document direction. This function returns the
+ * offsetLeft value or computes the Rtl equivalent of this value
+ * from the right of the offsetParent.
+ */
 export function getOffsetInlineStart(element: HTMLElement) {
   const offsetParentWidth = element.offsetParent?.clientWidth ?? 0;
   return getIsRtl(element) ? offsetParentWidth - element.offsetWidth - element.offsetLeft : element.offsetLeft;
 }
 
 /**
- * The scrollLeft value will be a negative number if the direction is RTL and
- * needs to be converted to a positive value for direction independent scroll
- * computations. Additionally, the scrollLeft value can be a decimal value on
- * systems using display scaling requiring the floor and ceiling calls.
+ * The scrollLeft value returned by the browser will be a negative number
+ * if the direction is RTL. This function returns a positive value for direction
+ * independent of scroll computations. Additionally, the scrollLeft value can be
+ * a decimal value on systems using display scaling requiring the floor and ceiling calls.
  */
 export function getScrollInlineStart(element: HTMLElement) {
   return getIsRtl(element) ? Math.floor(element.scrollLeft) * -1 : Math.ceil(element.scrollLeft);
 }
 
 /**
- * The clientX position needs to be converted so it is relative to the right of
- * the document in order for computations to yield the same result in both
- * element directions.
+ * The clientX value is computed from the top left corner of the document regardless
+ * of the document diretion. This function returns the clientX value or computes the
+ * Rtl equivalent relative to the top right corner of the document in order for
+ * computations to yield the same result in both element directions.
  */
 export function getLogicalClientX(event: PointerEvent | ReactPointerEvent<unknown>, IsRtl: boolean) {
   return IsRtl ? document.documentElement.clientWidth - event.clientX : event.clientX;

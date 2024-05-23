@@ -15,13 +15,16 @@ import {
 describe('getIsRtl utility function', () => {
   test('detects direction of an ltr element', () => {
     const { container } = render(<div id="test-element">Content</div>);
-    expect(getIsRtl(container)).toEqual(false);
+    expect(getIsRtl(container.querySelector('#test-element'))).toEqual(false);
   });
 
   test('detects direction of an rtl element', () => {
-    const { container } = render(<div id="test-element">Content</div>);
-    container.style.direction = 'rtl';
-    expect(getIsRtl(container)).toEqual(true);
+    const { container } = render(
+      <div id="test-element" style={{ direction: 'rtl' }}>
+        Content
+      </div>
+    );
+    expect(getIsRtl(container.querySelector('#test-element'))).toEqual(true);
   });
 
   test('detects direction of a null element', () => {
@@ -32,42 +35,64 @@ describe('getIsRtl utility function', () => {
 describe('getOffsetInlineStart utility function', () => {
   test('computes correct offsetInlineStart of an ltr element', () => {
     const { container } = render(<div id="test-element">Content</div>);
+    const element = container.querySelector('#test-element') as HTMLElement;
 
-    Object.defineProperty(container, 'offsetLeft', {
+    Object.defineProperty(element, 'offsetLeft', {
       value: 999,
     });
 
-    expect(getOffsetInlineStart(container)).toEqual(999);
+    expect(getOffsetInlineStart(element)).toEqual(999);
   });
 
   test('computes correct offsetInlineStart of an rtl element', () => {
-    const { container } = render(<div id="test-element">Content</div>);
-    container.style.direction = 'rtl';
+    const { container } = render(
+      <div id="offset-parent">
+        <div id="test-element" style={{ direction: 'rtl' }}>
+          Content
+        </div>
+      </div>
+    );
 
-    Object.defineProperty(container, 'offsetWidth', {
+    const offsetParent = container.querySelector('#offset-parent') as HTMLElement;
+    const element = container.querySelector('#test-element') as HTMLElement;
+
+    Object.defineProperty(offsetParent, 'clientWidth', {
+      value: 2000,
+    });
+
+    Object.defineProperty(element, 'offsetParent', {
+      value: offsetParent,
+    });
+
+    Object.defineProperty(element, 'offsetWidth', {
       value: 1000,
     });
 
-    Object.defineProperty(container, 'offsetLeft', {
+    Object.defineProperty(element, 'offsetLeft', {
       value: 500,
     });
 
-    expect(getOffsetInlineStart(container)).toEqual(-1500);
+    expect(getOffsetInlineStart(element)).toEqual(500);
   });
 });
 
 describe('getScrollInlineStart utility function', () => {
   test('computes correct scrollInlineStart in ltr', () => {
     const { container } = render(<div id="test-element">Content</div>);
-    container.scrollLeft = 100;
-    expect(getScrollInlineStart(container)).toEqual(100);
+    const element = container.querySelector('#test-element') as HTMLElement;
+    element.scrollLeft = 100;
+    expect(getScrollInlineStart(element)).toEqual(100);
   });
 
   test('computes correct scrollInlineStart in rtl', () => {
-    const { container } = render(<div id="test-element">Content</div>);
-    container.style.direction = 'rtl';
-    container.scrollLeft = 100;
-    expect(getScrollInlineStart(container)).toEqual(-100);
+    const { container } = render(
+      <div id="test-element" style={{ direction: 'rtl' }}>
+        Content
+      </div>
+    );
+    const element = container.querySelector('#test-element') as HTMLElement;
+    element.scrollLeft = 100;
+    expect(getScrollInlineStart(element)).toEqual(-100);
   });
 });
 
@@ -96,22 +121,21 @@ describe('getLogicalClientX utility function', () => {
 describe('getLogicalBoundingClientRect utility function', () => {
   test('computes correct logicalBoundingClientRect in ltr', () => {
     const { container } = render(<div id="test-element">Content</div>);
+    const element = container.querySelector('#test-element') as HTMLElement;
 
-    jest.spyOn(container, 'getBoundingClientRect').mockReturnValue({
+    jest.spyOn(element, 'getBoundingClientRect').mockReturnValue({
       bottom: 123,
       height: 456,
       left: 789,
       right: 987,
-      toJSON() {
-        return;
-      },
+      toJSON() {},
       top: 321,
       width: 654,
       x: 999,
       y: 998,
     });
 
-    expect(getLogicalBoundingClientRect(container)).toEqual({
+    expect(getLogicalBoundingClientRect(element)).toEqual({
       blockSize: 456,
       inlineSize: 654,
       insetBlockEnd: 123,
@@ -122,24 +146,26 @@ describe('getLogicalBoundingClientRect utility function', () => {
   });
 
   test('computes correct logicalBoundingClientRect in rtl', () => {
-    const { container } = render(<div id="test-element">Content</div>);
-    container.style.direction = 'rtl';
+    const { container } = render(
+      <div id="test-element" style={{ direction: 'rtl' }}>
+        Content
+      </div>
+    );
+    const element = container.querySelector('#test-element') as HTMLElement;
 
-    jest.spyOn(container, 'getBoundingClientRect').mockReturnValue({
+    jest.spyOn(element, 'getBoundingClientRect').mockReturnValue({
       bottom: 123,
       height: 456,
       left: 789,
       right: 987,
-      toJSON() {
-        return;
-      },
+      toJSON() {},
       top: 321,
       width: 654,
       x: 999,
       y: 998,
     });
 
-    expect(getLogicalBoundingClientRect(container)).toEqual({
+    expect(getLogicalBoundingClientRect(element)).toEqual({
       blockSize: 456,
       inlineSize: 654,
       insetBlockEnd: 123,
@@ -162,8 +188,12 @@ describe('getLogicalPageX utility function', () => {
   });
 
   test('computes correct logicalPageX in rtl', () => {
-    const { container } = render(<div id="test-element">Content</div>);
-    container.style.direction = 'rtl';
+    const { container } = render(
+      <div id="test-element" style={{ direction: 'rtl' }}>
+        Content
+      </div>
+    );
+    const element = container.querySelector('#test-element') as HTMLElement;
 
     const callback = (event: MouseEvent) => {
       Object.defineProperty(document.documentElement, 'clientWidth', {
@@ -177,7 +207,7 @@ describe('getLogicalPageX utility function', () => {
       expect(getLogicalPageX(event)).toEqual(-877);
     };
 
-    container.addEventListener('click', callback);
-    container.click();
+    element.addEventListener('click', callback);
+    element.click();
   });
 });
