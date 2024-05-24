@@ -17,3 +17,11 @@ export {
 } from './visual-mode';
 export { isDevelopment } from './is-development';
 export { warnOnce, clearMessageCache } from './logging';
+export {
+  getIsRtl,
+  getOffsetInlineStart,
+  getScrollInlineStart,
+  getLogicalClientX,
+  getLogicalBoundingClientRect,
+  getLogicalPageX,
+} from './direction';
