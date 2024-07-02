@@ -1,0 +1,12 @@
+@use '../../../src/internal/focus-visible' as focus-visible;
+
+.focus-visible {
+  .inner {
+    display: none;
+  }
+  @include focus-visible.when-visible {
+    .inner {
+      display: inline;
+    }
+  }
+}

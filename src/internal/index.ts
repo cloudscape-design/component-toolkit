@@ -25,3 +25,5 @@ export {
   getLogicalBoundingClientRect,
   getLogicalPageX,
 } from './direction';
+export { useFocusVisible } from './focus-visible';
+export { type KeyCode, isModifierKey } from './keycode';
