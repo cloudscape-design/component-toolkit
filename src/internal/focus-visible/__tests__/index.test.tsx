@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import useFocusVisible from '../';
+import { useFocusVisible } from '../';
 
 function Fixture() {
   useFocusVisible();

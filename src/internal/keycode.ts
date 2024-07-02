@@ -20,3 +20,9 @@ export enum KeyCode {
   alt = 18,
   meta = 91,
 }
+
+export function isModifierKey(event: KeyboardEvent) {
+  // we do not want to highlight focused element
+  // when special keys are pressed
+  return [KeyCode.shift, KeyCode.alt, KeyCode.control, KeyCode.meta].indexOf(event.keyCode) > -1;
+}

@@ -2,13 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useEffect } from 'react';
-import { KeyCode } from '../keycode';
-
-export function isModifierKey(event: KeyboardEvent) {
-  // we do not want to highlight focused element
-  // when special keys are pressed
-  return [KeyCode.shift, KeyCode.alt, KeyCode.control, KeyCode.meta].indexOf(event.keyCode) > -1;
-}
+import { isModifierKey } from '../keycode';
 
 function setIsKeyboard(active: boolean) {
   if (active) {
@@ -40,7 +34,7 @@ function removeListeners() {
   document.removeEventListener('keydown', handleKeydown);
 }
 
-export default function useFocusVisible() {
+export function useFocusVisible() {
   useEffect(() => {
     if (componentsCount === 0) {
       addListeners();
