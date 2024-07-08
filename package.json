@@ -24,7 +24,9 @@
   "scripts": {
     "prebuild": "rm -rf lib",
     "build": "tsc",
-    "postbuild": "cp package.json README.md LICENSE lib",
+    "postbuild": "npm run postbuild:root && npm run postbuild:focus-visible",
+    "postbuild:root": "cp package.json README.md LICENSE lib",
+    "postbuild:focus-visible": "cp ./src/internal/focus-visible/index.scss lib/internal/focus-visible",
     "test-pages": "vite --config ./test-pages/vite.config.mts",
     "test:unit": "jest -c jest.unit.config.js",
     "test:integ": "jest -c jest.integ.config.js",
