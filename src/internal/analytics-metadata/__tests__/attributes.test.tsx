@@ -4,7 +4,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import {
-  getAnalyticslabelAttribute,
+  getAnalyticsLabelAttribute,
   copyAnalyticsMetadataAttribute,
   getAnalyticsMetadataAttribute,
   METADATA_DATA_ATTRIBUTE,
@@ -29,8 +29,8 @@ test('copyAnalyticsMetadataAttribute should select only data-awsui-analytics att
   expect((container.firstElementChild as HTMLElement).classList.contains('test-class')).toBe(false);
 });
 
-test('getAnalyticslabelAttribute should add data-awsui-analytics-label attribute', () => {
+test('getAnalyticsLabelAttribute should add data-awsui-analytics-label attribute', () => {
   const labelIdentifier = 'label-id';
-  const { container } = render(<div {...getAnalyticslabelAttribute(labelIdentifier)} />);
+  const { container } = render(<div {...getAnalyticsLabelAttribute(labelIdentifier)} />);
   expect((container.firstElementChild as HTMLElement).dataset[LABEL_DATA_ATTRIBUTE]).toEqual(labelIdentifier);
 });

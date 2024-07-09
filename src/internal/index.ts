@@ -32,6 +32,6 @@ export {
   GeneratedAnalyticsMetadata,
   getAnalyticsMetadataAttribute,
   copyAnalyticsMetadataAttribute,
-  getAnalyticslabelAttribute,
+  getAnalyticsLabelAttribute,
   getGeneratedAnalyticsMetadata,
 } from './analytics-metadata';

@@ -4,7 +4,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { getLabelFromElement, processLabel } from '../labels-utils';
-import { getAnalyticsMetadataAttribute, getAnalyticslabelAttribute } from '../attributes';
+import { getAnalyticsMetadataAttribute, getAnalyticsLabelAttribute } from '../attributes';
 
 describe('getLabelFromElement', () => {
   test('returns an empty string if the element is null', () => {
@@ -125,7 +125,7 @@ describe('processLabel', () => {
     expect(processLabel(target, '')).toEqual('content');
     expect(processLabel(target, { selector: '' })).toEqual('content');
   });
-  test('returns node label when selector is an empty string', () => {
+  test('returns node label when selector is a chain', () => {
     const { container } = render(
       <div>
         <div id="target">
@@ -142,7 +142,7 @@ describe('processLabel', () => {
     expect(processLabel(target, '.label-class h1')).toEqual('label to return');
     expect(processLabel(target, { selector: '.label-class h1' })).toEqual('label to return');
   });
-  test('returns first available label when selector is an array', () => {
+  test('returns first non-empty label when selector is an array', () => {
     const { container } = render(
       <div>
         <div id="target">
@@ -176,8 +176,9 @@ describe('processLabel', () => {
       </div>
     );
     const target = container.querySelector('#target') as HTMLElement;
-
+    //  root="self" refers to the element containing the data attribute
     expect(processLabel(target, { selector: '.label-class', root: 'self' })).toEqual('inner label');
+    //  root="self" refers to the parent component
     expect(processLabel(target, { selector: '.label-class', root: 'component' })).toEqual('outer label');
   });
 
@@ -186,29 +187,29 @@ describe('processLabel', () => {
       <div>
         <div {...getAnalyticsMetadataAttribute({ component: { name: 'FirstComponentName' } })}>
           <div id="target1">
-            <div className="redirect-label-class-one" {...getAnalyticslabelAttribute('#target2 .label-class')}>
+            <div className="redirect-label-class-one" {...getAnalyticsLabelAttribute('#target2 .label-class')}>
               <div id="target2">
                 <div className="label-class">second inner label</div>
               </div>
             </div>
-            <div className="redirect-label-class-two" {...getAnalyticslabelAttribute('h1')}>
+            <div className="redirect-label-class-two" {...getAnalyticsLabelAttribute('h1')}>
               <h1>heading1</h1>
               <h2>heading2</h2>
             </div>
-            <div className="redirect-label-class-three" {...getAnalyticslabelAttribute('')}>
+            <div className="redirect-label-class-three" {...getAnalyticsLabelAttribute('')}>
               <h1>heading1</h1>
               <h2>heading2</h2>
             </div>
-            <div className="redirect-label-class-four" {...getAnalyticslabelAttribute('h2')}>
+            <div className="redirect-label-class-four" {...getAnalyticsLabelAttribute('h2')}>
               <h1>heading1</h1>
-              <h2 {...getAnalyticslabelAttribute('.text-content')}>
+              <h2 {...getAnalyticsLabelAttribute('.text-content')}>
                 <span className="text-content">content inside header</span>
                 <span>other content</span>
               </h2>
             </div>
-            <div className="redirect-label-class-five" {...getAnalyticslabelAttribute('h2')}>
+            <div className="redirect-label-class-five" {...getAnalyticsLabelAttribute('h2')}>
               <h1>heading1</h1>
-              <h2 {...getAnalyticslabelAttribute('.wonrg-text-content')}>
+              <h2 {...getAnalyticsLabelAttribute('.wonrg-text-content')}>
                 <span className="text-content">content inside header</span>
                 <span>other content</span>
               </h2>

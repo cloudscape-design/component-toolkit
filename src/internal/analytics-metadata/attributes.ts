@@ -16,6 +16,6 @@ export const copyAnalyticsMetadataAttribute = (props: any) => ({
   [METADATA_ATTRIBUTE]: props[METADATA_ATTRIBUTE],
 });
 
-export const getAnalyticslabelAttribute = (labelIdentifierString: string) => ({
+export const getAnalyticsLabelAttribute = (labelIdentifierString: string) => ({
   [LABEL_ATTRIBUTE]: labelIdentifierString,
 });

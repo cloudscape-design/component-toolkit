@@ -4,9 +4,9 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { getAnalyticsMetadataAttribute, METADATA_ATTRIBUTE } from '../attributes';
-import { findNextNode, isNodeComponent, findComponentUp } from '../dom-utils';
+import { findLogicalParent, isNodeComponent, findComponentUp } from '../dom-utils';
 
-describe('findNextNode', () => {
+describe('findLogicalParent', () => {
   test('finds parent', () => {
     const { container } = render(
       <div id="parent">
@@ -14,7 +14,7 @@ describe('findNextNode', () => {
       </div>
     );
     const child = container.querySelector('#child');
-    expect(findNextNode(child as HTMLElement)?.id).toEqual('parent');
+    expect(findLogicalParent(child as HTMLElement)?.id).toEqual('parent');
   });
   test('returns null when child does not exist', () => {
     const { container } = render(
@@ -23,7 +23,7 @@ describe('findNextNode', () => {
       </div>
     );
     const child = container.querySelector('#wrong-child');
-    expect(findNextNode(child as HTMLElement)).toBeNull();
+    expect(findLogicalParent(child as HTMLElement)).toBeNull();
   });
   test('returns null when parent does not exist', () => {
     const { container } = render(
@@ -31,7 +31,7 @@ describe('findNextNode', () => {
         <div id="child"></div>
       </div>
     );
-    expect(findNextNode(container.parentElement?.parentElement as HTMLElement)).toBeNull();
+    expect(findLogicalParent(container.parentElement?.parentElement as HTMLElement)).toBeNull();
   });
   test('returns element referred to with referrerId', () => {
     const { container } = render(
@@ -41,7 +41,7 @@ describe('findNextNode', () => {
       </div>
     );
     const child = container.querySelector('#child');
-    expect(findNextNode(child as HTMLElement)?.classList.contains('parent')).toBe(true);
+    expect(findLogicalParent(child as HTMLElement)?.classList.contains('parent')).toBe(true);
   });
   test('returns null when element referred to with referrerId does not exist', () => {
     const { container } = render(
@@ -51,7 +51,7 @@ describe('findNextNode', () => {
       </div>
     );
     const child = container.querySelector('#child');
-    expect(findNextNode(child as HTMLElement)).toBeNull();
+    expect(findLogicalParent(child as HTMLElement)).toBeNull();
   });
 });
 
@@ -100,7 +100,11 @@ describe('findComponentUp', () => {
     expect(findComponentUp(container.querySelector('#target-element'))?.id).toBe('component-element');
   });
   test('returns null when element has no parent component', () => {
-    const { container } = render(<div />);
-    expect(findComponentUp(container)).toBeNull();
+    const { container } = render(
+      <div>
+        <div id="target-element"></div>
+      </div>
+    );
+    expect(findComponentUp(container.querySelector('#target-element'))).toBeNull();
   });
 });

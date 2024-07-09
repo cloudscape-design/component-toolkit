@@ -26,7 +26,7 @@ describe('merge', () => {
     const source = { one: { three: 'three' } };
     expect(merge(null, source)).toEqual(source);
   });
-  test('returns empty objet when both source and target are null', () => {
+  test('returns empty object when both source and target are null', () => {
     expect(merge(null, null)).toEqual({});
   });
   test('merges keys when not defined in target', () => {
@@ -61,7 +61,7 @@ describe('mergeMetadata', () => {
       contexts: [{ type: 'component', detail: componentMetadata.component }],
     });
   });
-  test('adds component to existing context as first element', () => {
+  test('adds component to existing context as last element', () => {
     const contexts: GeneratedAnalyticsMetadataFragment['contexts'] = [
       { type: 'component', detail: { name: 'c1', label: 'label' } },
     ];

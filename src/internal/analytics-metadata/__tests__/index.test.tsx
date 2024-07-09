@@ -4,58 +4,8 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { getGeneratedAnalyticsMetadata } from '../';
-import { METADATA_ATTRIBUTE, getAnalyticsMetadataAttribute, getAnalyticslabelAttribute } from '../attributes';
-
-const ComponentOne = ({ malformed }: { malformed?: boolean }) => (
-  <div
-    {...getAnalyticsMetadataAttribute({
-      component: { name: 'ComponentOne', label: '.component-label', properties: { multi: 'true' } },
-    })}
-  >
-    <div
-      {...(malformed
-        ? { [METADATA_ATTRIBUTE]: "{'corruptedJSON':}" }
-        : getAnalyticsMetadataAttribute({ detail: { keyOne: 'valueOne', keyTwo: 'overriddenValueTwo' } }))}
-    >
-      <div
-        id="target"
-        {...getAnalyticsMetadataAttribute({
-          action: 'select',
-          detail: { label: { selector: '.event-label', root: 'component' }, keyTwo: 'valueTwo' },
-        })}
-      >
-        content
-      </div>
-    </div>
-    <div className="component-label">component label</div>
-    <div className="event-label">event label</div>
-  </div>
-);
-
-const ComponentTwo = () => (
-  <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentTwo', label: '.component-label' } })}>
-    <div className="component-label" {...getAnalyticslabelAttribute('.sub-label')}>
-      <div className="sub-label">sub label</div>
-      <div>another text content to ignore</div>
-    </div>
-    <div id="id:nested:portal" />
-  </div>
-);
-
-const ComponentThree = () => (
-  <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentThree' } })}>
-    <div
-      {...getAnalyticsMetadataAttribute({
-        component: { innerContext: { position: '2', columnLabel: '.invalid-selector' } },
-      })}
-    >
-      <ComponentTwo />
-      <div data-awsui-referrer-id="id:nested:portal">
-        <ComponentOne />
-      </div>
-    </div>
-  </div>
-);
+import { METADATA_ATTRIBUTE } from '../attributes';
+import { ComponentOne, ComponentThree } from './components';
 
 describe('getGeneratedAnalyticsMetadata', () => {
   test('returns an empty object when input is null', () => {

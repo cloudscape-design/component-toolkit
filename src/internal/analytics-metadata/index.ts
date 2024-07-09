@@ -5,12 +5,12 @@ export { GeneratedAnalyticsMetadataFragment, GeneratedAnalyticsMetadata } from '
 export {
   getAnalyticsMetadataAttribute,
   copyAnalyticsMetadataAttribute,
-  getAnalyticslabelAttribute,
+  getAnalyticsLabelAttribute,
 } from './attributes';
 
 import { METADATA_DATA_ATTRIBUTE } from './attributes';
 import { GeneratedAnalyticsMetadata, GeneratedAnalyticsMetadataFragment } from './interfaces';
-import { findNextNode } from './dom-utils';
+import { findLogicalParent } from './dom-utils';
 import { mergeMetadata, processMetadata } from './metadata-utils';
 
 export const getGeneratedAnalyticsMetadata = (target: HTMLElement | null): GeneratedAnalyticsMetadata => {
@@ -26,7 +26,7 @@ export const getGeneratedAnalyticsMetadata = (target: HTMLElement | null): Gener
     } catch (ex) {
       /* empty */
     } finally {
-      currentNode = findNextNode(currentNode);
+      currentNode = findLogicalParent(currentNode);
     }
   }
   return metadata as GeneratedAnalyticsMetadata;

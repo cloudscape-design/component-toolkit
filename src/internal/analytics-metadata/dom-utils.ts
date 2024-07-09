@@ -3,7 +3,7 @@
 
 import { METADATA_DATA_ATTRIBUTE } from './attributes';
 
-export const findNextNode = (node: HTMLElement): HTMLElement | null => {
+export const findLogicalParent = (node: HTMLElement): HTMLElement | null => {
   try {
     const referrer = node.dataset.awsuiReferrerId;
     if (referrer) {
@@ -18,7 +18,7 @@ export const findNextNode = (node: HTMLElement): HTMLElement | null => {
 export function findComponentUp(node: HTMLElement | null): HTMLElement | null {
   let firstComponentElement = node;
   while (firstComponentElement && firstComponentElement.tagName !== 'body' && !isNodeComponent(firstComponentElement)) {
-    firstComponentElement = findNextNode(firstComponentElement);
+    firstComponentElement = findLogicalParent(firstComponentElement);
   }
   return firstComponentElement && firstComponentElement.tagName !== 'body' ? firstComponentElement : null;
 }
