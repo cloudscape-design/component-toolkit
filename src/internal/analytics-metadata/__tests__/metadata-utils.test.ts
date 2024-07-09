@@ -44,6 +44,11 @@ describe('merge', () => {
     const target = { one: { three: 'three' } };
     expect(merge(target, source)).toEqual({ one: { two: 'two', three: 'three' } });
   });
+  test('copies arrays in target', () => {
+    const source = { two: 'two' };
+    const target = { one: ['three', 'four'] };
+    expect(merge(target, source)).toEqual({ one: ['three', 'four'], two: 'two' });
+  });
 });
 
 describe('mergeMetadata', () => {
