@@ -17,18 +17,17 @@ export const findNextNode = (node: HTMLElement): HTMLElement | null => {
 
 export function findComponentUp(node: HTMLElement | null): HTMLElement | null {
   let firstComponentElement = node;
-  while (
-    firstComponentElement &&
-    firstComponentElement?.tagName !== 'body' &&
-    !isNodeComponent(firstComponentElement)
-  ) {
+  while (firstComponentElement && firstComponentElement.tagName !== 'body' && !isNodeComponent(firstComponentElement)) {
     firstComponentElement = findNextNode(firstComponentElement);
   }
   return firstComponentElement && firstComponentElement.tagName !== 'body' ? firstComponentElement : null;
 }
 
 export const isNodeComponent = (node: HTMLElement): boolean => {
-  const metadataString = node.dataset[METADATA_DATA_ATTRIBUTE] || '{}';
+  const metadataString = node.dataset[METADATA_DATA_ATTRIBUTE];
+  if (!metadataString) {
+    return false;
+  }
   try {
     const metadata = JSON.parse(metadataString);
     return !!metadata.component && !!metadata.component.name;

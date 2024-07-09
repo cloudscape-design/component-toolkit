@@ -64,5 +64,5 @@ export const getLabelFromElement = (element: HTMLElement | null): string => {
     return getLabelFromElement(elementWithLabel as HTMLElement);
   }
 
-  return element?.textContent || '';
+  return element.textContent || '';
 };
