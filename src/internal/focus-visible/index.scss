@@ -11,3 +11,10 @@
     @content;
   }
 }
+
+@mixin when-visible-unfocused {
+  // stylelint-disable-next-line selector-combinator-disallowed-list
+  body[data-awsui-focus-visible='true'] & {
+    @content;
+  }
+}
