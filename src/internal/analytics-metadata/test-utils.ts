@@ -15,7 +15,7 @@ export const getRawAnalyticsMetadata = (target: HTMLElement | null): RawAnalytic
     labelSelectors: [],
   };
   let currentNode = target;
-  while (currentNode && currentNode.tagName !== 'body') {
+  while (currentNode) {
     try {
       const currentMetadataString = currentNode.dataset[METADATA_DATA_ATTRIBUTE];
       if (currentMetadataString) {
@@ -33,9 +33,9 @@ export const getRawAnalyticsMetadata = (target: HTMLElement | null): RawAnalytic
 };
 
 const getLabelSelectors = (localMetadata: any): Array<string> => {
-  return Object.keys(localMetadata).reduce((acc: any, key: string) => {
+  return Object.keys(localMetadata).reduce((acc: Array<string>, key: string) => {
     if (key.toLowerCase().match(/label$/)) {
-      acc = [...acc, ...getSelectorsFromLabel(localMetadata[key])];
+      acc = [...acc, ...getLabelSelectorsFromLabelIdentifier(localMetadata[key])];
     } else if (typeof localMetadata[key] !== 'string') {
       acc = [...acc, ...getLabelSelectors(localMetadata[key])];
     }
@@ -43,7 +43,7 @@ const getLabelSelectors = (localMetadata: any): Array<string> => {
   }, []);
 };
 
-const getSelectorsFromLabel = (label: string | LabelIdentifier): Array<string> => {
+const getLabelSelectorsFromLabelIdentifier = (label: string | LabelIdentifier): Array<string> => {
   if (typeof label === 'string') {
     return [label];
   } else if (typeof label.selector === 'string') {

@@ -17,7 +17,7 @@ import { mergeMetadata, processMetadata } from './metadata-utils';
 export const getGeneratedAnalyticsMetadata = (target: HTMLElement | null): GeneratedAnalyticsMetadata => {
   let metadata: GeneratedAnalyticsMetadataFragment = {};
   let currentNode = target;
-  while (currentNode && currentNode.tagName !== 'body') {
+  while (currentNode) {
     try {
       const currentMetadataString = currentNode.dataset[METADATA_DATA_ATTRIBUTE];
       if (currentMetadataString) {
