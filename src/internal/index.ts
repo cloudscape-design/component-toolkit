@@ -34,4 +34,5 @@ export {
   copyAnalyticsMetadataAttribute,
   getAnalyticsLabelAttribute,
   getGeneratedAnalyticsMetadata,
+  getRawAnalyticsMetadata,
 } from './analytics-metadata';

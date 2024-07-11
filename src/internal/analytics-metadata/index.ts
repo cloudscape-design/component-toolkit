@@ -7,6 +7,7 @@ export {
   copyAnalyticsMetadataAttribute,
   getAnalyticsLabelAttribute,
 } from './attributes';
+export { getRawAnalyticsMetadata } from './test-utils';
 
 import { METADATA_DATA_ATTRIBUTE } from './attributes';
 import { GeneratedAnalyticsMetadata, GeneratedAnalyticsMetadataFragment } from './interfaces';
