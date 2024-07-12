@@ -27,11 +27,3 @@ export {
 } from './direction';
 export { useFocusVisible } from './focus-visible';
 export { KeyCode, isModifierKey } from './keycode';
-export {
-  GeneratedAnalyticsMetadataFragment,
-  GeneratedAnalyticsMetadata,
-  getAnalyticsMetadataAttribute,
-  copyAnalyticsMetadataAttribute,
-  getAnalyticsLabelAttribute,
-  getGeneratedAnalyticsMetadata,
-} from './analytics-metadata';
