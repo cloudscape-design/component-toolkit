@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
-import { getRawAnalyticsMetadata } from '../test-utils';
+import { getRawAnalyticsMetadata } from '../testing-utils';
 import { METADATA_ATTRIBUTE } from '../attributes';
 import { ComponentOne, ComponentThree } from './components';
 
