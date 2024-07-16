@@ -7,12 +7,7 @@ import { createSingletonHandler } from '../singleton-handler';
 import { useStableCallback } from '../stable-callback';
 import { isDevelopment } from '../is-development';
 import { warnOnce } from '../logging';
-
-const awsuiVisualRefreshFlag = Symbol.for('awsui-visual-refresh-flag');
-interface ExtendedWindow extends Window {
-  [awsuiVisualRefreshFlag]?: () => boolean;
-}
-declare const window: ExtendedWindow;
+import { awsuiVisualRefreshFlag, getGlobal } from '../global-flags';
 
 export function isMotionDisabled(element: HTMLElement): boolean {
   return (
@@ -83,20 +78,29 @@ export function clearVisualRefreshState() {
   visualRefreshState = undefined;
 }
 
-function detectVisualRefresh() {
+function detectVisualRefreshClassName() {
   return typeof document !== 'undefined' && !!document.querySelector('.awsui-visual-refresh');
+}
+
+function detectVisualRefreshFlag() {
+  const global = getGlobal();
+  return global?.[awsuiVisualRefreshFlag]?.() ?? false;
 }
 
 export function useRuntimeVisualRefresh() {
   if (visualRefreshState === undefined) {
-    visualRefreshState = detectVisualRefresh();
-    if (!visualRefreshState && typeof window !== 'undefined' && window[awsuiVisualRefreshFlag]?.()) {
-      document.body.classList.add('awsui-visual-refresh');
-      visualRefreshState = true;
+    visualRefreshState = detectVisualRefreshClassName();
+    if (!visualRefreshState) {
+      if (detectVisualRefreshFlag()) {
+        visualRefreshState = true;
+        if (typeof document !== 'undefined') {
+          document.body.classList.add('awsui-visual-refresh');
+        }
+      }
     }
   }
   if (isDevelopment) {
-    const newVisualRefreshState = detectVisualRefresh();
+    const newVisualRefreshState = detectVisualRefreshClassName() || detectVisualRefreshFlag();
     if (newVisualRefreshState !== visualRefreshState) {
       warnOnce(
         'Visual Refresh',

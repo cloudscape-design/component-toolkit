@@ -1,6 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+export const awsuiVisualRefreshFlag = Symbol.for('awsui-visual-refresh-flag');
 export const awsuiGlobalFlagsSymbol = Symbol.for('awsui-global-flags');
 
 interface GlobalFlags {
@@ -8,19 +9,19 @@ interface GlobalFlags {
 }
 
 export interface FlagsHolder {
+  [awsuiVisualRefreshFlag]?: () => boolean;
   [awsuiGlobalFlagsSymbol]?: GlobalFlags;
 }
 
 export const getTopWindow = () => {
-  return window.top;
+  return window.top as FlagsHolder | null;
 };
 
-function getGlobal() {
-  return typeof window !== 'undefined' ? window : globalThis;
+export function getGlobal() {
+  return (typeof window !== 'undefined' ? window : globalThis) as FlagsHolder | null;
 }
 
-function readFlag(window: unknown, flagName: keyof GlobalFlags) {
-  const holder = window as FlagsHolder | null;
+function readFlag(holder: FlagsHolder | null, flagName: keyof GlobalFlags) {
   return holder?.[awsuiGlobalFlagsSymbol]?.[flagName];
 }
 
