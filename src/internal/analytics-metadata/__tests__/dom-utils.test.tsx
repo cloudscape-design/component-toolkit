@@ -3,8 +3,12 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
-import { getAnalyticsMetadataAttribute, METADATA_ATTRIBUTE } from '../attributes';
+import { activateAnalyticsMetadata, getAnalyticsMetadataAttribute, METADATA_ATTRIBUTE } from '../attributes';
 import { findLogicalParent, isNodeComponent, findComponentUp } from '../dom-utils';
+
+beforeAll(() => {
+  activateAnalyticsMetadata(true);
+});
 
 describe('findLogicalParent', () => {
   test('finds parent', () => {

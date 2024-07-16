@@ -4,7 +4,11 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { getLabelFromElement, processLabel } from '../labels-utils';
-import { getAnalyticsMetadataAttribute, getAnalyticsLabelAttribute } from '../attributes';
+import { getAnalyticsMetadataAttribute, getAnalyticsLabelAttribute, activateAnalyticsMetadata } from '../attributes';
+
+beforeAll(() => {
+  activateAnalyticsMetadata(true);
+});
 
 describe('getLabelFromElement', () => {
   test('returns an empty string if the element is null', () => {

@@ -6,4 +6,5 @@ export {
   getAnalyticsMetadataAttribute,
   copyAnalyticsMetadataAttribute,
   getAnalyticsLabelAttribute,
+  activateAnalyticsMetadata,
 } from './attributes';
