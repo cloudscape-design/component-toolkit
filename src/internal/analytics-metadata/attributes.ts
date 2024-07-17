@@ -5,7 +5,7 @@ import { GeneratedAnalyticsMetadataFragment } from './interfaces';
 import { getGlobalFlag } from '../global-flags';
 
 export const METADATA_DATA_ATTRIBUTE = 'awsuiAnalytics';
-export const METADATA_ATTRIBUTE = `data-awsui-analytics`;
+export const METADATA_ATTRIBUTE = 'data-awsui-analytics';
 export const LABEL_DATA_ATTRIBUTE = 'awsuiAnalyticsLabel';
 const LABEL_ATTRIBUTE = 'data-awsui-analytics-label';
 

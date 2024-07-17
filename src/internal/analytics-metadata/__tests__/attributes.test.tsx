@@ -33,11 +33,11 @@ describe.each([true, false])('With activate analitycs metadata = %s', active => 
     const metadata = { component: { name: 'whatever' } };
     const props = { ...getAnalyticsMetadataAttribute(metadata), className: 'test-class' };
     const { container } = render(<div {...copyAnalyticsMetadataAttribute(props)} />);
+    expect((container.firstElementChild as HTMLElement).classList.contains('test-class')).toBe(false);
     if (active) {
       expect((container.firstElementChild as HTMLElement).dataset[METADATA_DATA_ATTRIBUTE]).toEqual(
         JSON.stringify(metadata)
       );
-      expect((container.firstElementChild as HTMLElement).classList.contains('test-class')).toBe(false);
     } else {
       expect((container.firstElementChild as HTMLElement).dataset[METADATA_DATA_ATTRIBUTE]).toBeUndefined();
     }
