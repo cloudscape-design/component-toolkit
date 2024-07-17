@@ -4,8 +4,12 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { getRawAnalyticsMetadata } from '../testing-utils';
-import { METADATA_ATTRIBUTE } from '../attributes';
+import { METADATA_ATTRIBUTE, activateAnalyticsMetadata } from '../attributes';
 import { ComponentOne, ComponentThree } from './components';
+
+beforeAll(() => {
+  activateAnalyticsMetadata(true);
+});
 
 describe('getRawAnalyticsMetadata', () => {
   test('returns metadata and labels', () => {

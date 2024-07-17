@@ -5,6 +5,7 @@ export const awsuiGlobalFlagsSymbol = Symbol.for('awsui-global-flags');
 
 interface GlobalFlags {
   appLayoutWidget?: boolean;
+  analyticsMetadata?: boolean;
 }
 
 export interface FlagsHolder {
