@@ -8,10 +8,10 @@ import * as globalFlags from '../';
 import { awsuiGlobalFlagsSymbol, FlagsHolder } from '../';
 const { getGlobalFlag } = globalFlags;
 
-declare const global: typeof globalThis & FlagsHolder;
+const globalWithFlags = globalThis as FlagsHolder;
 
 afterEach(() => {
-  delete global[awsuiGlobalFlagsSymbol];
+  delete globalWithFlags[awsuiGlobalFlagsSymbol];
 });
 
 describe('getGlobalFlag', () => {
@@ -23,13 +23,13 @@ describe('getGlobalFlag', () => {
     expect(getGlobalFlag('appLayoutWidget')).toBeUndefined();
   });
   test('returns undefined if the global flags object exists but the flag is not set', () => {
-    global[awsuiGlobalFlagsSymbol] = {};
+    globalWithFlags[awsuiGlobalFlagsSymbol] = {};
     expect(getGlobalFlag('appLayoutWidget')).toBeUndefined();
   });
   test('returns appLayoutWidget value when defined', () => {
-    global[awsuiGlobalFlagsSymbol] = { appLayoutWidget: false };
+    globalWithFlags[awsuiGlobalFlagsSymbol] = { appLayoutWidget: false };
     expect(getGlobalFlag('appLayoutWidget')).toBe(false);
-    global[awsuiGlobalFlagsSymbol].appLayoutWidget = true;
+    globalWithFlags[awsuiGlobalFlagsSymbol].appLayoutWidget = true;
     expect(getGlobalFlag('appLayoutWidget')).toBe(true);
   });
 });
