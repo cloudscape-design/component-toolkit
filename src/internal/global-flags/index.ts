@@ -37,3 +37,16 @@ export const getGlobalFlag = (flagName: keyof GlobalFlags): GlobalFlags[keyof Gl
     return undefined;
   }
 };
+
+export const setGlobalFlag = (flagName: keyof GlobalFlags, value: GlobalFlags[keyof GlobalFlags] | undefined) => {
+  const holder = getGlobal() as FlagsHolder;
+  if (value === undefined) {
+    const currentValue = readFlag(holder, flagName);
+    if (currentValue !== undefined) {
+      delete holder[awsuiGlobalFlagsSymbol]![flagName];
+    }
+  } else {
+    holder[awsuiGlobalFlagsSymbol] = holder[awsuiGlobalFlagsSymbol] || {};
+    holder[awsuiGlobalFlagsSymbol][flagName] = value;
+  }
+};
