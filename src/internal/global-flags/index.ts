@@ -38,7 +38,10 @@ export const getGlobalFlag = (flagName: keyof GlobalFlags): GlobalFlags[keyof Gl
   }
 };
 
-export const setGlobalFlag = (flagName: keyof GlobalFlags, value: GlobalFlags[keyof GlobalFlags] | undefined) => {
+export const setGlobalFlag = <FlagName extends keyof GlobalFlags>(
+  flagName: FlagName,
+  value: GlobalFlags[FlagName] | undefined
+) => {
   const holder = getGlobal() as FlagsHolder;
   if (value === undefined) {
     const currentValue = readFlag(holder, flagName);
