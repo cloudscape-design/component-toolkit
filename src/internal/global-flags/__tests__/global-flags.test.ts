@@ -3,7 +3,7 @@
 
 import * as globalFlags from '../';
 import { FlagsHolder, awsuiGlobalFlagsSymbol } from '../';
-const { getGlobalFlag } = globalFlags;
+const { getGlobalFlag, setGlobalFlag } = globalFlags;
 
 declare const window: Window & FlagsHolder;
 
@@ -68,5 +68,33 @@ describe('getGlobalFlag', () => {
     });
     window[awsuiGlobalFlagsSymbol] = { appLayoutWidget: true };
     expect(getGlobalFlag('appLayoutWidget')).toBe(true);
+  });
+});
+
+describe('setGlobalFlag', () => {
+  test('sets value if global flag object exists', () => {
+    window[awsuiGlobalFlagsSymbol] = {};
+    setGlobalFlag('appLayoutWidget', true);
+    expect(getGlobalFlag('appLayoutWidget')).toBe(true);
+    setGlobalFlag('appLayoutWidget', false);
+    expect(getGlobalFlag('appLayoutWidget')).toBe(false);
+  });
+  test('sets value if global flag object does not exist', () => {
+    setGlobalFlag('appLayoutWidget', true);
+    expect(getGlobalFlag('appLayoutWidget')).toBe(true);
+  });
+  test('sets value if flag already exists', () => {
+    window[awsuiGlobalFlagsSymbol] = { appLayoutWidget: false };
+    setGlobalFlag('appLayoutWidget', true);
+    expect(getGlobalFlag('appLayoutWidget')).toBe(true);
+  });
+  test('does not create global flag object if value is undefined', () => {
+    setGlobalFlag('appLayoutWidget', undefined);
+    expect(window[awsuiGlobalFlagsSymbol]).toBeUndefined();
+  });
+  test('removes flag if value is undefined', () => {
+    window[awsuiGlobalFlagsSymbol] = { appLayoutWidget: false };
+    setGlobalFlag('appLayoutWidget', undefined);
+    expect(Object.keys(window[awsuiGlobalFlagsSymbol]).length).toBe(0);
   });
 });
