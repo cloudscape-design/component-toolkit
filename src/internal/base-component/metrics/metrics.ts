@@ -101,8 +101,10 @@ export class Metrics {
   }
 }
 
+export function clearOneTimeMetricsCache(): void {
+  oneTimeMetrics.clear();
+}
+
 export class MetricsTestHelper {
-  resetOneTimeMetricsCache() {
-    oneTimeMetrics.clear();
-  }
+  resetOneTimeMetricsCache = clearOneTimeMetricsCache;
 }
