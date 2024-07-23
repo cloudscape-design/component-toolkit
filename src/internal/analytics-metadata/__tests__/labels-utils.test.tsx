@@ -93,6 +93,22 @@ describe('getLabelFromElement', () => {
     const target = container.querySelector('#target');
     expect(getLabelFromElement(target as HTMLElement)).toEqual('');
   });
+  test('trims the label', () => {
+    const { container } = render(
+      <div>
+        <div id="target1" aria-label=" abcd efg ">
+          content
+        </div>
+        <div id="target2">
+          {'   '}content{'   '}
+        </div>
+      </div>
+    );
+    const target1 = container.querySelector('#target1');
+    expect(getLabelFromElement(target1 as HTMLElement)).toEqual('abcd efg');
+    const target2 = container.querySelector('#target2');
+    expect(getLabelFromElement(target2 as HTMLElement)).toEqual('content');
+  });
 });
 
 describe('processLabel', () => {

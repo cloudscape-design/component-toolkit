@@ -56,7 +56,7 @@ export const getLabelFromElement = (element: HTMLElement | null): string => {
   }
   const ariaLabel = element.getAttribute('aria-label');
   if (ariaLabel) {
-    return ariaLabel;
+    return ariaLabel.trim();
   }
   const ariaLabelledBy = element.getAttribute('aria-labelledby');
   if (ariaLabelledBy) {
@@ -64,5 +64,5 @@ export const getLabelFromElement = (element: HTMLElement | null): string => {
     return getLabelFromElement(elementWithLabel as HTMLElement);
   }
 
-  return element.textContent || '';
+  return element.textContent ? element.textContent.trim() : '';
 };
