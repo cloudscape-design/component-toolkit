@@ -64,7 +64,14 @@ describe('getGeneratedAnalyticsMetadata', () => {
           },
           {
             type: 'component',
-            detail: { name: 'ComponentThree', innerContext: { position: '2', columnLabel: '' } },
+            detail: {
+              name: 'ComponentThree',
+              innerContext: {
+                position: '2',
+                columnLabel: '',
+                anotherLabel: 'sub labelanother text content to ignorecontentcomponent labelevent label',
+              },
+            },
           },
         ],
       });

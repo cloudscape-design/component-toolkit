@@ -56,6 +56,9 @@ describe('getRawAnalyticsMetadata', () => {
                 selector: '.invalid-selector',
                 root: 'self',
               },
+              anotherLabel: {
+                root: 'self',
+              },
             },
           },
         },

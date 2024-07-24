@@ -46,8 +46,11 @@ const getLabelSelectors = (localMetadata: any): Array<string> => {
 const getLabelSelectorsFromLabelIdentifier = (label: string | LabelIdentifier): Array<string> => {
   if (typeof label === 'string') {
     return [label];
-  } else if (typeof label.selector === 'string') {
-    return [label.selector];
+  } else if (label.selector) {
+    if (typeof label.selector === 'string') {
+      return [label.selector];
+    }
+    return label.selector;
   }
-  return label.selector;
+  return [];
 };

@@ -145,6 +145,15 @@ describe('processLabel', () => {
     expect(processLabel(target, '')).toEqual('content');
     expect(processLabel(target, { selector: '' })).toEqual('content');
   });
+  test('returns node label when selector is undefined and has root="self" ', () => {
+    const { container } = render(
+      <div>
+        <div id="target">content</div>
+      </div>
+    );
+    const target = container.querySelector('#target') as HTMLElement;
+    expect(processLabel(target, { root: 'self' })).toEqual('content');
+  });
   test('returns node label when selector is a chain', () => {
     const { container } = render(
       <div>

@@ -47,7 +47,13 @@ export const ComponentThree = () => (
   <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentThree' } })}>
     <div
       {...getAnalyticsMetadataAttribute({
-        component: { innerContext: { position: '2', columnLabel: { selector: '.invalid-selector', root: 'self' } } },
+        component: {
+          innerContext: {
+            position: '2',
+            columnLabel: { selector: '.invalid-selector', root: 'self' },
+            anotherLabel: { root: 'self' },
+          },
+        },
       })}
     >
       <ComponentTwo />
