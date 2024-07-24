@@ -35,7 +35,7 @@ interface GeneratedAnalyticsMetadataComponentContext {
 }
 
 export interface LabelIdentifier {
-  selector: string | Array<string>;
+  selector?: string | Array<string>;
   root?: 'component' | 'self';
 }
 
