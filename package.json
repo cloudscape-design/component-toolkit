@@ -32,7 +32,7 @@
     "postbuild:focus-visible": "cp ./src/internal/focus-visible/index.scss lib/internal/focus-visible",
     "test-pages": "vite --config ./test-pages/vite.config.mts",
     "test:unit": "jest -c jest.unit.config.js",
-    "test:integ": "jest -c jest.integ.config.js",
+    "test:integ": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest -c jest.integ.config.js",
     "test": "npm run test:unit && npm-run-all -r -p test-pages test:integ",
     "lint": "eslint --ignore-path .gitignore --ext ts,tsx,js .",
     "prepare": "husky"
