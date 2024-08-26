@@ -82,6 +82,15 @@ describe('getLabelFromElement', () => {
     const target = container.querySelector('#target');
     expect(getLabelFromElement(target as HTMLElement)).toEqual('second content');
   });
+  test('returns text content aria-labelledby refers to the element itself', () => {
+    const { container } = render(
+      <div id="target" aria-labelledby="target">
+        content
+      </div>
+    );
+    const target = container.querySelector('#target');
+    expect(getLabelFromElement(target as HTMLElement)).toEqual('content');
+  });
   test('returns empty string if aria-labelledby element does not exist', () => {
     const { container } = render(
       <div>

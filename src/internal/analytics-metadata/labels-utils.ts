@@ -61,7 +61,9 @@ export const getLabelFromElement = (element: HTMLElement | null): string => {
   const ariaLabelledBy = element.getAttribute('aria-labelledby');
   if (ariaLabelledBy) {
     const elementWithLabel = document.querySelector(`[id="${ariaLabelledBy.split(' ')[0]}"]`);
-    return getLabelFromElement(elementWithLabel as HTMLElement);
+    if (elementWithLabel !== element) {
+      return getLabelFromElement(elementWithLabel as HTMLElement);
+    }
   }
 
   return element.textContent ? element.textContent.trim() : '';
