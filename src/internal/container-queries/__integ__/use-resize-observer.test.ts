@@ -6,7 +6,7 @@ import { BasePageObject } from '@cloudscape-design/browser-test-tools/page-objec
 
 export class PageObject extends BasePageObject {
   resizeWindow(width: number, height: number) {
-    return this.browser.setWindowSize(width, height);
+    return this.setWindowSize({ width, height });
   }
 }
 
