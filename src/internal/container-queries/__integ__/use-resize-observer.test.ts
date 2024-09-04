@@ -23,10 +23,11 @@ describe('use-resize-observer', () => {
     'reports dimensions correctly',
     setupTest(async page => {
       await page.waitForVisible('#target');
-      await page.resizeWindow(999, 777);
-      await expect(page.getElementsText('#target')).resolves.toEqual(['Content: 979/757\nBorder: 999/777']);
-      await page.resizeWindow(777, 333);
-      await expect(page.getElementsText('#target')).resolves.toEqual(['Content: 757/313\nBorder: 777/333']);
+      await expect(page.getElementsText('#target')).resolves.toEqual(['Content: 280/280\nBorder: 300/300']);
+      await page.click('[id="width+"]');
+      await page.click('[id="height-"]');
+      await page.pause(10);
+      await expect(page.getElementsText('#target')).resolves.toEqual(['Content: 290/270\nBorder: 310/290']);
     })
   );
 });

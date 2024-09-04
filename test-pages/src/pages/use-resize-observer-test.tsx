@@ -10,23 +10,40 @@ export default function Page() {
 
   useResizeObserver(() => document.querySelector('#target'), setEntry);
 
-  const contentWidth = entry?.contentBoxWidth || 0;
-  const contentHeight = entry?.contentBoxHeight || 0;
-  const borderWidth = entry?.borderBoxWidth || 0;
-  const borderHeight = entry?.borderBoxHeight || 0;
+  const [width, setWidth] = useState(300);
+  const [height, setHeight] = useState(300);
 
   return (
-    <div
-      id="target"
-      style={{
-        width: '100%',
-        height: '100%',
-        padding: '10px',
-      }}
-    >
-      Content: {contentWidth}/{contentHeight}
-      <br />
-      Border: {borderWidth}/{borderHeight}
+    <div style={{ margin: '10px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ display: 'flex', gap: '16px' }}>
+        <button id="width+" onClick={() => setWidth(prev => prev + 10)}>
+          Width + 10px
+        </button>
+        <button id="width-" onClick={() => setWidth(prev => prev - 10)}>
+          Width - 10px
+        </button>
+        <button id="height+" onClick={() => setHeight(prev => prev + 10)}>
+          Height + 10px
+        </button>
+        <button id="height-" onClick={() => setHeight(prev => prev - 10)}>
+          Height - 10px
+        </button>
+      </div>
+
+      <div id="container" style={{ width, height, background: 'gray' }}>
+        <div
+          id="target"
+          style={{
+            width: '100%',
+            height: '100%',
+            padding: '10px',
+          }}
+        >
+          Content: {entry?.contentBoxWidth || 0}/{entry?.contentBoxHeight || 0}
+          <br />
+          Border: {entry?.borderBoxWidth || 0}/{entry?.borderBoxHeight || 0}
+        </div>
+      </div>
     </div>
   );
 }
