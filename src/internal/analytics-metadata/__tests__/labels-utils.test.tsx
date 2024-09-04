@@ -206,18 +206,23 @@ describe('processLabel', () => {
   });
   test('respects the root property', () => {
     const { container } = render(
-      <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentName' } })}>
-        <div className="label-class">outer label</div>
-        <div id="target">
-          <div className="label-class">inner label</div>
+      <>
+        <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentName' } })}>
+          <div className="label-class">outer label</div>
+          <div id="target">
+            <div className="label-class">inner label</div>
+          </div>
         </div>
-      </div>
+        <div className="outer-class">label outside of the component</div>
+      </>
     );
     const target = container.querySelector('#target') as HTMLElement;
     //  root="self" refers to the element containing the data attribute
     expect(processLabel(target, { selector: '.label-class', root: 'self' })).toEqual('inner label');
-    //  root="self" refers to the parent component
+    //  root="component" refers to the parent component
     expect(processLabel(target, { selector: '.label-class', root: 'component' })).toEqual('outer label');
+    //  root="body" refers to body
+    expect(processLabel(target, { selector: '.outer-class', root: 'body' })).toEqual('label outside of the component');
   });
 
   test('forwards the label resolution with data-awsui-analytics-label', () => {

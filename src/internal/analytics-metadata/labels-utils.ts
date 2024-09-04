@@ -40,6 +40,9 @@ const processSingleLabel = (
   if (root === 'component') {
     return processSingleLabel(findComponentUp(node), labelSelector);
   }
+  if (root === 'body') {
+    return processSingleLabel(document.body, labelSelector);
+  }
   let labelElement: HTMLElement | null = node;
   if (labelSelector) {
     labelElement = labelElement.querySelector(labelSelector) as HTMLElement | null;

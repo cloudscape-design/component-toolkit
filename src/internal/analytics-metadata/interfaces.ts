@@ -36,7 +36,7 @@ interface GeneratedAnalyticsMetadataComponentContext {
 
 export interface LabelIdentifier {
   selector?: string | Array<string>;
-  root?: 'component' | 'self';
+  root?: 'component' | 'self' | 'body';
 }
 
 export interface GeneratedAnalyticsMetadataFragment extends Omit<Partial<GeneratedAnalyticsMetadata>, 'detail'> {
