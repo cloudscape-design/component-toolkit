@@ -56,6 +56,14 @@ describe('PanoramaClient', () => {
     expect(consoleSpy).toHaveBeenCalledWith(`Event type for metric is too long: ${eventType}`);
   });
 
+  test('prints an error when event name is too long', () => {
+    const eventName = 'a'.repeat(1001);
+    panorama.sendMetric({ eventName });
+
+    expect(window.panorama).not.toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(`Event name for metric is too long: ${eventName}`);
+  });
+
   test('prints an error when event value is too long', () => {
     const eventValue = 'a'.repeat(4001);
     panorama.sendMetric({ eventValue });

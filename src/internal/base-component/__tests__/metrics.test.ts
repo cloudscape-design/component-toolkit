@@ -55,8 +55,18 @@ describe('Client Metrics support', () => {
     });
 
     test('does nothing when window.AWSC.Clog is undefined', () => {
-      window.AWSC = undefined;
+      window.AWSC = {};
       metrics.sendMetric('name', 0); // only proves no exception thrown
+    });
+
+    test('uses panorama API as fallback when AWSC.Clog.log is unavailable', () => {
+      delete window.AWSC;
+      metrics.sendMetric('name', 0);
+      expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+        eventName: 'name',
+        eventValue: '0',
+        timestamp: expect.any(Number),
+      });
     });
 
     test('does nothing when window.AWSC.Clog.log is undefined', () => {
@@ -68,10 +78,15 @@ describe('Client Metrics support', () => {
 
     describe('within an iframe', () => {
       mockConsoleError();
+      const originalWindowParent = Object.getOwnPropertyDescriptor(window, 'parent')!;
+
+      afterEach(() => {
+        Object.defineProperty(window, 'parent', originalWindowParent);
+        expect(window.parent.AWSC).toBeUndefined();
+      });
+
       const setupIframe = () => {
-        const parentWindow = { ...window };
-        Object.defineProperty(window, 'parent', { value: parentWindow });
-        Object.defineProperty(parentWindow, 'parent', { value: parentWindow });
+        Object.defineProperty(window, 'parent', { configurable: true, writable: true, value: { parent: {} } });
       };
 
       test('does nothing when AWSC is not defined in the parent iframe', () => {
@@ -91,6 +106,8 @@ describe('Client Metrics support', () => {
           },
         };
         jest.spyOn(window.parent.AWSC.Clog, 'log');
+        expect(window.AWSC).toBeUndefined();
+        expect(window.parent.AWSC).toBeDefined();
 
         metrics.sendMetric('name', 0, undefined);
         expect(window.parent.AWSC.Clog.log).toHaveBeenCalledWith('name', 0, undefined);
@@ -173,6 +190,17 @@ describe('Client Metrics support', () => {
   });
 
   describe('sendMetricObject', () => {
+    test('uses panorama API as fallback when AWSC.Clog.log is unavailable', () => {
+      window.AWSC = undefined;
+      metrics.sendMetricObject({ source: 'pkg', action: 'used', version: '5.0' }, 1);
+      expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+        eventDetail: '{"o":"main","s":"pkg","t":"default","a":"used","f":"react","v":"5.0"}',
+        eventName: 'awsui_pkg_d50',
+        eventValue: '1',
+        timestamp: expect.any(Number),
+      });
+    });
+
     describe('correctly maps input object to metric name', () => {
       test('applies default values for theme (default) and framework (react)', () => {
         metrics.sendMetricObject(
