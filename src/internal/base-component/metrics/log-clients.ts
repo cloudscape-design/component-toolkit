@@ -11,6 +11,7 @@ interface MetricsWindow extends Window {
 }
 
 export interface MetricsV2EventItem {
+  eventName?: string;
   eventType?: string;
   eventContext?: string;
   eventDetail?: string | Record<string, string | number | boolean>;
@@ -45,6 +46,13 @@ export class CLogClient {
     const AWSC = this.findAWSC(window);
     if (typeof AWSC === 'object' && typeof AWSC.Clog === 'object' && typeof AWSC.Clog.log === 'function') {
       AWSC.Clog.log(metricName, value, detail);
+    } else {
+      new PanoramaClient().sendMetric({
+        eventName: metricName,
+        eventDetail: detail,
+        eventValue: `${value}`,
+        timestamp: Date.now(),
+      });
     }
   }
 
@@ -80,6 +88,10 @@ export class PanoramaClient {
     }
     if (typeof metric.eventValue === 'object') {
       metric.eventValue = JSON.stringify(metric.eventValue);
+    }
+    if (!validateLength(metric.eventName, 1000)) {
+      console.error(`Event name for metric is too long: ${metric.eventName}`);
+      return;
     }
     if (!validateLength(metric.eventDetail, 4000)) {
       console.error(`Event detail for metric is too long: ${metric.eventDetail}`);
