@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LABEL_DATA_ATTRIBUTE } from './attributes';
-import { findComponentUp } from './dom-utils';
+import { findByClassNameUp, findComponentUp } from './dom-utils';
 import { LabelIdentifier } from './interfaces';
 
 export const processLabel = (node: HTMLElement | null, labelIdentifier: string | LabelIdentifier | null): string => {
@@ -13,13 +13,23 @@ export const processLabel = (node: HTMLElement | null, labelIdentifier: string |
   const selector = formattedLabelIdentifier.selector;
   if (Array.isArray(selector)) {
     for (const labelSelector of selector) {
-      const label = processSingleLabel(node, labelSelector, formattedLabelIdentifier.root);
+      const label = processSingleLabel(
+        node,
+        labelSelector,
+        formattedLabelIdentifier.root,
+        formattedLabelIdentifier.rootClassName
+      );
       if (label) {
         return label;
       }
     }
   }
-  return processSingleLabel(node, selector as string, formattedLabelIdentifier.root);
+  return processSingleLabel(
+    node,
+    selector as string,
+    formattedLabelIdentifier.root,
+    formattedLabelIdentifier.rootClassName
+  );
 };
 
 const formatLabelIdentifier = (labelIdentifier: string | LabelIdentifier): LabelIdentifier => {
@@ -32,10 +42,14 @@ const formatLabelIdentifier = (labelIdentifier: string | LabelIdentifier): Label
 const processSingleLabel = (
   node: HTMLElement | null,
   labelSelector: string,
-  root: LabelIdentifier['root'] = 'self'
+  root: LabelIdentifier['root'] = 'self',
+  rootClassName?: string
 ): string => {
   if (!node) {
     return '';
+  }
+  if (rootClassName) {
+    return processSingleLabel(findByClassNameUp(node, rootClassName), labelSelector);
   }
   if (root === 'component') {
     return processSingleLabel(findComponentUp(node), labelSelector);

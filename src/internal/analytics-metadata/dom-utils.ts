@@ -35,3 +35,14 @@ export const isNodeComponent = (node: HTMLElement): boolean => {
     return false;
   }
 };
+
+export function findByClassNameUp(node: HTMLElement | null, className: string): HTMLElement | null {
+  if (!node || !className) {
+    return null;
+  }
+  let current: HTMLElement | null = node;
+  while (current && current.tagName !== 'body' && !current.classList.contains(className)) {
+    current = findLogicalParent(current);
+  }
+  return current && current.tagName !== 'body' ? current : null;
+}

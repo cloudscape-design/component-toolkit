@@ -44,13 +44,20 @@ const getLabelSelectors = (localMetadata: any): Array<string> => {
 };
 
 const getLabelSelectorsFromLabelIdentifier = (label: string | LabelIdentifier): Array<string> => {
+  let labels: Array<string> = [];
   if (typeof label === 'string') {
-    return [label];
-  } else if (label.selector) {
-    if (typeof label.selector === 'string') {
-      return [label.selector];
+    labels.push(label);
+  } else {
+    if (label.selector) {
+      if (typeof label.selector === 'string') {
+        labels.push(label.selector);
+      } else {
+        labels = [...label.selector];
+      }
     }
-    return label.selector;
+    if (label.rootClassName) {
+      labels.push(`.${label.rootClassName}`);
+    }
   }
-  return [];
+  return labels;
 };
