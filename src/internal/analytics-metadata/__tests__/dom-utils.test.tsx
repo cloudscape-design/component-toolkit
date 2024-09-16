@@ -4,7 +4,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { activateAnalyticsMetadata, getAnalyticsMetadataAttribute, METADATA_ATTRIBUTE } from '../attributes';
-import { findLogicalParent, isNodeComponent, findComponentUp, findByClassNameUp } from '../dom-utils';
+import { findLogicalParent, isNodeComponent, findComponentUp, findSelectorUp } from '../dom-utils';
 
 beforeAll(() => {
   activateAnalyticsMetadata(true);
@@ -113,16 +113,16 @@ describe('findComponentUp', () => {
   });
 });
 
-describe('findByClassNameUp', () => {
+describe('findSelectorUp', () => {
   test('returns null when the node is null and/or the className is empty', () => {
-    expect(findByClassNameUp(null, 'abcd')).toBeNull();
-    expect(findByClassNameUp(null, '')).toBeNull();
+    expect(findSelectorUp(null, 'abcd')).toBeNull();
+    expect(findSelectorUp(null, '')).toBeNull();
     const { container } = render(
       <div id="root-element">
         <div id="target-element"></div>
       </div>
     );
-    expect(findByClassNameUp(container.querySelector('#target-element'), '')).toBeNull();
+    expect(findSelectorUp(container.querySelector('#target-element'), '')).toBeNull();
   });
   test('returns root element', () => {
     const { container } = render(
@@ -130,7 +130,7 @@ describe('findByClassNameUp', () => {
         <div id="target-element"></div>
       </div>
     );
-    expect(findByClassNameUp(container.querySelector('#target-element'), '.test-class')!.id).toBe('root-element');
+    expect(findSelectorUp(container.querySelector('#target-element'), '.test-class')!.id).toBe('root-element');
   });
   test('returns parent component element with portals', () => {
     const { container } = render(
@@ -143,7 +143,7 @@ describe('findByClassNameUp', () => {
         </div>
       </div>
     );
-    expect(findByClassNameUp(container.querySelector('#target-element'), '.test-class')!.id).toBe('root-element');
+    expect(findSelectorUp(container.querySelector('#target-element'), '.test-class')!.id).toBe('root-element');
   });
   test('returns null when element has no parent element with className', () => {
     const { container } = render(
@@ -151,6 +151,6 @@ describe('findByClassNameUp', () => {
         <div id="target-element"></div>
       </div>
     );
-    expect(findByClassNameUp(container.querySelector('#target-element'), '.test-class')).toBeNull();
+    expect(findSelectorUp(container.querySelector('#target-element'), '.test-class')).toBeNull();
   });
 });

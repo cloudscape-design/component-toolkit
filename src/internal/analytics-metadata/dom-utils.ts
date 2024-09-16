@@ -36,7 +36,7 @@ export const isNodeComponent = (node: HTMLElement): boolean => {
   }
 };
 
-export function findByClassNameUp(node: HTMLElement | null, selector: string): HTMLElement | null {
+export function findSelectorUp(node: HTMLElement | null, selector: string): HTMLElement | null {
   if (!selector) {
     return null;
   }
