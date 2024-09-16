@@ -225,7 +225,7 @@ describe('processLabel', () => {
     expect(processLabel(target, { selector: '.outer-class', root: 'body' })).toEqual('label outside of the component');
   });
 
-  test('respects the rootClassName property', () => {
+  test('respects the rootSelector property', () => {
     const { container } = render(
       <div className="root-class">
         <div className="label-class">outer label</div>
@@ -235,9 +235,9 @@ describe('processLabel', () => {
       </div>
     );
     const target = container.querySelector('#target') as HTMLElement;
-    expect(processLabel(target, { selector: '.label-class', rootClassName: 'root-class' })).toEqual('outer label');
+    expect(processLabel(target, { selector: '.label-class', rootSelector: '.root-class' })).toEqual('outer label');
   });
-  test('rootClassName prevails over root property', () => {
+  test('rootSelector prevails over root property', () => {
     const { container } = render(
       <>
         <div className="root-class">
@@ -253,13 +253,13 @@ describe('processLabel', () => {
       </>
     );
     const target = container.querySelector('#target') as HTMLElement;
-    expect(processLabel(target, { selector: '.label-class', root: 'self', rootClassName: 'root-class' })).toEqual(
+    expect(processLabel(target, { selector: '.label-class', root: 'self', rootSelector: '.root-class' })).toEqual(
       'root class label'
     );
-    expect(processLabel(target, { selector: '.label-class', root: 'component', rootClassName: 'root-class' })).toEqual(
+    expect(processLabel(target, { selector: '.label-class', root: 'component', rootSelector: '.root-class' })).toEqual(
       'root class label'
     );
-    expect(processLabel(target, { selector: '.outer-class', root: 'body', rootClassName: 'root-class' })).toEqual('');
+    expect(processLabel(target, { selector: '.outer-class', root: 'body', rootSelector: '.root-class' })).toEqual('');
   });
 
   test('forwards the label resolution with data-awsui-analytics-label', () => {

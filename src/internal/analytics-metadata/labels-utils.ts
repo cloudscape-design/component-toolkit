@@ -17,7 +17,7 @@ export const processLabel = (node: HTMLElement | null, labelIdentifier: string |
         node,
         labelSelector,
         formattedLabelIdentifier.root,
-        formattedLabelIdentifier.rootClassName
+        formattedLabelIdentifier.rootSelector
       );
       if (label) {
         return label;
@@ -28,7 +28,7 @@ export const processLabel = (node: HTMLElement | null, labelIdentifier: string |
     node,
     selector as string,
     formattedLabelIdentifier.root,
-    formattedLabelIdentifier.rootClassName
+    formattedLabelIdentifier.rootSelector
   );
 };
 
@@ -43,13 +43,13 @@ const processSingleLabel = (
   node: HTMLElement | null,
   labelSelector: string,
   root: LabelIdentifier['root'] = 'self',
-  rootClassName?: string
+  rootSelector?: string
 ): string => {
   if (!node) {
     return '';
   }
-  if (rootClassName) {
-    return processSingleLabel(findByClassNameUp(node, rootClassName), labelSelector);
+  if (rootSelector) {
+    return processSingleLabel(findByClassNameUp(node, rootSelector), labelSelector);
   }
   if (root === 'component') {
     return processSingleLabel(findComponentUp(node), labelSelector);

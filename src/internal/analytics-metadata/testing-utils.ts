@@ -55,8 +55,8 @@ const getLabelSelectorsFromLabelIdentifier = (label: string | LabelIdentifier): 
         labels = [...label.selector];
       }
     }
-    if (label.rootClassName) {
-      labels.push(`.${label.rootClassName}`);
+    if (label.rootSelector) {
+      labels.push(label.rootSelector);
     }
   }
   return labels;

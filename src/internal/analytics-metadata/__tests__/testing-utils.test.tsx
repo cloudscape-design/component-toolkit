@@ -60,7 +60,7 @@ describe('getRawAnalyticsMetadata', () => {
                 root: 'self',
               },
               yetAnotherLabel: {
-                rootClassName: 'root-class-name',
+                rootSelector: '.root-class-name',
               },
             },
           },

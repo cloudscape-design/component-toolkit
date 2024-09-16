@@ -130,7 +130,7 @@ describe('findByClassNameUp', () => {
         <div id="target-element"></div>
       </div>
     );
-    expect(findByClassNameUp(container.querySelector('#target-element'), 'test-class')!.id).toBe('root-element');
+    expect(findByClassNameUp(container.querySelector('#target-element'), '.test-class')!.id).toBe('root-element');
   });
   test('returns parent component element with portals', () => {
     const { container } = render(
@@ -143,7 +143,7 @@ describe('findByClassNameUp', () => {
         </div>
       </div>
     );
-    expect(findByClassNameUp(container.querySelector('#target-element'), 'test-class')!.id).toBe('root-element');
+    expect(findByClassNameUp(container.querySelector('#target-element'), '.test-class')!.id).toBe('root-element');
   });
   test('returns null when element has no parent element with className', () => {
     const { container } = render(
@@ -151,6 +151,6 @@ describe('findByClassNameUp', () => {
         <div id="target-element"></div>
       </div>
     );
-    expect(findByClassNameUp(container.querySelector('#target-element'), 'test-class')).toBeNull();
+    expect(findByClassNameUp(container.querySelector('#target-element'), '.test-class')).toBeNull();
   });
 });
