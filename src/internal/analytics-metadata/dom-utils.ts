@@ -37,9 +37,6 @@ export const isNodeComponent = (node: HTMLElement): boolean => {
 };
 
 export function findSelectorUp(node: HTMLElement | null, selector: string): HTMLElement | null {
-  if (!selector) {
-    return null;
-  }
   let current: HTMLElement | null = node;
   while (current && current.tagName !== 'body' && !current.matches(selector)) {
     current = findLogicalParent(current);

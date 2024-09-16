@@ -114,15 +114,14 @@ describe('findComponentUp', () => {
 });
 
 describe('findSelectorUp', () => {
-  test('returns null when the node is null and/or the className is empty', () => {
+  test('returns null when the node is null or the className is invalid', () => {
     expect(findSelectorUp(null, 'abcd')).toBeNull();
-    expect(findSelectorUp(null, '')).toBeNull();
     const { container } = render(
       <div id="root-element">
         <div id="target-element"></div>
       </div>
     );
-    expect(findSelectorUp(container.querySelector('#target-element'), '')).toBeNull();
+    expect(findSelectorUp(container.querySelector('#target-element'), '.dummy')).toBeNull();
   });
   test('returns root element', () => {
     const { container } = render(
