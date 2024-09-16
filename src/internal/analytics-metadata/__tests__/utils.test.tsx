@@ -70,6 +70,7 @@ describe('getGeneratedAnalyticsMetadata', () => {
                 position: '2',
                 columnLabel: '',
                 anotherLabel: 'sub labelanother text content to ignorecontentcomponent labelevent label',
+                yetAnotherLabel: '',
               },
             },
           },

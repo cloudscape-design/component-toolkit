@@ -52,6 +52,7 @@ export const ComponentThree = () => (
             position: '2',
             columnLabel: { selector: '.invalid-selector', root: 'self' },
             anotherLabel: { root: 'self' },
+            yetAnotherLabel: { rootSelector: '.root-class-name' },
           },
         },
       })}

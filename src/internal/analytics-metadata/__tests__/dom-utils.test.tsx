@@ -4,7 +4,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { activateAnalyticsMetadata, getAnalyticsMetadataAttribute, METADATA_ATTRIBUTE } from '../attributes';
-import { findLogicalParent, isNodeComponent, findComponentUp } from '../dom-utils';
+import { findLogicalParent, isNodeComponent, findComponentUp, findSelectorUp } from '../dom-utils';
 
 beforeAll(() => {
   activateAnalyticsMetadata(true);
@@ -18,7 +18,7 @@ describe('findLogicalParent', () => {
       </div>
     );
     const child = container.querySelector('#child');
-    expect(findLogicalParent(child as HTMLElement)?.id).toEqual('parent');
+    expect(findLogicalParent(child as HTMLElement)!.id).toEqual('parent');
   });
   test('returns null when child does not exist', () => {
     const { container } = render(
@@ -88,7 +88,7 @@ describe('findComponentUp', () => {
         <div id="target-element"></div>
       </div>
     );
-    expect(findComponentUp(container.querySelector('#target-element'))?.id).toBe('component-element');
+    expect(findComponentUp(container.querySelector('#target-element'))!.id).toBe('component-element');
   });
   test('returns parent component element with portals', () => {
     const { container } = render(
@@ -101,7 +101,7 @@ describe('findComponentUp', () => {
         </div>
       </div>
     );
-    expect(findComponentUp(container.querySelector('#target-element'))?.id).toBe('component-element');
+    expect(findComponentUp(container.querySelector('#target-element'))!.id).toBe('component-element');
   });
   test('returns null when element has no parent component', () => {
     const { container } = render(
@@ -110,5 +110,46 @@ describe('findComponentUp', () => {
       </div>
     );
     expect(findComponentUp(container.querySelector('#target-element'))).toBeNull();
+  });
+});
+
+describe('findSelectorUp', () => {
+  test('returns null when the node is null or the className is invalid', () => {
+    expect(findSelectorUp(null, 'abcd')).toBeNull();
+    const { container } = render(
+      <div id="root-element">
+        <div id="target-element"></div>
+      </div>
+    );
+    expect(findSelectorUp(container.querySelector('#target-element'), '.dummy')).toBeNull();
+  });
+  test('returns root element', () => {
+    const { container } = render(
+      <div id="root-element" className="test-class">
+        <div id="target-element"></div>
+      </div>
+    );
+    expect(findSelectorUp(container.querySelector('#target-element'), '.test-class')!.id).toBe('root-element');
+  });
+  test('returns parent component element with portals', () => {
+    const { container } = render(
+      <div>
+        <div id="root-element" className="test-class">
+          <div id=":rr5:"></div>
+        </div>
+        <div data-awsui-referrer-id=":rr5:">
+          <div id="target-element"></div>
+        </div>
+      </div>
+    );
+    expect(findSelectorUp(container.querySelector('#target-element'), '.test-class')!.id).toBe('root-element');
+  });
+  test('returns null when element has no parent element with className', () => {
+    const { container } = render(
+      <div>
+        <div id="target-element"></div>
+      </div>
+    );
+    expect(findSelectorUp(container.querySelector('#target-element'), '.test-class')).toBeNull();
   });
 });

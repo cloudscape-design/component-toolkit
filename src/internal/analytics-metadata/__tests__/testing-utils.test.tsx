@@ -59,6 +59,9 @@ describe('getRawAnalyticsMetadata', () => {
               anotherLabel: {
                 root: 'self',
               },
+              yetAnotherLabel: {
+                rootSelector: '.root-class-name',
+              },
             },
           },
         },
@@ -74,6 +77,7 @@ describe('getRawAnalyticsMetadata', () => {
         '.component-label',
         '.component-label',
         '.invalid-selector',
+        '.root-class-name',
       ],
     });
   });

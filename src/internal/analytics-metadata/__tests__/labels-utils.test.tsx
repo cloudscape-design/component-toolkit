@@ -225,6 +225,43 @@ describe('processLabel', () => {
     expect(processLabel(target, { selector: '.outer-class', root: 'body' })).toEqual('label outside of the component');
   });
 
+  test('respects the rootSelector property', () => {
+    const { container } = render(
+      <div className="root-class">
+        <div className="label-class">outer label</div>
+        <div id="target">
+          <div className="label-class">inner label</div>
+        </div>
+      </div>
+    );
+    const target = container.querySelector('#target') as HTMLElement;
+    expect(processLabel(target, { selector: '.label-class', rootSelector: '.root-class' })).toEqual('outer label');
+  });
+  test('rootSelector prevails over root property', () => {
+    const { container } = render(
+      <>
+        <div className="root-class">
+          <div className="label-class">root class label</div>
+          <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentName' } })}>
+            <div className="label-class">component label</div>
+            <div id="target">
+              <div className="label-class">inner label</div>
+            </div>
+          </div>
+        </div>
+        <div className="outer-class">label outside of the component</div>
+      </>
+    );
+    const target = container.querySelector('#target') as HTMLElement;
+    expect(processLabel(target, { selector: '.label-class', root: 'self', rootSelector: '.root-class' })).toEqual(
+      'root class label'
+    );
+    expect(processLabel(target, { selector: '.label-class', root: 'component', rootSelector: '.root-class' })).toEqual(
+      'root class label'
+    );
+    expect(processLabel(target, { selector: '.outer-class', root: 'body', rootSelector: '.root-class' })).toEqual('');
+  });
+
   test('forwards the label resolution with data-awsui-analytics-label', () => {
     const { container } = render(
       <div>
