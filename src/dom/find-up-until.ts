@@ -1,6 +1,8 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+import { isHTMLElement } from './element-types';
+
 /**
  * Checks if the current element or any of its parent is matched with `test` function.
  *
@@ -20,9 +22,9 @@ export default function findUpUntil(from: HTMLElement, test: (element: HTMLEleme
   while (current && !test(current)) {
     current = current.parentElement;
     // If a component is used within an svg (i.e. as foreignObject), then it will
-    // have some ancestor elements that are SVGElement. We want to skip those,
+    // have some ancestor nodes that are SVGElement. We want to skip those,
     // as they have very different properties to HTMLElements.
-    while (current && !(current instanceof HTMLElement)) {
+    while (current && !isHTMLElement(current)) {
       current = (current as Element).parentElement;
     }
   }
