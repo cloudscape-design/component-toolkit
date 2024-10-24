@@ -9,18 +9,21 @@ import { isDevelopment } from '../is-development';
 import { warnOnce } from '../logging';
 import { awsuiVisualRefreshFlag, getGlobal } from '../global-flags';
 
-export function isMotionDisabled(element: HTMLElement): boolean {
+function safeMatchMedia(element: HTMLElement, query: string) {
   try {
     const targetWindow = element.ownerDocument?.defaultView ?? window;
-
-    return (
-      !!findUpUntil(element, node => node.classList.contains('awsui-motion-disabled')) ||
-      (targetWindow?.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false)
-    );
+    return targetWindow.matchMedia(query).matches ?? false;
   } catch (error) {
     console.warn(error);
     return false;
   }
+}
+
+export function isMotionDisabled(element: HTMLElement): boolean {
+  return (
+    !!findUpUntil(element, node => node.classList.contains('awsui-motion-disabled')) ||
+    safeMatchMedia(element, '(prefers-reduced-motion: reduce)')
+  );
 }
 
 // Note that this hook doesn't take into consideration @media print (unlike the dark mode CSS),

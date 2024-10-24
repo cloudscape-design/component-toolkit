@@ -69,4 +69,21 @@ describe('isMotionDisabled', () => {
     const element = renderResult.container.querySelector('#test-element') as HTMLElement;
     expect(isMotionDisabled(element)).toEqual(true);
   });
+
+  test('should default to false when an error is thrown and a warning is logged', () => {
+    matchMedia.mockReturnValue(null);
+
+    const warnSpy = jest.spyOn(console, 'warn');
+
+    const renderResult = render(
+      <div>
+        <div id="test-element">Content</div>
+      </div>
+    );
+    const element = renderResult.container.querySelector('#test-element') as HTMLElement;
+
+    expect(isMotionDisabled(element)).toEqual(false);
+
+    expect(warnSpy).toHaveBeenCalled();
+  });
 });
