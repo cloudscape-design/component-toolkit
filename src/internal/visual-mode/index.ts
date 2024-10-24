@@ -9,10 +9,20 @@ import { isDevelopment } from '../is-development';
 import { warnOnce } from '../logging';
 import { awsuiVisualRefreshFlag, getGlobal } from '../global-flags';
 
+function safeMatchMedia(element: HTMLElement, query: string) {
+  try {
+    const targetWindow = element.ownerDocument?.defaultView ?? window;
+    return targetWindow.matchMedia?.(query).matches ?? false;
+  } catch (error) {
+    console.warn(error);
+    return false;
+  }
+}
+
 export function isMotionDisabled(element: HTMLElement): boolean {
   return (
     !!findUpUntil(element, node => node.classList.contains('awsui-motion-disabled')) ||
-    (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false)
+    safeMatchMedia(element, '(prefers-reduced-motion: reduce)')
   );
 }
 
