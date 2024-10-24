@@ -12,7 +12,7 @@ import { awsuiVisualRefreshFlag, getGlobal } from '../global-flags';
 export function isMotionDisabled(element: HTMLElement): boolean {
   return (
     !!findUpUntil(element, node => node.classList.contains('awsui-motion-disabled')) ||
-    (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false)
+    (element?.ownerDocument?.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false)
   );
 }
 
