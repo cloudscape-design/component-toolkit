@@ -12,7 +12,7 @@ import { awsuiVisualRefreshFlag, getGlobal } from '../global-flags';
 function safeMatchMedia(element: HTMLElement, query: string) {
   try {
     const targetWindow = element.ownerDocument?.defaultView ?? window;
-    return targetWindow.matchMedia(query).matches ?? false;
+    return targetWindow.matchMedia?.(query).matches ?? false;
   } catch (error) {
     console.warn(error);
     return false;
