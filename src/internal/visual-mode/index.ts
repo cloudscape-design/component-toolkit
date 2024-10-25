@@ -66,7 +66,7 @@ export function useReducedMotion(elementRef: React.RefObject<HTMLElement>) {
      * References:  https://www.reddit.com/r/reactjs/comments/1ej505e/why_does_it_rerender_even_when_state_is_same/#:~:text=If%20the%20new%20value%20you,shouldn't%20affect%20your%20code
      */
     if (newValue !== value) {
-      setValue(isMotionDisabled(node));
+      setValue(newValue);
     }
   });
   return value;
