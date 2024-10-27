@@ -56,7 +56,18 @@ export function useDensityMode(elementRef: React.RefObject<HTMLElement>) {
 export function useReducedMotion(elementRef: React.RefObject<HTMLElement>) {
   const [value, setValue] = useState(false);
   useMutationObserver(elementRef, node => {
-    setValue(isMotionDisabled(node));
+    const newValue = isMotionDisabled(node);
+    /**
+     * React has a behavior that triggers a re-render even if the same value is provided in the setState, while it does not
+     * commit any changes to the DOM (commit phase) the function rerenders. This causes a false react act warnings in testing
+     * and any component using the Transition component which in return uses this hook will possibly have false react warnings.
+     *
+     * To fix this, we manually stop setting the state ourselves if we see the same value.
+     * References:  https://www.reddit.com/r/reactjs/comments/1ej505e/why_does_it_rerender_even_when_state_is_same/#:~:text=If%20the%20new%20value%20you,shouldn't%20affect%20your%20code
+     */
+    if (newValue !== value) {
+      setValue(newValue);
+    }
   });
   return value;
 }
