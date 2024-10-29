@@ -36,7 +36,12 @@ export function useCurrentMode(elementRef: React.RefObject<HTMLElement>) {
       node,
       node => node.classList.contains('awsui-polaris-dark-mode') || node.classList.contains('awsui-dark-mode')
     );
-    setValue(darkModeParent ? 'dark' : 'light');
+    const newValue = darkModeParent ? 'dark' : 'light';
+
+    // refer to the comment below in `useReducedMotion`
+    if (newValue !== value) {
+      setValue(newValue);
+    }
   });
   return value;
 }
@@ -48,7 +53,12 @@ export function useDensityMode(elementRef: React.RefObject<HTMLElement>) {
       node,
       node => node.classList.contains('awsui-polaris-compact-mode') || node.classList.contains('awsui-compact-mode')
     );
-    setValue(compactModeParent ? 'compact' : 'comfortable');
+    const newValue = compactModeParent ? 'compact' : 'comfortable';
+
+    // refer to the comment below in `useReducedMotion`
+    if (newValue !== value) {
+      setValue(newValue);
+    }
   });
   return value;
 }
