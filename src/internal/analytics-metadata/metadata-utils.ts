@@ -29,6 +29,10 @@ export const processMetadata = (node: HTMLElement | null, localMetadata: any): G
   }, {});
 };
 
+const isNil = (value: any) => {
+  return typeof value === 'undefined' || value === null;
+};
+
 export const merge = (inputTarget: any, inputSource: any): any => {
   const merged: any = {};
   const target = inputTarget || {};
@@ -39,7 +43,7 @@ export const merge = (inputTarget: any, inputSource: any): any => {
   for (const key of allKeys) {
     if (target[key] && !source[key]) {
       merged[key] = target[key];
-    } else if (!target[key] && source[key]) {
+    } else if (!target[key] && !isNil(source[key])) {
       merged[key] = source[key];
     } else if (typeof target[key] === 'string') {
       merged[key] = source[key];
