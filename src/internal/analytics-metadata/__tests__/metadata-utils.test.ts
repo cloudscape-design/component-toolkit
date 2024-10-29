@@ -40,9 +40,9 @@ describe('merge', () => {
     expect(merge(target, source)).toEqual(source);
   });
   test('recursively merges keys when not defined in nested target', () => {
-    const source = { one: { two: 'two' } };
+    const source = { one: { two: 'two', four: '' } };
     const target = { one: { three: 'three' } };
-    expect(merge(target, source)).toEqual({ one: { two: 'two', three: 'three' } });
+    expect(merge(target, source)).toEqual({ one: { two: 'two', three: 'three', four: '' } });
   });
   test('copies arrays in target', () => {
     const source = { two: 'two' };
