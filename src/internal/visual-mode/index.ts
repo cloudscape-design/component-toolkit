@@ -40,7 +40,7 @@ export function useCurrentMode(elementRef: React.RefObject<HTMLElement>) {
 
     // refer to the comment below in `useReducedMotion`
     if (newValue !== value) {
-      setValue(darkModeParent ? 'dark' : 'light');
+      setValue(newValue);
     }
   });
   return value;
@@ -57,7 +57,7 @@ export function useDensityMode(elementRef: React.RefObject<HTMLElement>) {
 
     // refer to the comment below in `useReducedMotion`
     if (newValue !== value) {
-      setValue(compactModeParent ? 'compact' : 'comfortable');
+      setValue(newValue);
     }
   });
   return value;
