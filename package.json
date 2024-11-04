@@ -14,6 +14,7 @@
     ".": "./index.js",
     "./dom": "./dom/index.js",
     "./internal": "./internal/index.js",
+    "./internal/metrics": "./internal/metrics.js",
     "./internal/testing": "./internal/testing.js",
     "./internal/analytics-metadata": "./internal/analytics-metadata/index.js",
     "./internal/analytics-metadata/utils": "./internal/analytics-metadata/utils.js",
