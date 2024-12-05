@@ -1,6 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+import { unstable_batchedUpdates } from 'react-dom';
 import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
 import { useEffect, useLayoutEffect } from 'react';
 import { ContainerQueryEntry, ElementReference } from './interfaces';
@@ -56,7 +57,9 @@ export function useResizeObserver(elementRef: ElementReference, onObserve: (entr
       const observer = new ResizeObserver(entries => {
         // Prevent observe notifications on already unmounted component.
         if (connected) {
-          stableOnObserve(convertResizeObserverEntry(entries[0]));
+          unstable_batchedUpdates(() => {
+            stableOnObserve(convertResizeObserverEntry(entries[0]));
+          });
         }
       });
       observer.observe(element);
