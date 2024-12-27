@@ -20,6 +20,7 @@
     "./internal/analytics-metadata/utils": "./internal/analytics-metadata/utils.js",
     "./package.json": "./package.json"
   },
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/cloudscape-design/component-toolkit.git"
