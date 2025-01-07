@@ -43,16 +43,18 @@ export class CLogClient {
       console.error(`Detail for metric ${metricName} is too long: ${detail}`);
       return;
     }
+    const wasSent = new PanoramaClient().sendMetric({
+      eventName: metricName,
+      eventDetail: detail,
+      eventValue: `${value}`,
+      timestamp: Date.now(),
+    });
+    if (wasSent) {
+      return;
+    }
     const AWSC = this.findAWSC(window);
     if (typeof AWSC === 'object' && typeof AWSC.Clog === 'object' && typeof AWSC.Clog.log === 'function') {
       AWSC.Clog.log(metricName, value, detail);
-    } else {
-      new PanoramaClient().sendMetric({
-        eventName: metricName,
-        eventDetail: detail,
-        eventValue: `${value}`,
-        timestamp: Date.now(),
-      });
     }
   }
 
@@ -82,7 +84,11 @@ export class PanoramaClient {
   /**
    * Sends metric but only if Console Platform client v2 logging JS API is present in the page.
    */
-  sendMetric(metric: MetricsV2EventItem): void {
+  sendMetric(metric: MetricsV2EventItem): boolean {
+    const panorama = this.findPanorama(window);
+    if (typeof panorama !== 'function') {
+      return false;
+    }
     if (typeof metric.eventDetail === 'object') {
       metric.eventDetail = JSON.stringify(metric.eventDetail);
     }
@@ -91,28 +97,26 @@ export class PanoramaClient {
     }
     if (!validateLength(metric.eventName, 1000)) {
       console.error(`Event name for metric is too long: ${metric.eventName}`);
-      return;
+      return true;
     }
     if (!validateLength(metric.eventDetail, 4000)) {
       console.error(`Event detail for metric is too long: ${metric.eventDetail}`);
-      return;
+      return true;
     }
     if (!validateLength(metric.eventValue, 4000)) {
       console.error(`Event value for metric is too long: ${metric.eventValue}`);
-      return;
+      return true;
     }
     if (!validateLength(metric.eventContext, 4000)) {
       console.error(`Event context for metric is too long: ${metric.eventContext}`);
-      return;
+      return true;
     }
     if (!validateLength(metric.eventType, 50)) {
       console.error(`Event type for metric is too long: ${metric.eventType}`);
-      return;
+      return true;
     }
-    const panorama = this.findPanorama(window);
-    if (typeof panorama === 'function') {
-      panorama('trackCustomEvent', { timestamp: Date.now(), ...metric });
-    }
+    panorama('trackCustomEvent', { timestamp: Date.now(), ...metric });
+    return true;
   }
 
   private findPanorama(currentWindow?: MetricsWindow): any | undefined {

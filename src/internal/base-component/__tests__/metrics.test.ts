@@ -27,8 +27,13 @@ describe('Client Metrics support', () => {
   const metrics = new Metrics('dummy-package', '1.0');
 
   const checkMetric = (metricName: string, detailObject: MetricDetail) => {
-    expect(window.AWSC.Clog.log).toHaveBeenCalledWith(metricName, 1, JSON.stringify(detailObject));
-    expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(1);
+    expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+      eventName: metricName,
+      eventDetail: JSON.stringify(detailObject),
+      eventValue: '1',
+      timestamp: expect.any(Number),
+    });
+    expect(window.panorama).toHaveBeenCalledTimes(1);
   };
 
   beforeEach(() => {
@@ -49,31 +54,16 @@ describe('Client Metrics support', () => {
   });
 
   describe('sendMetric', () => {
-    test('does nothing when window.AWSC is undefined', () => {
+    test('does nothing of both AWSC and panorama APIs are not available', () => {
+      delete window.panorama;
       delete window.AWSC;
-      metrics.sendMetric('name', 0); // only proves no exception thrown
+      expect(() => metrics.sendMetric('name', 0)).not.toThrow();
     });
 
-    test('does nothing when window.AWSC.Clog is undefined', () => {
-      window.AWSC = {};
-      metrics.sendMetric('name', 0); // only proves no exception thrown
-    });
-
-    test('uses panorama API as fallback when AWSC.Clog.log is unavailable', () => {
-      delete window.AWSC;
+    test('uses AWSC.Clog.log API as fallback when panorama is unavailable', () => {
+      delete window.panorama;
       metrics.sendMetric('name', 0);
-      expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-        eventName: 'name',
-        eventValue: '0',
-        timestamp: expect.any(Number),
-      });
-    });
-
-    test('does nothing when window.AWSC.Clog.log is undefined', () => {
-      window.AWSC = {
-        Clog: undefined,
-      };
-      metrics.sendMetric('name', 0); // only proves no exception thrown
+      expect(window.AWSC.Clog.log).toHaveBeenCalledWith('name', 0, undefined);
     });
 
     describe('within an iframe', () => {
@@ -82,51 +72,60 @@ describe('Client Metrics support', () => {
 
       afterEach(() => {
         Object.defineProperty(window, 'parent', originalWindowParent);
-        expect(window.parent.AWSC).toBeUndefined();
+        expect(window.parent.panorama).toBeUndefined();
       });
 
       const setupIframe = () => {
         Object.defineProperty(window, 'parent', { configurable: true, writable: true, value: { parent: {} } });
       };
 
-      test('does nothing when AWSC is not defined in the parent iframe', () => {
-        delete window.AWSC;
+      test('does nothing when window.panorama is not defined in the parent iframe', () => {
+        delete window.panorama;
         setupIframe();
-        expect(window.parent.AWSC).toBeUndefined();
+        expect(window.parent.panorama).toBeUndefined();
 
         metrics.sendMetric('name', 0); // only proves no exception thrown
       });
 
-      test('works if parent has AWSC', () => {
+      test('works if window.parent has panorama object', () => {
         setupIframe();
-        delete window.AWSC;
-        window.parent.AWSC = {
-          Clog: {
-            log: () => {},
-          },
-        };
-        jest.spyOn(window.parent.AWSC.Clog, 'log');
-        expect(window.AWSC).toBeUndefined();
-        expect(window.parent.AWSC).toBeDefined();
+        delete window.panorama;
+        window.parent.panorama = () => {};
+        jest.spyOn(window.parent, 'panorama');
+        expect(window.panorama).toBeUndefined();
+        expect(window.parent.panorama).toBeDefined();
 
         metrics.sendMetric('name', 0, undefined);
-        expect(window.parent.AWSC.Clog.log).toHaveBeenCalledWith('name', 0, undefined);
+        expect(window.parent.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+          eventName: 'name',
+          eventValue: '0',
+          timestamp: expect.any(Number),
+        });
       });
     });
 
-    describe('when window.AWSC.Clog.log is defined', () => {
+    describe('when window.panorama is defined', () => {
       mockConsoleError();
 
-      test('delegates to window.AWSC.Clog.log when defined', () => {
+      test('delegates to window.panorama when defined', () => {
         metrics.sendMetric('name', 0, undefined);
-        expect(window.AWSC.Clog.log).toHaveBeenCalledWith('name', 0, undefined);
+        expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+          eventName: 'name',
+          eventValue: '0',
+          timestamp: expect.any(Number),
+        });
       });
 
       describe('Metric name validation', () => {
         const tryValidMetric = (metricName: string) => {
-          test(`calls AWSC.Clog.log when valid metric name used (${metricName})`, () => {
+          test(`calls window.panorama when valid metric name used (${metricName})`, () => {
             metrics.sendMetric(metricName, 1, 'detail');
-            expect(window.AWSC.Clog.log).toHaveBeenCalledWith(metricName, 1, 'detail');
+            expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+              eventName: metricName,
+              eventValue: '1',
+              eventDetail: 'detail',
+              timestamp: expect.any(Number),
+            });
           });
         };
 
@@ -135,6 +134,8 @@ describe('Client Metrics support', () => {
             metrics.sendMetric(metricName, 0, 'detail');
             expect(console.error).toHaveBeenCalledWith(`Invalid metric name: ${metricName}`);
             jest.mocked(console.error).mockReset();
+            expect(window.panorama).not.toHaveBeenCalled();
+            expect(window.AWSC.Clog.log).not.toHaveBeenCalled();
           });
         };
 
@@ -161,7 +162,12 @@ describe('Client Metrics support', () => {
         test('accepts details below the character limit', () => {
           const validDetail = 'a'.repeat(4000);
           metrics.sendMetric('metricName', 1, validDetail);
-          expect(window.AWSC.Clog.log).toHaveBeenCalledWith('metricName', 1, validDetail);
+          expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+            eventName: 'metricName',
+            eventValue: '1',
+            eventDetail: validDetail,
+            timestamp: expect.any(Number),
+          });
         });
 
         test('throws an error when detail is too long', () => {
@@ -169,6 +175,8 @@ describe('Client Metrics support', () => {
           metrics.sendMetric('metricName', 0, invalidDetail);
           expect(console.error).toHaveBeenCalledWith(`Detail for metric metricName is too long: ${invalidDetail}`);
           jest.mocked(console.error).mockReset();
+          expect(window.panorama).not.toHaveBeenCalled();
+          expect(window.AWSC.Clog.log).not.toHaveBeenCalled();
         });
       });
     });
@@ -177,15 +185,31 @@ describe('Client Metrics support', () => {
   describe('sendMetricOnce', () => {
     test('logs a metric name only once', () => {
       metrics.sendMetricOnce('my-event', 1);
-      expect(window.AWSC.Clog.log).toHaveBeenCalledWith('my-event', 1, undefined);
-      expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(1);
+      expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+        eventName: 'my-event',
+        eventValue: '1',
+        timestamp: expect.any(Number),
+      });
+      expect(window.panorama).toHaveBeenCalledTimes(1);
 
       metrics.sendMetricOnce('my-event', 2);
-      expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(1);
+      expect(window.panorama).toHaveBeenCalledTimes(1);
+    });
 
-      metrics.sendMetricOnce('My-Event', 3);
-      expect(window.AWSC.Clog.log).toHaveBeenCalledWith('My-Event', 3, undefined);
-      expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(2);
+    test('does not deduplicate metrics in different casing', () => {
+      metrics.sendMetricOnce('my-event', 1);
+      metrics.sendMetricOnce('My-Event', 2);
+      expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+        eventName: 'my-event',
+        eventValue: '1',
+        timestamp: expect.any(Number),
+      });
+      expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+        eventName: 'My-Event',
+        eventValue: '2',
+        timestamp: expect.any(Number),
+      });
+      expect(window.panorama).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -265,7 +289,7 @@ describe('Client Metrics support', () => {
 
       metrics.sendMetricObjectOnce(metricObj, 1);
       metrics.sendMetricObjectOnce(metricObj, 1);
-      expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(1);
+      expect(window.panorama).toHaveBeenCalledTimes(1);
     });
     test('logs metric for each different version if same source and action', () => {
       metrics.sendMetricObjectOnce(
@@ -284,7 +308,7 @@ describe('Client Metrics support', () => {
         },
         1
       );
-      expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(2);
+      expect(window.panorama).toHaveBeenCalledTimes(2);
     });
     test('logs a metric multiple times if same source but different actions', () => {
       metrics.sendMetricObjectOnce(
@@ -303,7 +327,7 @@ describe('Client Metrics support', () => {
         },
         1
       );
-      expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(2);
+      expect(window.panorama).toHaveBeenCalledTimes(2);
     });
   });
 
