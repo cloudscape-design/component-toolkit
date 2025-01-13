@@ -19,6 +19,8 @@ export interface MetricsV2EventItem {
   timestamp?: number;
 }
 
+type PanoramaFunction = (event: 'trackCustomEvent', data: MetricsV2EventItem) => void;
+
 function validateLength(value: string | undefined, maxLength: number): boolean {
   return !value || value.length <= maxLength;
 }
@@ -86,7 +88,7 @@ export class PanoramaClient {
    */
   sendMetric(metric: MetricsV2EventItem): boolean {
     const panorama = this.findPanorama(window);
-    if (typeof panorama !== 'function') {
+    if (!panorama) {
       return false;
     }
     if (typeof metric.eventDetail === 'object') {
@@ -96,30 +98,41 @@ export class PanoramaClient {
       metric.eventValue = JSON.stringify(metric.eventValue);
     }
     if (!validateLength(metric.eventName, 1000)) {
-      console.error(`Event name for metric is too long: ${metric.eventName}`);
+      this.onMetricError(`Event name for metric is too long: ${metric.eventName}`);
       return true;
     }
     if (!validateLength(metric.eventDetail, 4000)) {
-      console.error(`Event detail for metric is too long: ${metric.eventDetail}`);
+      this.onMetricError(`Event detail for metric is too long: ${metric.eventDetail}`);
       return true;
     }
     if (!validateLength(metric.eventValue, 4000)) {
-      console.error(`Event value for metric is too long: ${metric.eventValue}`);
+      this.onMetricError(`Event value for metric is too long: ${metric.eventValue}`);
       return true;
     }
     if (!validateLength(metric.eventContext, 4000)) {
-      console.error(`Event context for metric is too long: ${metric.eventContext}`);
+      this.onMetricError(`Event context for metric is too long: ${metric.eventContext}`);
       return true;
     }
     if (!validateLength(metric.eventType, 50)) {
-      console.error(`Event type for metric is too long: ${metric.eventType}`);
+      this.onMetricError(`Event type for metric is too long: ${metric.eventType}`);
       return true;
     }
     panorama('trackCustomEvent', { timestamp: Date.now(), ...metric });
     return true;
   }
 
-  private findPanorama(currentWindow?: MetricsWindow): any | undefined {
+  private onMetricError(message: string) {
+    console.error(message);
+    const panorama = this.findPanorama(window);
+    if (panorama) {
+      panorama('trackCustomEvent', {
+        eventName: 'awsui-metric-error',
+        eventDetail: message.slice(0, 4000),
+      });
+    }
+  }
+
+  private findPanorama(currentWindow?: MetricsWindow): PanoramaFunction | undefined {
     try {
       if (typeof currentWindow?.panorama === 'function') {
         return currentWindow?.panorama;
