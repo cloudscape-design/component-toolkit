@@ -2,24 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as React from 'react';
-import {
-  SingleTabStopNavigationAPI,
-  SingleTabStopNavigationProvider,
-  useSingleTabStopNavigation,
-} from '../../../src/internal/single-tab-stop';
+import { SingleTabStopNavigationAPI, SingleTabStopNavigationProvider } from '../../../src/internal/single-tab-stop';
 
 import handleKey from '../../../src/internal/utils/handle-key';
 import { circleIndex } from '../../../src/internal/utils/circle-index';
 import { KeyCode } from '../../../src/internal/keycode';
 import { getAllFocusables } from '../../../src/internal/focus-lock/utils';
-import useForwardFocus from '../../../src/internal/utils/use-forward-focus';
 
-export default function SingleTabStop() {
+export default function SingleTabStopKeyboardNav({
+  children,
+  matchId,
+  direction = 'horizontal',
+}: {
+  children: React.ReactNode;
+  matchId: string;
+  direction?: 'horizontal' | 'vertical';
+}) {
   const navigationAPI = React.useRef<SingleTabStopNavigationAPI>(null);
   const containerObjectRef = React.useRef<HTMLDivElement>(null);
   const focusedIdRef = React.useRef<null | string>(null);
-
-  const itemsRef = React.useRef<Record<string, any | null>>({});
 
   function onUnregisterActive(focusableElement: HTMLElement) {
     // Only refocus when the node is actually removed (no such ID anymore).
@@ -32,7 +33,7 @@ export default function SingleTabStop() {
 
   function getNextFocusTarget(): null | HTMLElement {
     if (containerObjectRef.current) {
-      const buttons: HTMLButtonElement[] = Array.from(containerObjectRef.current.querySelectorAll('button'));
+      const buttons: HTMLButtonElement[] = Array.from(containerObjectRef.current.querySelectorAll(matchId));
       return buttons.find(button => button.dataset.itemid === focusedIdRef.current) ?? buttons[0] ?? null;
     }
     return null;
@@ -56,7 +57,16 @@ export default function SingleTabStop() {
 
   function onKeyDown(event: React.KeyboardEvent) {
     const focusTarget = navigationAPI.current?.getFocusTarget();
-    const specialKeys = [KeyCode.right, KeyCode.left, KeyCode.end, KeyCode.home, KeyCode.pageUp, KeyCode.pageDown];
+    const specialKeys = [
+      KeyCode.right,
+      KeyCode.left,
+      KeyCode.up,
+      KeyCode.down,
+      KeyCode.end,
+      KeyCode.home,
+      KeyCode.pageUp,
+      KeyCode.pageDown,
+    ];
 
     const hasModifierKeys = (event: React.MouseEvent | React.KeyboardEvent) => {
       return event.ctrlKey || event.altKey || event.shiftKey || event.metaKey;
@@ -69,7 +79,7 @@ export default function SingleTabStop() {
       return;
     }
     // Ignore navigation when the focused element is not an item.
-    if (document.activeElement && !document.activeElement.matches('button')) {
+    if (document.activeElement && !document.activeElement.matches(matchId)) {
       return;
     }
     event.preventDefault();
@@ -80,8 +90,16 @@ export default function SingleTabStop() {
     handleKey(event as any, {
       onHome: () => focusElement(focusables[0]),
       onEnd: () => focusElement(focusables[focusables.length - 1]),
-      onInlineStart: () => focusElement(focusables[circleIndex(activeIndex - 1, [0, focusables.length - 1])]),
-      onInlineEnd: () => focusElement(focusables[circleIndex(activeIndex + 1, [0, focusables.length - 1])]),
+      onInlineStart: () =>
+        direction === 'horizontal' &&
+        focusElement(focusables[circleIndex(activeIndex - 1, [0, focusables.length - 1])]),
+      onInlineEnd: () =>
+        direction === 'horizontal' &&
+        focusElement(focusables[circleIndex(activeIndex + 1, [0, focusables.length - 1])]),
+      onBlockStart: () =>
+        direction === 'vertical' && focusElement(focusables[circleIndex(activeIndex - 1, [0, focusables.length - 1])]),
+      onBlockEnd: () =>
+        direction === 'vertical' && focusElement(focusables[circleIndex(activeIndex + 1, [0, focusables.length - 1])]),
     });
   }
 
@@ -99,41 +117,15 @@ export default function SingleTabStop() {
   }
 
   return (
-    <div>
-      <button>Before</button>
-      <div ref={containerObjectRef} onFocus={onFocus} onBlur={onBlur} onKeyDown={onKeyDown}>
-        <SingleTabStopNavigationProvider
-          ref={navigationAPI}
-          navigationActive={true}
-          getNextFocusTarget={getNextFocusTarget}
-          onUnregisterActive={onUnregisterActive}
-        >
-          <TestButton id="one" ref={element => (itemsRef.current.one = element)}>
-            One
-          </TestButton>
-          <TestButton id="two" ref={element => (itemsRef.current.two = element)}>
-            Two
-          </TestButton>
-          <TestButton id="three" ref={element => (itemsRef.current.three = element)}>
-            Three
-          </TestButton>
-        </SingleTabStopNavigationProvider>
-      </div>
-      <button>After</button>
+    <div ref={containerObjectRef} onFocus={onFocus} onBlur={onBlur} onKeyDown={onKeyDown}>
+      <SingleTabStopNavigationProvider
+        ref={navigationAPI}
+        navigationActive={true}
+        getNextFocusTarget={getNextFocusTarget}
+        onUnregisterActive={onUnregisterActive}
+      >
+        {children}
+      </SingleTabStopNavigationProvider>
     </div>
   );
 }
-
-const TestButton = React.forwardRef(
-  ({ id, children }: { id: string; children: string }, ref: React.Ref<HTMLButtonElement | null>) => {
-    const buttonRef = React.useRef<HTMLButtonElement>(null);
-    const { tabIndex } = useSingleTabStopNavigation(buttonRef);
-    useForwardFocus(ref, buttonRef);
-
-    return (
-      <button tabIndex={tabIndex} id={id} data-itemid={id} ref={buttonRef}>
-        {children}
-      </button>
-    );
-  }
-);
