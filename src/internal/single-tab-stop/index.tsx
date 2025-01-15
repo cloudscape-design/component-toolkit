@@ -101,7 +101,6 @@ export const SingleTabStopNavigationProvider = forwardRef(
     // The focusable element tabIndex is only set to 0 if the element matches the focus target.
     function registerFocusable(focusableElement: Element, changeHandler: FocusableChangeHandler) {
       focusables.current.add(focusableElement);
-      console.log('isRegistered', focusableElement);
 
       focusHandlers.current.set(focusableElement, changeHandler);
       const isFocusable = !!focusablesState.current.get(focusableElement);
@@ -113,6 +112,7 @@ export const SingleTabStopNavigationProvider = forwardRef(
       onRegisterFocusable?.(focusableElement);
       return () => unregisterFocusable(focusableElement);
     }
+
     function unregisterFocusable(focusableElement: Element) {
       focusables.current.delete(focusableElement);
       focusHandlers.current.delete(focusableElement);

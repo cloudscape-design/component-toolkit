@@ -2,17 +2,24 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as React from 'react';
-import { SingleTabStopNavigationAPI, SingleTabStopNavigationProvider } from '../../../src/internal/single-tab-stop';
+import {
+  SingleTabStopNavigationAPI,
+  SingleTabStopNavigationProvider,
+  useSingleTabStopNavigation,
+} from '../../../src/internal/single-tab-stop';
 
 import handleKey from '../../../src/internal/utils/handle-key';
 import { circleIndex } from '../../../src/internal/utils/circle-index';
 import { KeyCode } from '../../../src/internal/keycode';
 import { getAllFocusables } from '../../../src/internal/focus-lock/utils';
+import useForwardFocus from '../../../src/internal/utils/use-forward-focus';
 
 export default function SingleTabStop() {
   const navigationAPI = React.useRef<SingleTabStopNavigationAPI>(null);
   const containerObjectRef = React.useRef<HTMLDivElement>(null);
   const focusedIdRef = React.useRef<null | string>(null);
+
+  const itemsRef = React.useRef<Record<string, any | null>>({});
 
   function onUnregisterActive(focusableElement: HTMLElement) {
     // Only refocus when the node is actually removed (no such ID anymore).
@@ -79,18 +86,16 @@ export default function SingleTabStop() {
   }
 
   function focusElement(element: HTMLElement) {
-    console.log(navigationAPI.current, 'navigationAPI');
     element.focus();
   }
 
   // List all non-disabled and registered focusables: those are eligible for keyboard navigation.
   function getFocusablesFrom(target: HTMLElement) {
-    // function isElementRegistered(element: HTMLElement) {
-    //   return navigationAPI.current?.isRegistered(element) ?? false;
-    // }
+    function isElementRegistered(element: HTMLElement) {
+      return navigationAPI.current?.isRegistered(element) ?? false;
+    }
 
-    return getAllFocusables(target);
-    //return getAllFocusables(target).filter(el => isElementRegistered(el));
+    return getAllFocusables(target).filter(el => isElementRegistered(el));
   }
 
   return (
@@ -101,16 +106,30 @@ export default function SingleTabStop() {
         getNextFocusTarget={getNextFocusTarget}
         onUnregisterActive={onUnregisterActive}
       >
-        <button id="one" data-itemid="one">
+        <TestButton id="one" ref={element => (itemsRef.current.one = element)}>
           One
-        </button>
-        <button id="two" data-itemid="two">
+        </TestButton>
+        <TestButton id="two" ref={element => (itemsRef.current.two = element)}>
           Two
-        </button>
-        <button id="three" data-itemid="three">
+        </TestButton>
+        <TestButton id="three" ref={element => (itemsRef.current.three = element)}>
           Three
-        </button>
+        </TestButton>
       </SingleTabStopNavigationProvider>
     </div>
   );
 }
+
+const TestButton = React.forwardRef(
+  ({ id, children }: { id: string; children: string }, ref: React.Ref<HTMLButtonElement | null>) => {
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
+    const { tabIndex } = useSingleTabStopNavigation(buttonRef);
+    useForwardFocus(ref, buttonRef);
+
+    return (
+      <button tabIndex={tabIndex} id={id} data-itemid={id} ref={buttonRef}>
+        {children}
+      </button>
+    );
+  }
+);
