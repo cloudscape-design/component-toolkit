@@ -20,7 +20,6 @@ export function useComponentMetrics(
       metrics.sendMetricOnce('awsui-viewport-width', window.innerWidth || 0);
       metrics.sendMetricOnce('awsui-viewport-height', window.innerHeight || 0);
     }
-    metrics.logComponentsLoaded();
     metrics.logComponentUsed(componentName.toLowerCase(), configuration);
     // Components do not change the name dynamically. Explicit empty array to prevent accidental double metrics
     // eslint-disable-next-line react-hooks/exhaustive-deps

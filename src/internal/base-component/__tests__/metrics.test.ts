@@ -416,21 +416,6 @@ describe('Client Metrics support', () => {
     });
   });
 
-  describe('logComponentsLoaded', () => {
-    test('logs the components package loaded metric', () => {
-      metrics.logComponentsLoaded();
-      checkMetric(`awsui_dummy-package_d10`, {
-        o: 'main',
-        s: 'dummy-package',
-        t: 'default',
-        a: 'loaded',
-        f: 'react',
-        v: '1.0',
-        c: undefined,
-      });
-    });
-  });
-
   describe('sendPanoramaMetric', () => {
     test('does nothing when panorama is undefined', () => {
       delete window.panorama;
