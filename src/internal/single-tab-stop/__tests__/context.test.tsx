@@ -13,6 +13,11 @@ function Button(props: React.HTMLAttributes<HTMLButtonElement>) {
   return <button {...props} ref={buttonRef} tabIndex={tabIndex} />;
 }
 
+test('subscribed components can be rendered outside single tab stop navigation context', () => {
+  render(<Button />);
+  expect(document.querySelector('button')).not.toHaveAttribute('tabIndex');
+});
+
 test('does not override tab index when keyboard navigation is not active', () => {
   renderWithSingleTabStopNavigation(<Button id="button" />, { navigationActive: false });
   expect(document.querySelector('#button')).not.toHaveAttribute('tabIndex');

@@ -60,4 +60,8 @@ describe('nodeBelongs', () => {
     `;
     expect(nodeBelongs(div.querySelector('#container1'), div.querySelector('#node') as Node)).toBe(true);
   });
+
+  test('returns false if target is not a node', () => {
+    expect(nodeBelongs(div.querySelector('#container1'), {} as any)).toBe(false);
+  });
 });
