@@ -3,3 +3,4 @@
 
 export { default as findUpUntil } from './find-up-until';
 export { default as nodeContains } from './node-contains';
+export { default as nodeBelongs } from './node-belongs';
