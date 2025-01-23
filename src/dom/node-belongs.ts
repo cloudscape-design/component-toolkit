@@ -12,7 +12,7 @@ import { isHTMLElement, isNode } from './element-types';
  * @param container Container node
  * @param target Node that is checked to be a descendant of the container
  */
-export function nodeBelongs(container: Node | null, target: Node | EventTarget | null): boolean {
+export default function nodeBelongs(container: Node | null, target: Node | EventTarget | null): boolean {
   if (!isNode(target)) {
     return false;
   }

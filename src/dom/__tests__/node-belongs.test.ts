@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { nodeBelongs } from '../node-belongs';
+import nodeBelongs from '../node-belongs';
 
 describe('nodeBelongs', () => {
   let div: HTMLDivElement;

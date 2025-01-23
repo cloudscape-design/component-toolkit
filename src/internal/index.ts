@@ -28,3 +28,11 @@ export {
 export { useFocusVisible } from './focus-visible';
 export { KeyCode, isModifierKey } from './keycode';
 export { getGlobalFlag } from './global-flags';
+export {
+  SingleTabStopNavigationAPI,
+  SingleTabStopNavigationProvider,
+  useSingleTabStopNavigation,
+} from './single-tab-stop';
+export { isFocusable, getAllFocusables, getFirstFocusable, getLastFocusable } from './focus-lock-utils/utils';
+export { default as handleKey } from './utils/handle-key';
+export { default as circleIndex } from './utils/circle-index';
