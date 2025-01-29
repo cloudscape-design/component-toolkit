@@ -28,7 +28,8 @@ describe('Client Metrics support', () => {
 
   const checkMetric = (metricName: string, detailObject: MetricDetail) => {
     expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-      eventName: metricName,
+      eventType: 'awsui',
+      eventContext: metricName,
       eventDetail: JSON.stringify(detailObject),
       eventValue: '1',
       timestamp: expect.any(Number),
@@ -97,7 +98,8 @@ describe('Client Metrics support', () => {
 
         metrics.sendMetric('name', 0, undefined);
         expect(window.parent.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-          eventName: 'name',
+          eventType: 'awsui',
+          eventContext: 'name',
           eventValue: '0',
           timestamp: expect.any(Number),
         });
@@ -110,7 +112,8 @@ describe('Client Metrics support', () => {
       test('delegates to window.panorama when defined', () => {
         metrics.sendMetric('name', 0, undefined);
         expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-          eventName: 'name',
+          eventType: 'awsui',
+          eventContext: 'name',
           eventValue: '0',
           timestamp: expect.any(Number),
         });
@@ -121,7 +124,8 @@ describe('Client Metrics support', () => {
           test(`calls window.panorama when valid metric name used (${metricName})`, () => {
             metrics.sendMetric(metricName, 1, 'detail');
             expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-              eventName: metricName,
+              eventType: 'awsui',
+              eventContext: metricName,
               eventValue: '1',
               eventDetail: 'detail',
               timestamp: expect.any(Number),
@@ -163,7 +167,8 @@ describe('Client Metrics support', () => {
           const validDetail = 'a'.repeat(4000);
           metrics.sendMetric('metricName', 1, validDetail);
           expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-            eventName: 'metricName',
+            eventType: 'awsui',
+            eventContext: 'metricName',
             eventValue: '1',
             eventDetail: validDetail,
             timestamp: expect.any(Number),
@@ -186,7 +191,8 @@ describe('Client Metrics support', () => {
     test('logs a metric name only once', () => {
       metrics.sendMetricOnce('my-event', 1);
       expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-        eventName: 'my-event',
+        eventType: 'awsui',
+        eventContext: 'my-event',
         eventValue: '1',
         timestamp: expect.any(Number),
       });
@@ -200,12 +206,14 @@ describe('Client Metrics support', () => {
       metrics.sendMetricOnce('my-event', 1);
       metrics.sendMetricOnce('My-Event', 2);
       expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-        eventName: 'my-event',
+        eventType: 'awsui',
+        eventContext: 'my-event',
         eventValue: '1',
         timestamp: expect.any(Number),
       });
       expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-        eventName: 'My-Event',
+        eventType: 'awsui',
+        eventContext: 'My-Event',
         eventValue: '2',
         timestamp: expect.any(Number),
       });
@@ -218,8 +226,9 @@ describe('Client Metrics support', () => {
       window.AWSC = undefined;
       metrics.sendMetricObject({ source: 'pkg', action: 'used', version: '5.0' }, 1);
       expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+        eventType: 'awsui',
+        eventContext: 'awsui_pkg_d50',
         eventDetail: '{"o":"main","s":"pkg","t":"default","a":"used","f":"react","v":"5.0"}',
-        eventName: 'awsui_pkg_d50',
         eventValue: '1',
         timestamp: expect.any(Number),
       });
