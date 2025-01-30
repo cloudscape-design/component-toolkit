@@ -11,15 +11,23 @@ interface MetricsWindow extends Window {
 }
 
 export interface MetricsV2EventItem {
-  eventName?: string;
-  eventType?: string;
   eventContext?: string;
   eventDetail?: string | Record<string, string | number | boolean>;
   eventValue?: string | Record<string, string | number | boolean>;
   timestamp?: number;
 }
 
-type PanoramaFunction = (event: 'trackCustomEvent', data: MetricsV2EventItem) => void;
+interface PanoramaMetric {
+  eventType: string;
+  eventContext?: string;
+  eventValue?: string;
+  eventDetail?: string;
+  timestamp: number;
+}
+
+type PanoramaFunction = (event: 'trackCustomEvent', data: PanoramaMetric) => void;
+
+const AWSUI_EVENT = 'awsui';
 
 function validateLength(value: string | undefined, maxLength: number): boolean {
   return !value || value.length <= maxLength;
@@ -46,7 +54,7 @@ export class CLogClient {
       return;
     }
     const wasSent = new PanoramaClient().sendMetric({
-      eventName: metricName,
+      eventContext: metricName,
       eventDetail: detail,
       eventValue: `${value}`,
       timestamp: Date.now(),
@@ -91,33 +99,27 @@ export class PanoramaClient {
     if (!panorama) {
       return false;
     }
-    if (typeof metric.eventDetail === 'object') {
-      metric.eventDetail = JSON.stringify(metric.eventDetail);
-    }
-    if (typeof metric.eventValue === 'object') {
-      metric.eventValue = JSON.stringify(metric.eventValue);
-    }
-    if (!validateLength(metric.eventName, 1000)) {
-      this.onMetricError(`Event name for metric is too long: ${metric.eventName}`);
+    const payload: PanoramaMetric = {
+      eventType: AWSUI_EVENT,
+      timestamp: Date.now(),
+      ...metric,
+      eventDetail: typeof metric.eventDetail === 'object' ? JSON.stringify(metric.eventDetail) : metric.eventDetail,
+      eventValue: typeof metric.eventValue === 'object' ? JSON.stringify(metric.eventValue) : metric.eventValue,
+    };
+
+    if (!validateLength(payload.eventDetail, 4000)) {
+      this.onMetricError(`Event detail for metric is too long: ${payload.eventDetail}`);
       return true;
     }
-    if (!validateLength(metric.eventDetail, 4000)) {
-      this.onMetricError(`Event detail for metric is too long: ${metric.eventDetail}`);
+    if (!validateLength(payload.eventValue, 4000)) {
+      this.onMetricError(`Event value for metric is too long: ${payload.eventValue}`);
       return true;
     }
-    if (!validateLength(metric.eventValue, 4000)) {
-      this.onMetricError(`Event value for metric is too long: ${metric.eventValue}`);
+    if (!validateLength(payload.eventContext, 4000)) {
+      this.onMetricError(`Event context for metric is too long: ${payload.eventContext}`);
       return true;
     }
-    if (!validateLength(metric.eventContext, 4000)) {
-      this.onMetricError(`Event context for metric is too long: ${metric.eventContext}`);
-      return true;
-    }
-    if (!validateLength(metric.eventType, 50)) {
-      this.onMetricError(`Event type for metric is too long: ${metric.eventType}`);
-      return true;
-    }
-    panorama('trackCustomEvent', { timestamp: Date.now(), ...metric });
+    panorama('trackCustomEvent', payload);
     return true;
   }
 
@@ -126,8 +128,10 @@ export class PanoramaClient {
     const panorama = this.findPanorama(window);
     if (panorama) {
       panorama('trackCustomEvent', {
-        eventName: 'awsui-metric-error',
+        eventType: AWSUI_EVENT,
+        eventContext: 'awsui-metric-error',
         eventDetail: message.slice(0, 4000),
+        timestamp: Date.now(),
       });
     }
   }

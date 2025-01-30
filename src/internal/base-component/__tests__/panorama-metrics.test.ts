@@ -23,59 +23,35 @@ describe('PanoramaClient', () => {
   });
 
   test('sends simple metrics', () => {
-    panorama.sendMetric({ eventType: 'custom', eventValue: 'value' });
+    panorama.sendMetric({ eventValue: 'value' });
 
     expect(window.panorama).toHaveBeenCalledWith(
       'trackCustomEvent',
-      expect.objectContaining({ eventType: 'custom', eventValue: 'value' })
+      expect.objectContaining({ eventType: 'awsui', eventValue: 'value' })
     );
   });
 
   test('converts objects to strings', () => {
-    panorama.sendMetric({ eventType: 'custom', eventValue: { test: 'value' }, eventDetail: { test: 'detail' } });
+    panorama.sendMetric({ eventValue: { test: 'value' }, eventDetail: { test: 'detail' } });
 
     expect(window.panorama).toHaveBeenCalledWith(
       'trackCustomEvent',
-      expect.objectContaining({ eventType: 'custom', eventValue: '{"test":"value"}', eventDetail: '{"test":"detail"}' })
+      expect.objectContaining({ eventValue: '{"test":"value"}', eventDetail: '{"test":"detail"}' })
     );
   });
 
   test('prints an error when event details are too long', () => {
     const eventDetail = 'a'.repeat(4001);
-    panorama.sendMetric({ eventType: 'custom', eventDetail });
+    panorama.sendMetric({ eventContext: 'custom', eventDetail });
 
     expect(window.panorama).toHaveBeenCalledTimes(1);
     expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-      eventName: 'awsui-metric-error',
+      eventType: 'awsui',
+      eventContext: 'awsui-metric-error',
       eventDetail: expect.stringMatching(/Event detail for metric is too long:.*/),
+      timestamp: expect.any(Number),
     });
     expect(consoleSpy).toHaveBeenCalledWith(`Event detail for metric is too long: ${eventDetail}`);
-  });
-
-  test('prints an error when event type is too long', () => {
-    const eventType = 'a'.repeat(51);
-    const errorMessage = `Event type for metric is too long: ${eventType}`;
-    panorama.sendMetric({ eventType });
-
-    expect(window.panorama).toHaveBeenCalledTimes(1);
-    expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-      eventName: 'awsui-metric-error',
-      eventDetail: errorMessage,
-    });
-    expect(consoleSpy).toHaveBeenCalledWith(errorMessage);
-  });
-
-  test('prints an error when event name is too long', () => {
-    const eventName = 'a'.repeat(1001);
-    const errorMessage = `Event name for metric is too long: ${eventName}`;
-    panorama.sendMetric({ eventName });
-
-    expect(window.panorama).toHaveBeenCalledTimes(1);
-    expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-      eventName: 'awsui-metric-error',
-      eventDetail: errorMessage,
-    });
-    expect(consoleSpy).toHaveBeenCalledWith(errorMessage);
   });
 
   test('prints an error when event value is too long', () => {
@@ -84,8 +60,10 @@ describe('PanoramaClient', () => {
 
     expect(window.panorama).toHaveBeenCalledTimes(1);
     expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-      eventName: 'awsui-metric-error',
+      eventType: 'awsui',
+      eventContext: 'awsui-metric-error',
       eventDetail: expect.stringMatching(/Event value for metric is too long:.*/),
+      timestamp: expect.any(Number),
     });
     expect(consoleSpy).toHaveBeenCalledWith(`Event value for metric is too long: ${eventValue}`);
   });
@@ -96,8 +74,10 @@ describe('PanoramaClient', () => {
 
     expect(window.panorama).toHaveBeenCalledTimes(1);
     expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-      eventName: 'awsui-metric-error',
+      eventType: 'awsui',
+      eventContext: 'awsui-metric-error',
       eventDetail: expect.stringMatching(/Event context for metric is too long:.*/),
+      timestamp: expect.any(Number),
     });
     expect(consoleSpy).toHaveBeenCalledWith(`Event context for metric is too long: ${eventContext}`);
   });
