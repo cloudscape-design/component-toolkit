@@ -18,8 +18,10 @@ describe('useVisualRefresh', () => {
     return <div data-testid="current-mode">{isRefresh.toString()}</div>;
   }
 
-  beforeEach(() => clearVisualRefreshState());
-  afterEach(() => document.body.classList.remove('awsui-visual-refresh'));
+  afterEach(() => {
+    clearVisualRefreshState();
+    expect(document.querySelector('.awsui-visual-refresh')).toBeFalsy();
+  });
   afterEach(() => {
     clearMessageCache();
     jest.restoreAllMocks();

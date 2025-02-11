@@ -107,6 +107,9 @@ let visualRefreshState: undefined | boolean = undefined;
 // for testing
 export function clearVisualRefreshState() {
   visualRefreshState = undefined;
+  if (typeof document !== 'undefined') {
+    document.body.classList.remove('awsui-visual-refresh');
+  }
 }
 
 function detectVisualRefreshClassName() {
