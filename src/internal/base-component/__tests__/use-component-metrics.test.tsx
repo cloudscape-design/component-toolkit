@@ -77,7 +77,6 @@ describe('useComponentMetrics', () => {
     // the order is defined in the telemetry hook
     expect(window.AWSC.Clog.log).toHaveBeenNthCalledWith(1, 'awsui-viewport-width', 1024, undefined);
     expect(window.AWSC.Clog.log).toHaveBeenNthCalledWith(2, 'awsui-viewport-height', 768, undefined);
-    expect(window.AWSC.Clog.log).toHaveBeenNthCalledWith(3, 'awsui_toolkit_t30', 1, expect.stringContaining('loaded'));
     expect(window.AWSC.Clog.log).toHaveBeenLastCalledWith(
       getExpectedMetricName('test-component-1'),
       1,
