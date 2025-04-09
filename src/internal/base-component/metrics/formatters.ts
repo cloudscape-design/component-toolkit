@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { MetricDetail, MetricsLogItem } from './interfaces';
+import { MetricDetail, MetricsLogItem } from './interfaces.js';
 
 declare const AWSUI_METRIC_ORIGIN: string | undefined;
 

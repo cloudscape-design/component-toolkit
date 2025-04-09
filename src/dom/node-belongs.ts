@@ -1,9 +1,9 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { findUpUntil, nodeContains } from '.';
+import { findUpUntil, nodeContains } from './index.js';
 
-import { isHTMLElement, isNode } from './element-types';
+import { isHTMLElement, isNode } from './element-types.js';
 
 /**
  * Checks whether the given node (target) belongs to the container.

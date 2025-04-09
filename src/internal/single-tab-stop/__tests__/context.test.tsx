@@ -4,7 +4,7 @@
 import React, { useRef } from 'react';
 import { render, act } from '@testing-library/react';
 
-import { SingleTabStopNavigationContext, useSingleTabStopNavigation } from '../';
+import { SingleTabStopNavigationContext, useSingleTabStopNavigation } from '..//index.js';
 import { renderWithSingleTabStopNavigation } from './utils';
 
 function Button(props: React.HTMLAttributes<HTMLButtonElement>) {

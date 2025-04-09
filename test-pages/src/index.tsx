@@ -4,7 +4,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import pages from './pages-index';
+import pages from './pages-index.js';
 
 import './index.css';
 

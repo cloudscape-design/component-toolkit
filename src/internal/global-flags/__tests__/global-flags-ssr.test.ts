@@ -4,8 +4,8 @@
 /* eslint-disable header/header */
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
-import * as globalFlags from '../';
-import { awsuiGlobalFlagsSymbol, FlagsHolder } from '../';
+import * as globalFlags from '..//index.js';
+import { awsuiGlobalFlagsSymbol, FlagsHolder } from '..//index.js';
 const { getGlobalFlag, setGlobalFlag } = globalFlags;
 
 const globalWithFlags = globalThis as FlagsHolder;

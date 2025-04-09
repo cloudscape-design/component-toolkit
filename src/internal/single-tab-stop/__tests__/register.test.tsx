@@ -9,7 +9,7 @@ import {
   SingleTabStopNavigationContext,
   SingleTabStopNavigationProvider,
   useSingleTabStopNavigation,
-} from '../';
+} from '..//index.js';
 
 function Button(props: React.HTMLAttributes<HTMLButtonElement>) {
   const buttonRef = useRef<HTMLButtonElement>(null);

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useRef, useState, useCallback } from 'react';
-import { ContainerQueryEntry } from './interfaces';
-import { useResizeObserver } from '../internal/container-queries/use-resize-observer';
+import { ContainerQueryEntry } from './interfaces.js';
+import { useResizeObserver } from '../internal/container-queries/use-resize-observer.js';
 
 /**
  * Attaches resize-observer to the referenced element and keeps last observation in state.

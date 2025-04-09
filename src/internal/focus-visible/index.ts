@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useEffect } from 'react';
-import { isModifierKey } from '../keycode';
+import { isModifierKey } from '../keycode.js';
 
 function setIsKeyboard(active: boolean) {
   if (active) {

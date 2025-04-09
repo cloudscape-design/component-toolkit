@@ -1,8 +1,8 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import * as globalFlags from '../';
-import { FlagsHolder, awsuiGlobalFlagsSymbol } from '../';
+import * as globalFlags from '..//index.js';
+import { FlagsHolder, awsuiGlobalFlagsSymbol } from '..//index.js';
 const { getGlobalFlag, setGlobalFlag } = globalFlags;
 
 declare const window: Window & FlagsHolder;

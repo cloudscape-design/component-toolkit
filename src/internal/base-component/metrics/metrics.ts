@@ -1,9 +1,9 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { CLogClient, PanoramaClient, MetricsV2EventItem } from './log-clients';
-import { buildMetricDetail, buildMetricName, jsonStringify } from './formatters';
-import { ComponentConfiguration, MetricsLogItem } from './interfaces';
+import { CLogClient, PanoramaClient, MetricsV2EventItem } from './log-clients.js';
+import { buildMetricDetail, buildMetricName, jsonStringify } from './formatters.js';
+import { ComponentConfiguration, MetricsLogItem } from './interfaces.js';
 
 const oneTimeMetrics = new Set<string>();
 

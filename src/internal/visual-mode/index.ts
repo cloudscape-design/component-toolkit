@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useEffect, useState } from 'react';
-import { findUpUntil } from '../../dom';
-import { createSingletonHandler } from '../singleton-handler';
-import { useStableCallback } from '../stable-callback';
-import { isDevelopment } from '../is-development';
-import { warnOnce } from '../logging';
-import { awsuiVisualRefreshFlag, getGlobal } from '../global-flags';
+import { findUpUntil } from '../../dom/index.js';
+import { createSingletonHandler } from '../singleton-handler/index.js';
+import { useStableCallback } from '../stable-callback/index.js';
+import { isDevelopment } from '../is-development.js';
+import { warnOnce } from '../logging.js';
+import { awsuiVisualRefreshFlag, getGlobal } from '../global-flags/index.js';
 
 function safeMatchMedia(element: HTMLElement, query: string) {
   try {

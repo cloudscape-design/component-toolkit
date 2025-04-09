@@ -4,8 +4,8 @@
 import { unstable_batchedUpdates } from 'react-dom';
 import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
 import { useEffect, useLayoutEffect } from 'react';
-import { ContainerQueryEntry, ElementReference } from './interfaces';
-import { useStableCallback } from '../stable-callback';
+import { ContainerQueryEntry, ElementReference } from './interfaces.js';
+import { useStableCallback } from '../stable-callback/index.js';
 
 /**
  * Attaches resize-observer to the referenced element.

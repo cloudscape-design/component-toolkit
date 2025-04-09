@@ -8,7 +8,7 @@ import React from 'react';
 import { useRuntimeVisualRefresh, clearVisualRefreshState } from '../index';
 import { clearMessageCache } from '../../logging';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { awsuiVisualRefreshFlag, FlagsHolder } from '../../global-flags';
+import { awsuiVisualRefreshFlag, FlagsHolder } from '../../global-flags/index.js';
 
 const globalWithFlags = globalThis as FlagsHolder;
 

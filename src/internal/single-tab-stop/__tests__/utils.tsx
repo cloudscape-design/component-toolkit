@@ -4,7 +4,7 @@
 import React, { createRef, forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import { render } from '@testing-library/react';
 
-import { FocusableChangeHandler, SingleTabStopNavigationContext } from '../';
+import { FocusableChangeHandler, SingleTabStopNavigationContext } from '..//index.js';
 
 interface ProviderRef {
   setCurrentTarget(focusTarget: null | Element, suppressed?: (null | Element)[]): void;

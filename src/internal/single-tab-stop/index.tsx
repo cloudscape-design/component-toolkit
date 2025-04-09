@@ -11,7 +11,7 @@ import React, {
   useState,
 } from 'react';
 
-import nodeBelongs from '../../dom/node-belongs';
+import nodeBelongs from '../../dom/node-belongs.js';
 
 export type FocusableChangeHandler = (isFocusable: boolean) => void;
 
