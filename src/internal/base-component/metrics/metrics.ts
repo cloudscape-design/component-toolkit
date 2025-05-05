@@ -76,15 +76,6 @@ export class Metrics {
 
   /*
    * Reports a metric value 1 to Console Platform's client logging service to indicate that the
-   * component was loaded. The component load event will only be reported as used to client logging
-   * service once per page view.
-   */
-  logComponentsLoaded() {
-    this.sendMetricObjectOnce({ source: this.source, action: 'loaded', version: this.packageVersion }, 1);
-  }
-
-  /*
-   * Reports a metric value 1 to Console Platform's client logging service to indicate that the
    * component was used in the page.  A component will only be reported as used to client logging
    * service once per page view.
    */
