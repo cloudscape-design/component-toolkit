@@ -18,6 +18,28 @@ test('should attach readonly metadata to the returned root DOM node', () => {
   expect(Object.isFrozen(rootNode[COMPONENT_METADATA_KEY])).toBe(true);
 });
 
+test('should attach package metadata to the DOM node', () => {
+  function TestComponent() {
+    const ref = useComponentMetadata('test-component', {
+      packageName: 'component-toolkit',
+      version: '1.0.0',
+      theme: 'default',
+    });
+    return <div ref={ref}>Test</div>;
+  }
+
+  const { container } = render(<TestComponent />);
+  const rootNode: any = container.firstChild;
+
+  expect(rootNode[COMPONENT_METADATA_KEY]).toEqual({
+    name: 'test-component',
+    packageName: 'component-toolkit',
+    version: '1.0.0',
+    theme: 'default',
+  });
+  expect(Object.isFrozen(rootNode[COMPONENT_METADATA_KEY])).toBe(true);
+});
+
 test('should include analytics property when provided', () => {
   function TestComponent() {
     const ref = useComponentMetadata('test-component', '3.0.0', { instanceId: '123' });

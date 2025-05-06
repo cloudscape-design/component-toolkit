@@ -6,29 +6,36 @@ import { AnalyticsMetadata } from './metrics/interfaces';
 
 export const COMPONENT_METADATA_KEY = '__awsuiMetadata__';
 
-interface AwsUiMetadata {
-  name: string;
+interface PackageMetadata {
+  packageName?: string;
   version: string;
+  theme?: string;
+}
+
+interface ComponentMetadata extends PackageMetadata {
+  name: string;
   analytics?: AnalyticsMetadata;
 }
 
 interface HTMLMetadataElement extends HTMLElement {
-  [COMPONENT_METADATA_KEY]: AwsUiMetadata;
+  [COMPONENT_METADATA_KEY]: ComponentMetadata;
 }
 
 export function useComponentMetadata<T = any>(
   componentName: string,
-  packageVersion: string,
+  packageMetadata: PackageMetadata | string,
   analyticsMetadata?: AnalyticsMetadata
 ) {
   const elementRef = useRef<T>(null);
 
   useEffect(() => {
     if (elementRef.current) {
+      const pkgMetadata = typeof packageMetadata === 'string' ? { version: packageMetadata } : packageMetadata;
+
       const node = elementRef.current as unknown as HTMLMetadataElement;
-      const metadata: AwsUiMetadata = {
+      const metadata: ComponentMetadata = {
+        ...pkgMetadata,
         name: componentName,
-        version: packageVersion,
       };
 
       // Only add analytics property to metadata if analytics property is non-empty
