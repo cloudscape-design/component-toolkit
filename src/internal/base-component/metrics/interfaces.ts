@@ -18,7 +18,7 @@ export interface ComponentConfiguration {
   metadata?: Record<string, JSONValue>;
 }
 
-export type AnalyticsMetadata = Record<string, JSONValue>;
+export type AnalyticsMetadata = JSONObject;
 
 export interface MetricsLogItem {
   source: string;
