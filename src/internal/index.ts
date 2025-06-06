@@ -38,3 +38,4 @@ export { default as handleKey } from './utils/handle-key';
 export { default as circleIndex } from './utils/circle-index';
 export { default as Portal, PortalProps } from './portal';
 export { useMergeRefs } from './use-merge-refs';
+export { useControllableStateMode } from './controllable-state/use-controllable-state-mode';
