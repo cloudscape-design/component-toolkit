@@ -3,8 +3,7 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
-import { MetricsTestHelper } from '../metrics/metrics';
-import { formatVersionForMetricName, formatMajorVersionForMetricDetail } from '../metrics/formatters';
+import { clearOneTimeMetricsCache } from '../metrics/metrics';
 import { useComponentMetrics } from '../component-metrics';
 
 declare global {
@@ -46,7 +45,7 @@ function verifyMetricsAreLoggedOnlyOnce() {
 }
 
 function getExpectedMetricName(componentName: string) {
-  return `awsui_${componentName}_${formatVersionForMetricName('test', '3.0.0')}`;
+  return `awsui_${componentName}_t30`;
 }
 
 describe('useComponentMetrics', () => {
@@ -65,7 +64,7 @@ describe('useComponentMetrics', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    new MetricsTestHelper().resetOneTimeMetricsCache();
+    clearOneTimeMetricsCache();
   });
 
   test('component issues metrics upon rendering', () => {
@@ -83,11 +82,11 @@ describe('useComponentMetrics', () => {
       1,
       JSON.stringify({
         o: 'main',
-        s: 'test-component-1',
         t: 'test',
-        a: 'used',
         f: 'react',
-        v: formatMajorVersionForMetricDetail('3.0.0'),
+        v: '3.0.0',
+        a: 'used',
+        s: 'test-component-1',
         c: { props: {} },
       })
     );
@@ -109,11 +108,11 @@ describe('useComponentMetrics', () => {
       1,
       JSON.stringify({
         o: 'main',
-        s: 'test-component-2',
         t: 'test',
-        a: 'used',
         f: 'react',
-        v: formatMajorVersionForMetricDetail('3.0.0'),
+        v: '3.0.0',
+        a: 'used',
+        s: 'test-component-2',
         c: { props: {} },
       })
     );
@@ -129,11 +128,11 @@ describe('useComponentMetrics', () => {
     const metricName = getExpectedMetricName('test-component-with-props');
     const commonDetails = {
       o: 'main',
-      s: 'test-component-with-props',
       t: 'test',
-      a: 'used',
       f: 'react',
-      v: formatMajorVersionForMetricDetail('3.0.0'),
+      v: '3.0.0',
+      a: 'used',
+      s: 'test-component-with-props',
     };
     expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(1);
     expect(window.AWSC.Clog.log).toHaveBeenCalledWith(
@@ -161,11 +160,11 @@ describe('useComponentMetrics', () => {
       1,
       JSON.stringify({
         o: 'custom',
-        s: 'test-component-1',
         t: 'test',
-        a: 'used',
         f: 'react',
-        v: formatMajorVersionForMetricDetail('3.0.0'),
+        v: '3.0.0',
+        a: 'used',
+        s: 'test-component-1',
         c: { props: {} },
       })
     );

@@ -1,8 +1,8 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { MetricsTestHelper, Metrics } from '../metrics/metrics';
-import { MetricDetail } from '../metrics/interfaces';
+import { clearOneTimeMetricsCache, Metrics } from '../metrics/metrics';
+import { ComponentMetricMinified } from '../metrics/interfaces';
 
 declare global {
   interface Window {
@@ -24,9 +24,9 @@ function mockConsoleError() {
 }
 
 describe('Client Metrics support', () => {
-  const metrics = new Metrics('dummy-package', '1.0');
+  const metrics = new Metrics({ packageSource: 'dummy-package', packageVersion: '1.0', theme: 'default' });
 
-  const checkMetric = (metricName: string, detailObject: MetricDetail) => {
+  const checkMetric = (metricName: string, detailObject: ComponentMetricMinified) => {
     expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
       eventType: 'awsui',
       eventContext: metricName,
@@ -38,7 +38,6 @@ describe('Client Metrics support', () => {
   };
 
   beforeEach(() => {
-    metrics.initMetrics('default');
     window.AWSC = {
       Clog: {
         log: () => {},
@@ -51,19 +50,19 @@ describe('Client Metrics support', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    new MetricsTestHelper().resetOneTimeMetricsCache();
+    clearOneTimeMetricsCache();
   });
 
   describe('sendMetric', () => {
     test('does nothing of both AWSC and panorama APIs are not available', () => {
       delete window.panorama;
       delete window.AWSC;
-      expect(() => metrics.sendMetric('name', 0)).not.toThrow();
+      expect(() => metrics.sendOpsMetricValue('name', 0)).not.toThrow();
     });
 
     test('uses AWSC.Clog.log API as fallback when panorama is unavailable', () => {
       delete window.panorama;
-      metrics.sendMetric('name', 0);
+      metrics.sendOpsMetricValue('name', 0);
       expect(window.AWSC.Clog.log).toHaveBeenCalledWith('name', 0, undefined);
     });
 
@@ -85,7 +84,7 @@ describe('Client Metrics support', () => {
         setupIframe();
         expect(window.parent.panorama).toBeUndefined();
 
-        metrics.sendMetric('name', 0); // only proves no exception thrown
+        metrics.sendOpsMetricValue('name', 0); // only proves no exception thrown
       });
 
       test('works if window.parent has panorama object', () => {
@@ -96,7 +95,7 @@ describe('Client Metrics support', () => {
         expect(window.panorama).toBeUndefined();
         expect(window.parent.panorama).toBeDefined();
 
-        metrics.sendMetric('name', 0, undefined);
+        metrics.sendOpsMetricValue('name', 0);
         expect(window.parent.panorama).toHaveBeenCalledWith('trackCustomEvent', {
           eventType: 'awsui',
           eventContext: 'name',
@@ -110,7 +109,7 @@ describe('Client Metrics support', () => {
       mockConsoleError();
 
       test('delegates to window.panorama when defined', () => {
-        metrics.sendMetric('name', 0, undefined);
+        metrics.sendOpsMetricValue('name', 0);
         expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
           eventType: 'awsui',
           eventContext: 'name',
@@ -122,12 +121,11 @@ describe('Client Metrics support', () => {
       describe('Metric name validation', () => {
         const tryValidMetric = (metricName: string) => {
           test(`calls window.panorama when valid metric name used (${metricName})`, () => {
-            metrics.sendMetric(metricName, 1, 'detail');
+            metrics.sendOpsMetricValue(metricName, 1);
             expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
               eventType: 'awsui',
               eventContext: metricName,
               eventValue: '1',
-              eventDetail: 'detail',
               timestamp: expect.any(Number),
             });
           });
@@ -135,7 +133,7 @@ describe('Client Metrics support', () => {
 
         const tryInvalidMetric = (metricName: string) => {
           test(`logs an error when invalid metric name used (${metricName})`, () => {
-            metrics.sendMetric(metricName, 0, 'detail');
+            metrics.sendOpsMetricValue(metricName, 0);
             expect(console.error).toHaveBeenCalledWith(`Invalid metric name: ${metricName}`);
             jest.mocked(console.error).mockReset();
             expect(window.panorama).not.toHaveBeenCalled();
@@ -146,7 +144,7 @@ describe('Client Metrics support', () => {
         test('logs and error when metric name is too long', () => {
           // 1001 char: too long
           const longName = '1234567890'.repeat(100) + 'x';
-          metrics.sendMetric(longName, 0, 'detail');
+          metrics.sendOpsMetricValue(longName, 0);
           expect(console.error).toHaveBeenCalledWith(`Metric name ${longName} is too long`);
           jest.mocked(console.error).mockReset();
         });
@@ -161,35 +159,12 @@ describe('Client Metrics support', () => {
         tryInvalidMetric('colons:not:allowed'); // invalid characters
         tryInvalidMetric('spaces not allowed'); // invalid characters
       });
-
-      describe('Metric detail validation', () => {
-        test('accepts details below the character limit', () => {
-          const validDetail = 'a'.repeat(4000);
-          metrics.sendMetric('metricName', 1, validDetail);
-          expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
-            eventType: 'awsui',
-            eventContext: 'metricName',
-            eventValue: '1',
-            eventDetail: validDetail,
-            timestamp: expect.any(Number),
-          });
-        });
-
-        test('throws an error when detail is too long', () => {
-          const invalidDetail = 'a'.repeat(4001);
-          metrics.sendMetric('metricName', 0, invalidDetail);
-          expect(console.error).toHaveBeenCalledWith(`Detail for metric metricName is too long: ${invalidDetail}`);
-          jest.mocked(console.error).mockReset();
-          expect(window.panorama).not.toHaveBeenCalled();
-          expect(window.AWSC.Clog.log).not.toHaveBeenCalled();
-        });
-      });
     });
   });
 
   describe('sendMetricOnce', () => {
-    test('logs a metric name only once', () => {
-      metrics.sendMetricOnce('my-event', 1);
+    test('logs a metric of the same value only once', () => {
+      metrics.sendOpsMetricValue('my-event', 1);
       expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
         eventType: 'awsui',
         eventContext: 'my-event',
@@ -198,13 +173,27 @@ describe('Client Metrics support', () => {
       });
       expect(window.panorama).toHaveBeenCalledTimes(1);
 
-      metrics.sendMetricOnce('my-event', 2);
+      metrics.sendOpsMetricValue('my-event', 1);
       expect(window.panorama).toHaveBeenCalledTimes(1);
     });
 
+    test('does not deduplicate different values', () => {
+      metrics.sendOpsMetricValue('my-event', 1);
+      expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+        eventType: 'awsui',
+        eventContext: 'my-event',
+        eventValue: '1',
+        timestamp: expect.any(Number),
+      });
+      expect(window.panorama).toHaveBeenCalledTimes(1);
+
+      metrics.sendOpsMetricValue('my-event', 2);
+      expect(window.panorama).toHaveBeenCalledTimes(2);
+    });
+
     test('does not deduplicate metrics in different casing', () => {
-      metrics.sendMetricOnce('my-event', 1);
-      metrics.sendMetricOnce('My-Event', 2);
+      metrics.sendOpsMetricValue('my-event', 1);
+      metrics.sendOpsMetricValue('My-Event', 2);
       expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
         eventType: 'awsui',
         eventContext: 'my-event',
@@ -221,37 +210,38 @@ describe('Client Metrics support', () => {
     });
   });
 
-  describe('sendMetricObject', () => {
-    test('uses panorama API as fallback when AWSC.Clog.log is unavailable', () => {
-      window.AWSC = undefined;
-      metrics.sendMetricObject({ source: 'pkg', action: 'used', version: '5.0' }, 1);
+  describe('sendOpsMetricObject', () => {
+    test('sends metrics to panorama', () => {
+      metrics.sendOpsMetricObject('awsui-ops-demo', {});
       expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
         eventType: 'awsui',
-        eventContext: 'awsui_pkg_d50',
-        eventDetail: '{"o":"main","s":"pkg","t":"default","a":"used","f":"react","v":"5.0"}',
+        eventContext: 'awsui-ops-demo',
+        eventDetail: '{"o":"main","t":"default","f":"react","v":"1.0"}',
         eventValue: '1',
         timestamp: expect.any(Number),
       });
     });
 
+    test('deduplicates metrics with same details', () => {
+      metrics.sendOpsMetricObject('awsui-ops-demo', { foo: 'something' });
+      metrics.sendOpsMetricObject('awsui-ops-demo', { foo: 'something' });
+      expect(window.panorama).toHaveBeenCalledTimes(1);
+    });
+
+    test('allows to send multiple metrics of same name but different details', () => {
+      metrics.sendOpsMetricObject('awsui-ops-demo', { foo: 'something' });
+      metrics.sendOpsMetricObject('awsui-ops-demo', { foo: 'something-else' });
+      expect(window.panorama).toHaveBeenCalledTimes(2);
+    });
+
     describe('correctly maps input object to metric name', () => {
-      test('applies default values for theme (default) and framework (react)', () => {
-        metrics.sendMetricObject(
-          {
-            source: 'pkg',
-            action: 'used',
-            version: '5.0',
-          },
-          1
-        );
-        checkMetric('awsui_pkg_d50', {
+      test('applies default values for origin, theme, version, framework', () => {
+        metrics.sendOpsMetricObject('awsui-ops-demo', {});
+        checkMetric('awsui-ops-demo', {
           o: 'main',
-          s: 'pkg',
           t: 'default',
-          a: 'used',
           f: 'react',
-          v: '5.0',
-          c: undefined,
+          v: '1.0',
         });
       });
 
@@ -262,106 +252,22 @@ describe('Client Metrics support', () => {
         ['5.7.0', ['57', '5.7.0']],
         ['5.7 dkjhkhsgdjh', ['57', '5.7dkjhkhsgdjh']],
         ['5.7.0 kjfhgjhdshjsjd', ['57', '5.7.0kjfhgjhdshjsjd']],
-      ];
+      ] as const;
 
       versionTestCases.forEach(testCase => {
         test(`correctly interprets version ${testCase[0]}`, () => {
-          metrics.sendMetricObject(
-            {
-              source: 'pkg',
-              action: 'used',
-              version: testCase[0] as string,
-            },
-            1
-          );
-          checkMetric(`awsui_pkg_d${testCase[1][0]}`, {
+          const metrics = new Metrics('pkg', testCase[0]);
+          metrics.logComponentUsed('DummyComponentName', { props: {} });
+          checkMetric(`awsui_DummyComponentName_u${testCase[1][0]}`, {
             o: 'main',
-            s: 'pkg',
-            t: 'default',
-            a: 'used',
+            t: 'unknown',
             f: 'react',
             v: testCase[1][1],
-            c: undefined,
+            a: 'used',
+            s: 'DummyComponentName',
+            c: { props: {} },
           });
         });
-      });
-    });
-  });
-
-  describe('sendMetricObjectOnce', () => {
-    test('logs a metric only once if it is the same object', () => {
-      const metricObj = {
-        source: 'pkg',
-        action: 'used' as const,
-        version: '5.0',
-      };
-
-      metrics.sendMetricObjectOnce(metricObj, 1);
-      metrics.sendMetricObjectOnce(metricObj, 1);
-      expect(window.panorama).toHaveBeenCalledTimes(1);
-    });
-    test('logs metric for each different version if same source and action', () => {
-      metrics.sendMetricObjectOnce(
-        {
-          source: 'pkg1',
-          action: 'used',
-          version: '5.0',
-        },
-        1
-      );
-      metrics.sendMetricObjectOnce(
-        {
-          source: 'pkg1',
-          action: 'used',
-          version: '6.0',
-        },
-        1
-      );
-      expect(window.panorama).toHaveBeenCalledTimes(2);
-    });
-    test('logs a metric multiple times if same source but different actions', () => {
-      metrics.sendMetricObjectOnce(
-        {
-          source: 'pkg2',
-          action: 'used',
-          version: '5.0',
-        },
-        1
-      );
-      metrics.sendMetricObjectOnce(
-        {
-          source: 'pkg2',
-          action: 'loaded',
-          version: '5.0',
-        },
-        1
-      );
-      expect(window.panorama).toHaveBeenCalledTimes(2);
-    });
-  });
-
-  describe('initMetrics', () => {
-    test('sets theme', () => {
-      const metrics = new Metrics('dummy-package', 'dummy-version');
-      metrics.initMetrics('dummy-theme');
-
-      // check that the theme is correctly set
-      metrics.sendMetricObject(
-        {
-          source: 'pkg',
-          action: 'used',
-          version: '5.0',
-        },
-        1
-      );
-      checkMetric(`awsui_pkg_d50`, {
-        o: 'main',
-        s: 'pkg',
-        t: 'dummy-theme',
-        a: 'used',
-        f: 'react',
-        v: '5.0',
-        c: undefined,
       });
     });
   });
@@ -371,11 +277,11 @@ describe('Client Metrics support', () => {
       metrics.logComponentUsed('DummyComponentName', { props: {} });
       checkMetric(`awsui_DummyComponentName_d10`, {
         o: 'main',
-        s: 'DummyComponentName',
         t: 'default',
-        a: 'used',
         f: 'react',
         v: '1.0',
+        a: 'used',
+        s: 'DummyComponentName',
         c: { props: {} },
       });
     });
@@ -384,11 +290,11 @@ describe('Client Metrics support', () => {
       metrics.logComponentUsed('DummyComponentName', { props: { variant: 'primary' }, metadata: { isMobile: true } });
       checkMetric(`awsui_DummyComponentName_d10`, {
         o: 'main',
-        s: 'DummyComponentName',
         t: 'default',
-        a: 'used',
         f: 'react',
         v: '1.0',
+        a: 'used',
+        s: 'DummyComponentName',
         c: { props: { variant: 'primary' }, metadata: { isMobile: true } },
       });
     });
@@ -400,11 +306,11 @@ describe('Client Metrics support', () => {
       });
       checkMetric(`awsui_DummyComponentName_d10`, {
         o: 'main',
-        s: 'DummyComponentName',
         t: 'default',
-        a: 'used',
         f: 'react',
         v: '1.0',
+        a: 'used',
+        s: 'DummyComponentName',
         c: { props: {}, metadata: { nullValue: null } },
       });
     });
@@ -415,11 +321,11 @@ describe('Client Metrics support', () => {
       });
       checkMetric(`awsui_DummyComponentName_d10`, {
         o: 'main',
-        s: 'DummyComponentName',
         t: 'default',
-        a: 'used',
         f: 'react',
         v: '1.0',
+        a: 'used',
+        s: 'DummyComponentName',
         c: { props: { count: 123, notANumber: 'NaN', maxSize: 'Infinity' } },
       });
     });
@@ -430,11 +336,11 @@ describe('Client Metrics support', () => {
       metrics.logComponentsLoaded();
       checkMetric(`awsui_dummy-package_d10`, {
         o: 'main',
-        s: 'dummy-package',
         t: 'default',
-        a: 'loaded',
         f: 'react',
         v: '1.0',
+        a: 'loaded',
+        s: 'dummy-package',
         c: undefined,
       });
     });

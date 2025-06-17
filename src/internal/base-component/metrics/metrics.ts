@@ -2,45 +2,45 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { CLogClient, PanoramaClient, MetricsV2EventItem } from './log-clients';
-import { buildMetricDetail, buildMetricName, jsonStringify } from './formatters';
-import { ComponentConfiguration, MetricsLogItem } from './interfaces';
+import { buildComponentMetricDetail, buildMetricDetail, getMajorVersion } from './formatters';
+import { ComponentConfiguration, ComponentMetricDetail, PackageSettings } from './interfaces';
 
 const oneTimeMetrics = new Set<string>();
 
-// In case we need to override the theme for VR.
-let theme = '';
-function setTheme(newTheme: string) {
-  theme = newTheme;
-}
-
 export class Metrics {
-  readonly source: string;
-  readonly packageVersion: string;
+  private readonly context: PackageSettings;
+  private readonly clog = new CLogClient();
+  private readonly panorama = new PanoramaClient();
 
-  private clog = new CLogClient();
-  private panorama = new PanoramaClient();
-
-  constructor(source: string, packageVersion: string) {
-    this.source = source;
-    this.packageVersion = packageVersion;
-  }
-
-  initMetrics(theme: string) {
-    setTheme(theme);
-  }
-
-  /**
-   * Calls Console Platform's client logging JS API with provided metric name, value, and detail.
-   * Does nothing if Console Platform client logging JS is not present in page.
-   */
-  sendMetric(metricName: string, value: number, detail?: string): void {
-    if (!theme) {
-      // Metrics need to be initialized first (initMetrics)
-      console.error('Metrics need to be initialized first.');
-      return;
+  constructor(packageSource: PackageSettings);
+  constructor(packageSource: string, packageVersion: string);
+  constructor(...args: [PackageSettings] | [string, string]) {
+    if (args.length === 1) {
+      this.context = args[0];
+    } else {
+      const [packageSource, packageVersion] = args;
+      this.context = { packageSource, packageVersion, theme: 'unknown' };
     }
+  }
 
-    this.clog.sendMetric(metricName, value, detail);
+  private sendComponentMetric(metric: ComponentMetricDetail): void {
+    this.sendMetricOnce(
+      `awsui_${metric.componentName}_${this.context.theme.charAt(0)}${getMajorVersion(this.context.packageVersion)}`,
+      1,
+      buildComponentMetricDetail(metric, this.context)
+    );
+  }
+
+  /*
+   * Calls Console Platform's client logging only the first time the provided metricName is used.
+   * Subsequent calls with the same metricName are ignored.
+   */
+  private sendMetricOnce(metricName: string, value: number, detail?: string): void {
+    const key = [metricName + value + detail].join('|');
+    if (!oneTimeMetrics.has(key)) {
+      this.clog.sendMetric(metricName, value, detail);
+      oneTimeMetrics.add(key);
+    }
   }
 
   /**
@@ -51,27 +51,12 @@ export class Metrics {
     this.panorama.sendMetric(metric);
   }
 
-  sendMetricObject(metric: MetricsLogItem, value: number): void {
-    this.sendMetric(buildMetricName(metric, theme), value, buildMetricDetail(metric, theme));
+  sendOpsMetricObject(metricName: string, detail: Record<string, string>) {
+    this.sendMetricOnce(metricName, 1, buildMetricDetail(detail, this.context));
   }
 
-  sendMetricObjectOnce(metric: MetricsLogItem, value: number): void {
-    const metricKey = jsonStringify(metric);
-    if (!oneTimeMetrics.has(metricKey)) {
-      this.sendMetricObject(metric, value);
-      oneTimeMetrics.add(metricKey);
-    }
-  }
-
-  /*
-   * Calls Console Platform's client logging only the first time the provided metricName is used.
-   * Subsequent calls with the same metricName are ignored.
-   */
-  sendMetricOnce(metricName: string, value: number, detail?: string): void {
-    if (!oneTimeMetrics.has(metricName)) {
-      this.sendMetric(metricName, value, detail);
-      oneTimeMetrics.add(metricName);
-    }
+  sendOpsMetricValue(metricName: string, value: number) {
+    this.sendMetricOnce(metricName, value);
   }
 
   /*
@@ -80,7 +65,7 @@ export class Metrics {
    * service once per page view.
    */
   logComponentsLoaded() {
-    this.sendMetricObjectOnce({ source: this.source, action: 'loaded', version: this.packageVersion }, 1);
+    this.sendComponentMetric({ componentName: this.context.packageSource, action: 'loaded' });
   }
 
   /*
@@ -89,22 +74,14 @@ export class Metrics {
    * service once per page view.
    */
   logComponentUsed(componentName: string, configuration: ComponentConfiguration) {
-    this.sendMetricObjectOnce(
-      {
-        source: componentName,
-        action: 'used',
-        version: this.packageVersion,
-        configuration,
-      },
-      1
-    );
+    this.sendComponentMetric({
+      action: 'used',
+      componentName,
+      configuration,
+    });
   }
 }
 
 export function clearOneTimeMetricsCache(): void {
   oneTimeMetrics.clear();
-}
-
-export class MetricsTestHelper {
-  resetOneTimeMetricsCache = clearOneTimeMetricsCache;
 }
