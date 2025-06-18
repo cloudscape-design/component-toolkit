@@ -193,7 +193,8 @@ describe('Client Metrics support', () => {
 
     test('does not deduplicate metrics in different casing', () => {
       metrics.sendOpsMetricValue('my-event', 1);
-      metrics.sendOpsMetricValue('My-Event', 2);
+      metrics.sendOpsMetricValue('My-Event', 1);
+      expect(window.panorama).toHaveBeenCalledTimes(2);
       expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
         eventType: 'awsui',
         eventContext: 'my-event',
@@ -203,10 +204,9 @@ describe('Client Metrics support', () => {
       expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
         eventType: 'awsui',
         eventContext: 'My-Event',
-        eventValue: '2',
+        eventValue: '1',
         timestamp: expect.any(Number),
       });
-      expect(window.panorama).toHaveBeenCalledTimes(2);
     });
   });
 
