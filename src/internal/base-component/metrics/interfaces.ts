@@ -3,7 +3,7 @@
 
 type JSONValue = string | number | boolean | null | undefined;
 
-interface JSONObject {
+export interface JSONObject {
   [key: string]: JSONObject | JSONValue;
 }
 
@@ -20,29 +20,28 @@ export interface ComponentConfiguration {
 
 export type AnalyticsMetadata = JSONObject;
 
-export interface MetricsLogItem {
-  source: string;
+export interface ComponentMetricDetail {
+  componentName: string;
   // Currently logged actions
   // "loaded" – components package loaded
   // "used" – individual component used
   action: 'loaded' | 'used';
-  version: string;
   configuration?: ComponentConfiguration;
 }
 
-export interface MetricDetail {
+export interface ComponentMetricMinified {
   // origin
   o: string;
   // source, e.g. component or package name
-  s: string;
+  s?: string;
   // theme
   t: string;
   // action
-  a: string;
+  a?: string;
   // framework
   f: string;
   // version and git commit
   v: string;
   // component configuration
-  c: JSONObject | undefined;
+  c?: JSONObject;
 }

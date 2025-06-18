@@ -9,16 +9,15 @@ export { ComponentConfiguration };
 
 export function useComponentMetrics(
   componentName: string,
-  { packageSource, packageVersion, theme }: PackageSettings,
+  settings: PackageSettings,
   configuration: ComponentConfiguration = { props: {} }
 ) {
   useEffect(() => {
-    const metrics = new Metrics(packageSource, packageVersion);
+    const metrics = new Metrics(settings);
 
-    metrics.initMetrics(theme);
     if (typeof window !== 'undefined') {
-      metrics.sendMetricOnce('awsui-viewport-width', window.innerWidth || 0);
-      metrics.sendMetricOnce('awsui-viewport-height', window.innerHeight || 0);
+      metrics.sendOpsMetricValue('awsui-viewport-width', window.innerWidth || 0);
+      metrics.sendOpsMetricValue('awsui-viewport-height', window.innerHeight || 0);
     }
     metrics.logComponentsLoaded();
     metrics.logComponentUsed(componentName.toLowerCase(), configuration);

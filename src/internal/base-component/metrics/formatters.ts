@@ -1,28 +1,39 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { MetricDetail, MetricsLogItem } from './interfaces';
+import { PackageSettings, ComponentMetricDetail, JSONObject } from './interfaces';
 
 declare const AWSUI_METRIC_ORIGIN: string | undefined;
 
-// React is the only framework we're using.
-const framework = 'react';
-
-export function buildMetricDetail({ source, action, version, configuration }: MetricsLogItem, theme: string): string {
+export function buildMetricDetail(detail: JSONObject, context: PackageSettings): string {
   const metricOrigin = typeof AWSUI_METRIC_ORIGIN !== 'undefined' ? AWSUI_METRIC_ORIGIN : 'main';
-  const detailObject: MetricDetail = {
+  const detailObject = {
     o: metricOrigin,
-    s: source,
-    t: theme,
-    a: action,
-    f: framework,
-    v: formatMajorVersionForMetricDetail(version),
-    c: configuration as MetricDetail['c'],
+    t: context.theme,
+    // React is the only framework we're using.
+    f: 'react',
+    // Remove spaces from the version string for compactness
+    v: context.packageVersion.replace(/\s/g, ''),
+    ...detail,
   };
   return jsonStringify(detailObject);
 }
 
-export function jsonStringify(detailObject: any) {
+export function buildComponentMetricDetail(
+  { componentName, action, configuration }: ComponentMetricDetail,
+  context: PackageSettings
+): string {
+  return buildMetricDetail(
+    {
+      a: action,
+      s: componentName,
+      c: configuration as JSONObject | undefined,
+    },
+    context
+  );
+}
+
+function jsonStringify(detailObject: any) {
   return JSON.stringify(detailObject, detailSerializer);
 }
 
@@ -34,19 +45,7 @@ function detailSerializer(key: string, value: unknown) {
   return value;
 }
 
-export function buildMetricName({ source, version }: MetricsLogItem, theme: string): string {
-  return ['awsui', source, `${formatVersionForMetricName(theme, version)}`].join('_');
-}
-
-export function formatMajorVersionForMetricDetail(version: string) {
-  return version.replace(/\s/g, '');
-}
-
-export function formatVersionForMetricName(theme: string, version: string) {
-  return `${theme.charAt(0)}${getMajorVersion(version).replace('.', '')}`;
-}
-
-function getMajorVersion(versionString: string): string {
+export function getMajorVersion(versionString: string): string {
   const majorVersionMatch = versionString.match(/^(\d+\.\d+)/);
-  return majorVersionMatch ? majorVersionMatch[1] : '';
+  return majorVersionMatch ? majorVersionMatch[1].replace('.', '') : '';
 }
