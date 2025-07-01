@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { getRawAnalyticsMetadata } from './testing-utils';
+export { getComponentsTree } from './page-scanner-utils';
 
 import { METADATA_DATA_ATTRIBUTE } from './attributes';
 import { GeneratedAnalyticsMetadata, GeneratedAnalyticsMetadataFragment } from './interfaces';

@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { METADATA_ATTRIBUTE, getAnalyticsMetadataAttribute, getAnalyticsLabelAttribute } from '../attributes';
 
 export const ComponentOne = ({ malformed }: { malformed?: boolean }) => (
@@ -33,7 +33,7 @@ export const ComponentOne = ({ malformed }: { malformed?: boolean }) => (
   </div>
 );
 
-const ComponentTwo = () => (
+export const ComponentTwo = () => (
   <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentTwo', label: '.component-label' } })}>
     <div className="component-label" {...getAnalyticsLabelAttribute('.sub-label')}>
       <div className="sub-label">sub label</div>
@@ -43,7 +43,7 @@ const ComponentTwo = () => (
   </div>
 );
 
-export const ComponentThree = () => (
+export const ComponentThree = ({ children }: { children?: ReactNode }) => (
   <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentThree' } })}>
     <div
       {...getAnalyticsMetadataAttribute({
@@ -61,6 +61,7 @@ export const ComponentThree = () => (
       <div data-awsui-referrer-id="id:nested:portal">
         <ComponentOne />
       </div>
+      {children}
     </div>
   </div>
 );
