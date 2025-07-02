@@ -23,7 +23,7 @@ describe('getComponentsTree', () => {
       );
       const target = container.querySelector('#outer-target') as HTMLElement;
       expect(getComponentsTree(target)).toEqual([
-        { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' }, children: [] },
+        { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' } },
       ]);
     });
     test('only includes components inside the specified element', () => {
@@ -38,10 +38,10 @@ describe('getComponentsTree', () => {
         </>
       );
       expect(getComponentsTree(container.querySelector('#outer-target-1') as HTMLElement)).toEqual([
-        { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' }, children: [] },
+        { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' } },
       ]);
       expect(getComponentsTree(container.querySelector('#outer-target-2') as HTMLElement)).toEqual([
-        { name: 'ComponentTwo', label: 'sub label', children: [] },
+        { name: 'ComponentTwo', label: 'sub label' },
       ]);
     });
     test('can include multiple components', () => {
@@ -55,11 +55,11 @@ describe('getComponentsTree', () => {
         {
           name: 'ComponentThree',
           children: [
-            { name: 'ComponentTwo', label: 'sub label', children: [] },
-            { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' }, children: [] },
+            { name: 'ComponentTwo', label: 'sub label' },
+            { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' } },
           ],
         },
-        { name: 'ComponentTwo', label: 'sub label', children: [] },
+        { name: 'ComponentTwo', label: 'sub label' },
       ]);
     });
     test('can include multiple nested components', () => {
@@ -74,13 +74,13 @@ describe('getComponentsTree', () => {
         {
           name: 'ComponentThree',
           children: [
-            { name: 'ComponentTwo', label: 'sub label', children: [] },
-            { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' }, children: [] },
+            { name: 'ComponentTwo', label: 'sub label' },
+            { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' } },
             {
               name: 'ComponentThree',
               children: [
-                { name: 'ComponentTwo', label: 'sub label', children: [] },
-                { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' }, children: [] },
+                { name: 'ComponentTwo', label: 'sub label' },
+                { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' } },
               ],
             },
           ],
@@ -98,11 +98,11 @@ describe('getComponentsTree', () => {
         {
           name: 'ComponentThree',
           children: [
-            { name: 'ComponentTwo', label: 'sub label', children: [] },
-            { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' }, children: [] },
+            { name: 'ComponentTwo', label: 'sub label' },
+            { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' } },
           ],
         },
-        { name: 'ComponentTwo', label: 'sub label', children: [] },
+        { name: 'ComponentTwo', label: 'sub label' },
       ]);
     });
     test('skips malformed metadata', () => {
@@ -113,7 +113,7 @@ describe('getComponentsTree', () => {
       );
       const target = container.querySelector('#outer-target') as HTMLElement;
       expect(getComponentsTree(target)).toEqual([
-        { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' }, children: [] },
+        { name: 'ComponentOne', label: 'component label', properties: { multi: 'true' } },
       ]);
     });
   });
