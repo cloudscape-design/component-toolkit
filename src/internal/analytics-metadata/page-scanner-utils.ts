@@ -3,10 +3,12 @@
 
 import { METADATA_ATTRIBUTE } from './attributes';
 import { isNodeComponent } from './dom-utils';
-import { GeneratedAnalyticsMetadataComponent } from './interfaces';
 import { getGeneratedAnalyticsMetadata } from './utils';
 
-interface GeneratedAnalyticsMetadataComponentTree extends GeneratedAnalyticsMetadataComponent {
+interface GeneratedAnalyticsMetadataComponentTree {
+  name: string;
+  label: string;
+  properties?: Record<string, string>;
   children?: Array<GeneratedAnalyticsMetadataComponentTree>;
 }
 
@@ -26,10 +28,14 @@ const getComponentsTreeRecursive = (
       return;
     }
     visited.add(componentNode);
-    tree.push({
+    const treeItem: GeneratedAnalyticsMetadataComponentTree = {
       ...getGeneratedAnalyticsMetadata(componentNode).contexts[0].detail,
-      children: getComponentsTreeRecursive(componentNode, visited),
-    });
+    };
+    const children = getComponentsTreeRecursive(componentNode, visited);
+    if (children.length > 0) {
+      treeItem.children = children;
+    }
+    tree.push(treeItem);
   });
   return tree;
 };
