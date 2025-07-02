@@ -12,7 +12,7 @@ export interface GeneratedAnalyticsMetadata {
   contexts: Array<GeneratedAnalyticsMetadataComponentContext>;
 }
 
-export interface GeneratedAnalyticsMetadataComponent {
+interface GeneratedAnalyticsMetadataComponent {
   // name of the component. For example: "awsui.RadioGroup". We prefix the actual name with awsui to account for future tagging of custom components
   name: string;
 
