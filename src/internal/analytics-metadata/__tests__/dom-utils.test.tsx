@@ -4,7 +4,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { activateAnalyticsMetadata, getAnalyticsMetadataAttribute, METADATA_ATTRIBUTE } from '../attributes';
-import { findLogicalParent, isNodeComponent, findComponentUp, findSelectorUp } from '../dom-utils';
+import { findLogicalParent, isNodeComponent, findComponentUp, findSelectorUp, findPortals } from '../dom-utils';
 
 beforeAll(() => {
   activateAnalyticsMetadata(true);
@@ -151,5 +151,61 @@ describe('findSelectorUp', () => {
       </div>
     );
     expect(findSelectorUp(container.querySelector('#target-element'), '.test-class')).toBeNull();
+  });
+});
+
+describe('findPortals', () => {
+  test('returns an empty array when no referrerId is found', () => {
+    const { container } = render(<div id="root-element"></div>);
+    expect(findPortals(container.querySelector('#root-element')!)).toEqual([]);
+  });
+  test('returns an empty array when no portal is found', () => {
+    const { container } = render(
+      <div id="root-element">
+        <div data-awsui-referrer-id="id:portal"></div>
+      </div>
+    );
+    expect(findPortals(container.querySelector('#root-element')!)).toEqual([]);
+  });
+  test('returns one portal', () => {
+    const { container } = render(
+      <div id="root-element">
+        <div data-awsui-referrer-id="id:portal"></div>
+        <div id="id:portal" className="portal"></div>
+      </div>
+    );
+    expect(findPortals(container.querySelector('#root-element')!)).toEqual([container.querySelector('.portal')]);
+  });
+  test('returns multiple portals', () => {
+    const { container } = render(
+      <>
+        <div id="id:portal-2" className="portal-2"></div>
+        <div id="id:portal-3" className="portal-3"></div>
+        <div id="root-element">
+          <div data-awsui-referrer-id="id:portal-1"></div>
+          <div id="id:portal-1" className="portal-1"></div>
+          <div data-awsui-referrer-id="id:portal-2"></div>
+          <div data-awsui-referrer-id="id:portal-3"></div>
+        </div>
+      </>
+    );
+    expect(findPortals(container.querySelector('#root-element')!)).toEqual(
+      [1, 2, 3].map(index => container.querySelector(`.portal-${index}`))
+    );
+  });
+  test('returns only portals contained in the specified elements', () => {
+    const { container } = render(
+      <div id="root-element">
+        <div data-awsui-referrer-id="id:portal-1"></div>
+        <div id="id:portal-1" className="portal-1"></div>
+        <div id="target-element">
+          <div data-awsui-referrer-id="id:portal-2"></div>
+        </div>
+        <div id="id:portal-2" className="portal-2"></div>
+        <div data-awsui-referrer-id="id:portal-3"></div>
+        <div id="id:portal-3" className="portal-3"></div>
+      </div>
+    );
+    expect(findPortals(container.querySelector('#target-element')!)).toEqual([container.querySelector('.portal-2')]);
   });
 });

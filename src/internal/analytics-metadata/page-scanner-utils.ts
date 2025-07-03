@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { METADATA_ATTRIBUTE } from './attributes';
-import { isNodeComponent } from './dom-utils';
+import { findPortals, isNodeComponent } from './dom-utils';
 import { getGeneratedAnalyticsMetadata } from './utils';
 
 interface GeneratedAnalyticsMetadataComponentTree {
@@ -14,6 +14,9 @@ interface GeneratedAnalyticsMetadataComponentTree {
 
 const getComponentsArray = (node: HTMLElement | Document = document) => {
   const elementsWithMetadata = Array.from(node.querySelectorAll(`[${METADATA_ATTRIBUTE}]`)) as Array<HTMLElement>;
+  findPortals(node as HTMLElement).forEach(portal => {
+    elementsWithMetadata.push(...getComponentsArray(portal));
+  });
   return elementsWithMetadata.filter(isNodeComponent);
 };
 
