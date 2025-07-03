@@ -1,11 +1,11 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { METADATA_DATA_ATTRIBUTE } from './attributes';
+import { METADATA_DATA_ATTRIBUTE, REFERRER_ATTRIBUTE, REFERRER_DATA_ATTRIBUTE } from './attributes';
 
 export const findLogicalParent = (node: HTMLElement): HTMLElement | null => {
   try {
-    const referrer = node.dataset.awsuiReferrerId;
+    const referrer = node.dataset[REFERRER_DATA_ATTRIBUTE];
     if (referrer) {
       return document.querySelector(`[id="${referrer}"]`);
     }
@@ -43,3 +43,8 @@ export function findSelectorUp(node: HTMLElement | null, selector: string): HTML
   }
   return current && current.tagName !== 'body' ? current : null;
 }
+
+export const findPortals = (node: HTMLElement): Array<HTMLElement> =>
+  Array.from(node.querySelectorAll(`[${REFERRER_ATTRIBUTE}]`))
+    .map(element => findLogicalParent(element as HTMLElement))
+    .filter(element => !!element) as Array<HTMLElement>;
