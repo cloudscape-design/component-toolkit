@@ -6,6 +6,7 @@ import { PanoramaClient } from '../metrics/log-clients';
 declare global {
   interface Window {
     panorama?: any;
+    [key: symbol]: any;
   }
 }
 
@@ -85,5 +86,21 @@ describe('PanoramaClient', () => {
   test('forwards custom timestamps', () => {
     panorama.sendMetric({ timestamp: 15 });
     expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', expect.objectContaining({ timestamp: 15 }));
+  });
+
+  test('finds panorama function from Symbol.for("panorama") property', () => {
+    // Remove the regular panorama property
+    delete window.panorama;
+
+    const mockPanoramaSymbolFn = jest.fn();
+    const panoramaSymbol = Symbol.for('panorama');
+    (window as any)[panoramaSymbol] = mockPanoramaSymbolFn;
+
+    panorama.sendMetric({ eventValue: 'symbol-test' });
+
+    expect(mockPanoramaSymbolFn).toHaveBeenCalledWith(
+      'trackCustomEvent',
+      expect.objectContaining({ eventType: 'awsui', eventValue: 'symbol-test' })
+    );
   });
 });
