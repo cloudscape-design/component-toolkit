@@ -111,6 +111,53 @@ describe('findComponentUp', () => {
     );
     expect(findComponentUp(container.querySelector('#target-element'))).toBeNull();
   });
+  test('with `until` argument', () => {
+    const { container } = render(
+      <>
+        <div id="outer-element">
+          <div id="component-element" {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentName' } })}>
+            <div id="another-until">
+              <div id=":rr5:"></div>
+            </div>
+            <div id="target-element"></div>
+          </div>
+        </div>
+        <div data-awsui-referrer-id=":rr5:">
+          <div id="another-target-element"></div>
+        </div>
+      </>
+    );
+    expect(
+      findComponentUp(
+        container.querySelector('#target-element'),
+        container.querySelector('#outer-element') as HTMLElement
+      )!.id
+    ).toBe('component-element');
+    expect(
+      findComponentUp(
+        container.querySelector('#target-element'),
+        container.querySelector('#target-element') as HTMLElement
+      )
+    ).toBeNull();
+    expect(
+      findComponentUp(
+        container.querySelector('#target-element'),
+        container.querySelector('#component-element') as HTMLElement
+      )!.id
+    ).toBe('component-element');
+    expect(
+      findComponentUp(
+        container.querySelector('#another-target-element'),
+        container.querySelector('#outer-element') as HTMLElement
+      )!.id
+    ).toBe('component-element');
+    expect(
+      findComponentUp(
+        container.querySelector('#another-target-element'),
+        container.querySelector('#another-until') as HTMLElement
+      )
+    ).toBeNull();
+  });
 });
 
 describe('findSelectorUp', () => {

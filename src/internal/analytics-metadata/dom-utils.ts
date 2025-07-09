@@ -1,11 +1,11 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { METADATA_DATA_ATTRIBUTE } from './attributes';
+import { METADATA_DATA_ATTRIBUTE, REFERRER_DATA_ATTRIBUTE } from './attributes';
 
 export const findLogicalParent = (node: HTMLElement): HTMLElement | null => {
   try {
-    const referrer = node.dataset.awsuiReferrerId;
+    const referrer = node.dataset[REFERRER_DATA_ATTRIBUTE];
     if (referrer) {
       return document.querySelector(`[id="${referrer}"]`);
     }
@@ -15,12 +15,12 @@ export const findLogicalParent = (node: HTMLElement): HTMLElement | null => {
   }
 };
 
-export function findComponentUp(node: HTMLElement | null): HTMLElement | null {
+export function findComponentUp(node: HTMLElement | null, until: HTMLElement = document.body): HTMLElement | null {
   let firstComponentElement = node;
-  while (firstComponentElement && firstComponentElement.tagName !== 'body' && !isNodeComponent(firstComponentElement)) {
+  while (firstComponentElement && firstComponentElement !== until && !isNodeComponent(firstComponentElement)) {
     firstComponentElement = findLogicalParent(firstComponentElement);
   }
-  return firstComponentElement && firstComponentElement.tagName !== 'body' ? firstComponentElement : null;
+  return firstComponentElement && isNodeComponent(firstComponentElement) ? firstComponentElement : null;
 }
 
 export const isNodeComponent = (node: HTMLElement): boolean => {
