@@ -59,20 +59,26 @@ test('should work with multiple components', () => {
 });
 
 test('should add listeners only once', () => {
-  jest.spyOn(document, 'addEventListener');
-  jest.spyOn(document, 'removeEventListener');
+  const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
   const { rerender } = render(
     <>
       <Fixture />
       <Fixture />
     </>
   );
-  expect(document.addEventListener).toHaveBeenCalledTimes(2);
-  expect(document.removeEventListener).toHaveBeenCalledTimes(0);
+
+  expect(addEventListenerSpy).toHaveBeenCalledTimes(2);
+  const signal = (addEventListenerSpy.mock.calls[0][2] as AddEventListenerOptions).signal!;
+  expect(signal.aborted).toBe(false);
+
+  addEventListenerSpy.mockClear();
   rerender(<Fixture />);
-  expect(document.removeEventListener).toHaveBeenCalledTimes(0);
+  expect(addEventListenerSpy).toHaveBeenCalledTimes(0);
+  expect(signal.aborted).toBe(false);
+
   rerender(<span />);
-  expect(document.removeEventListener).toHaveBeenCalledTimes(2);
+  expect(addEventListenerSpy).toHaveBeenCalledTimes(0);
+  expect(signal.aborted).toBe(true);
 });
 
 test('should initialize late components with updated state', () => {
