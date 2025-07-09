@@ -142,6 +142,12 @@ export class PanoramaClient {
         return currentWindow?.panorama;
       }
 
+      const panoramaSymbol = Symbol.for('panorama');
+      const symbolProperty = (currentWindow as any)?.[panoramaSymbol];
+      if (typeof symbolProperty === 'function') {
+        return symbolProperty as PanoramaFunction;
+      }
+
       if (!currentWindow || currentWindow.parent === currentWindow) {
         // When the window has no more parents, it references itself
         return undefined;
