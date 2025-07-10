@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LABEL_DATA_ATTRIBUTE } from './attributes';
-import { findSelectorUp, findComponentUp } from './dom-utils';
+import { findSelectorUp, findComponentUpUntil } from './dom-utils';
 import { LabelIdentifier } from './interfaces';
 
 export const processLabel = (node: HTMLElement | null, labelIdentifier: string | LabelIdentifier | null): string => {
@@ -52,7 +52,7 @@ const processSingleLabel = (
     return processSingleLabel(findSelectorUp(node, rootSelector), labelSelector);
   }
   if (root === 'component') {
-    return processSingleLabel(findComponentUp(node), labelSelector);
+    return processSingleLabel(findComponentUpUntil(node), labelSelector);
   }
   if (root === 'body') {
     return processSingleLabel(document.body, labelSelector);
