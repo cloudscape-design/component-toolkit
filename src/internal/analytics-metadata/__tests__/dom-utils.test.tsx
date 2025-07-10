@@ -4,7 +4,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { activateAnalyticsMetadata, getAnalyticsMetadataAttribute, METADATA_ATTRIBUTE } from '../attributes';
-import { findLogicalParent, isNodeComponent, findComponentUp, findSelectorUp } from '../dom-utils';
+import { findLogicalParent, isNodeComponent, findComponentUpUntil, findSelectorUp } from '../dom-utils';
 
 beforeAll(() => {
   activateAnalyticsMetadata(true);
@@ -78,9 +78,9 @@ describe('isNodeComponent', () => {
   });
 });
 
-describe('findComponentUp', () => {
+describe('findComponentUpUntil', () => {
   test('returns null when input is null', () => {
-    expect(findComponentUp(null)).toBeNull();
+    expect(findComponentUpUntil(null)).toBeNull();
   });
   test('returns parent component element', () => {
     const { container } = render(
@@ -88,7 +88,7 @@ describe('findComponentUp', () => {
         <div id="target-element"></div>
       </div>
     );
-    expect(findComponentUp(container.querySelector('#target-element'))!.id).toBe('component-element');
+    expect(findComponentUpUntil(container.querySelector('#target-element'))!.id).toBe('component-element');
   });
   test('returns parent component element with portals', () => {
     const { container } = render(
@@ -101,7 +101,7 @@ describe('findComponentUp', () => {
         </div>
       </div>
     );
-    expect(findComponentUp(container.querySelector('#target-element'))!.id).toBe('component-element');
+    expect(findComponentUpUntil(container.querySelector('#target-element'))!.id).toBe('component-element');
   });
   test('returns null when element has no parent component', () => {
     const { container } = render(
@@ -109,7 +109,7 @@ describe('findComponentUp', () => {
         <div id="target-element"></div>
       </div>
     );
-    expect(findComponentUp(container.querySelector('#target-element'))).toBeNull();
+    expect(findComponentUpUntil(container.querySelector('#target-element'))).toBeNull();
   });
   test('with `until` argument', () => {
     const { container } = render(
@@ -128,31 +128,31 @@ describe('findComponentUp', () => {
       </>
     );
     expect(
-      findComponentUp(
+      findComponentUpUntil(
         container.querySelector('#target-element'),
         container.querySelector('#outer-element') as HTMLElement
       )!.id
     ).toBe('component-element');
     expect(
-      findComponentUp(
+      findComponentUpUntil(
         container.querySelector('#target-element'),
         container.querySelector('#target-element') as HTMLElement
       )
     ).toBeNull();
     expect(
-      findComponentUp(
+      findComponentUpUntil(
         container.querySelector('#target-element'),
         container.querySelector('#component-element') as HTMLElement
       )!.id
     ).toBe('component-element');
     expect(
-      findComponentUp(
+      findComponentUpUntil(
         container.querySelector('#another-target-element'),
         container.querySelector('#outer-element') as HTMLElement
       )!.id
     ).toBe('component-element');
     expect(
-      findComponentUp(
+      findComponentUpUntil(
         container.querySelector('#another-target-element'),
         container.querySelector('#another-until') as HTMLElement
       )

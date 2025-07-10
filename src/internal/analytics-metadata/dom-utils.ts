@@ -15,7 +15,7 @@ export const findLogicalParent = (node: HTMLElement): HTMLElement | null => {
   }
 };
 
-export function findComponentUp(node: HTMLElement | null, until: HTMLElement = document.body): HTMLElement | null {
+export function findComponentUpUntil(node: HTMLElement | null, until: HTMLElement = document.body): HTMLElement | null {
   let firstComponentElement = node;
   while (firstComponentElement && firstComponentElement !== until && !isNodeComponent(firstComponentElement)) {
     firstComponentElement = findLogicalParent(firstComponentElement);
