@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { METADATA_ATTRIBUTE, REFERRER_ATTRIBUTE, REFERRER_DATA_ATTRIBUTE } from './attributes';
-import { findComponentUp, isNodeComponent } from './dom-utils';
+import { findComponentUpUntil, isNodeComponent } from './dom-utils';
 import { getGeneratedAnalyticsMetadata } from './utils';
 
 interface GeneratedAnalyticsMetadataComponentTree {
@@ -38,7 +38,7 @@ const buildComponentsMap = (node: HTMLElement | Document = document) => {
     parents: new Map<HTMLElement, Array<HTMLElement>>(),
   };
   componentsArray.forEach(element => {
-    const parent = element.parentElement ? findComponentUp(element.parentElement, node as HTMLElement) : null;
+    const parent = element.parentElement ? findComponentUpUntil(element.parentElement, node as HTMLElement) : null;
     if (!parent) {
       map.roots.push(element);
     } else {
