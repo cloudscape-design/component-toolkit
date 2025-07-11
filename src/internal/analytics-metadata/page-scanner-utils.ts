@@ -18,10 +18,15 @@ interface ComponentsMap {
 }
 
 const findPortalsOutsideOfNode = (node: HTMLElement): Array<HTMLElement> =>
-  (Array.from(document.querySelectorAll(`[${REFERRER_ATTRIBUTE}]`)) as Array<HTMLElement>).filter(element => {
-    const referrer = element.dataset[REFERRER_DATA_ATTRIBUTE];
-    return !!node.querySelector(`[id="${referrer}"]`) && !node.querySelector(`[${REFERRER_ATTRIBUTE}="${referrer}"]`);
-  });
+  (Array.from((node.ownerDocument || node).querySelectorAll(`[${REFERRER_ATTRIBUTE}]`)) as Array<HTMLElement>).filter(
+    element => {
+      const referrer = element.dataset[REFERRER_DATA_ATTRIBUTE];
+      return !!node.querySelector(`[id="${referrer}"]`) && !node.querySelector(`[${REFERRER_ATTRIBUTE}="${referrer}"]`);
+    }
+  );
+
+const findAccessibleIframes = (node: HTMLElement | Document): Array<HTMLIFrameElement> =>
+  Array.from(node.querySelectorAll('iframe')).filter(iframe => !!iframe.contentDocument);
 
 const getComponentsArray = (node: HTMLElement | Document = document) => {
   const elementsWithMetadata = Array.from(node.querySelectorAll(`[${METADATA_ATTRIBUTE}]`)) as Array<HTMLElement>;
@@ -48,7 +53,34 @@ const buildComponentsMap = (node: HTMLElement | Document = document) => {
       map.parents.get(parent)?.push(element);
     }
   });
+  findAccessibleIframes(node).forEach(
+    iframe =>
+      iframe.contentDocument &&
+      mergeComponentsMaps(
+        map,
+        findComponentUpUntil(iframe, node as HTMLElement),
+        buildComponentsMap(iframe.contentDocument)
+      )
+  );
   return map;
+};
+
+const mergeComponentsMaps = (
+  parentMap: ComponentsMap,
+  parentComponent: HTMLElement | null,
+  childMap: ComponentsMap
+): void => {
+  parentMap.parents = new Map([...parentMap.parents, ...childMap.parents]);
+  if (childMap.roots.length > 0) {
+    if (parentComponent) {
+      if (!parentMap.parents.has(parentComponent)) {
+        parentMap.parents.set(parentComponent, []);
+      }
+      childMap.roots.forEach(root => parentMap.parents.get(parentComponent)?.push(root));
+    } else {
+      parentMap.roots = [...parentMap.roots, ...childMap.roots];
+    }
+  }
 };
 
 const getComponentsTreeRecursive = (
