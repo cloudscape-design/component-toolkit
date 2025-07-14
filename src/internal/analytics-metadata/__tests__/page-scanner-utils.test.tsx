@@ -211,6 +211,7 @@ describe('getComponentsTree', () => {
           children: [
             {
               name: 'ComponentTwo',
+              label: 'Nested title',
               children: [
                 { name: 'ComponentTwoInPortal' },
                 { name: 'ComponentThree', children: [{ name: 'ComponentThreeInPortal' }] },

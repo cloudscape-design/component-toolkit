@@ -93,7 +93,12 @@ const NestedIframe = () => {
 
   return (
     <>
-      <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentTwo' } })}>
+      <h1>Nested title</h1>
+      <div
+        {...getAnalyticsMetadataAttribute({
+          component: { name: 'ComponentTwo', label: { selector: 'h1', root: 'body' } },
+        })}
+      >
         <div>inside iframe</div>
         <div id="sub-target">
           <div ref={ref}></div>;<div id="id:portal-1"></div>
@@ -134,6 +139,7 @@ export const AppWithIframe = () => {
 
   return (
     <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentOne' } })}>
+      <h1>Main title</h1>
       <div ref={ref}></div>;
       <iframe src="https://www.amazon.com/" />
     </div>
