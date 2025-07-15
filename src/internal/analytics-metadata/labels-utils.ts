@@ -55,7 +55,7 @@ const processSingleLabel = (
     return processSingleLabel(findComponentUpUntil(node), labelSelector);
   }
   if (root === 'body') {
-    return processSingleLabel(document.body, labelSelector);
+    return processSingleLabel(node.ownerDocument.body, labelSelector);
   }
   let labelElement: HTMLElement | null = node;
   if (labelSelector) {

@@ -7,7 +7,7 @@ export const findLogicalParent = (node: HTMLElement): HTMLElement | null => {
   try {
     const referrer = node.dataset[REFERRER_DATA_ATTRIBUTE];
     if (referrer) {
-      return document.querySelector(`[id="${referrer}"]`);
+      return (node.ownerDocument || node).querySelector(`[id="${referrer}"]`);
     }
     return node.parentElement;
   } catch (ex) {

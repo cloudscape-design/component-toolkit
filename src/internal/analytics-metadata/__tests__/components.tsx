@@ -1,8 +1,9 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { METADATA_ATTRIBUTE, getAnalyticsMetadataAttribute, getAnalyticsLabelAttribute } from '../attributes';
+import ReactDOM from 'react-dom';
 
 export const ComponentOne = ({ malformed }: { malformed?: boolean }) => (
   <div
@@ -65,3 +66,82 @@ export const ComponentThree = ({ children }: { children?: ReactNode }) => (
     </div>
   </div>
 );
+
+const NestedIframe = () => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = ref.current;
+    if (!container) {
+      return;
+    }
+    const iframeEl = container.ownerDocument.createElement('iframe');
+    iframeEl.id = 'iframe-2';
+    container.appendChild(iframeEl);
+
+    const iframeDocument = iframeEl.contentDocument!;
+    iframeDocument.open();
+    iframeDocument.writeln('<!DOCTYPE html>');
+    iframeDocument.close();
+    iframeDocument.body.innerHTML =
+      '<div><div data-awsui-analytics="{&quot;component&quot;:{&quot;name&quot;:&quot;ComponentThree&quot;}}"><div id="sub-sub-target">inside iframe inside iframe</div><div id="id:portal-2"></div></div><div data-awsui-referrer-id="id:portal-2"><div data-awsui-analytics="{&quot;component&quot;:{&quot;name&quot;:&quot;ComponentThreeInPortal&quot;}}"> </div></div></div>';
+
+    return () => {
+      container.removeChild(iframeEl);
+    };
+  });
+
+  return (
+    <>
+      <h1>Nested title</h1>
+      <div
+        {...getAnalyticsMetadataAttribute({
+          component: { name: 'ComponentTwo', label: { selector: 'h1', root: 'body' } },
+        })}
+      >
+        <div>inside iframe</div>
+        <div id="sub-target">
+          <div ref={ref}></div>;<div id="id:portal-1"></div>
+        </div>
+      </div>
+      <div data-awsui-referrer-id="id:portal-1">
+        <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentTwoInPortal' } })}> </div>
+      </div>
+    </>
+  );
+};
+
+export const AppWithIframe = () => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = ref.current;
+    if (!container) {
+      return;
+    }
+    const iframeEl = container.ownerDocument.createElement('iframe');
+    iframeEl.id = 'iframe-1';
+    container.appendChild(iframeEl);
+
+    const iframeDocument = iframeEl.contentDocument!;
+    iframeDocument.open();
+    iframeDocument.writeln('<!DOCTYPE html>');
+    iframeDocument.close();
+
+    const innerAppRoot = iframeDocument.createElement('div');
+    iframeDocument.body.appendChild(innerAppRoot);
+    ReactDOM.render(<NestedIframe />, innerAppRoot);
+    return () => {
+      ReactDOM.unmountComponentAtNode(innerAppRoot);
+      container.removeChild(iframeEl);
+    };
+  });
+
+  return (
+    <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentOne' } })}>
+      <h1>Main title</h1>
+      <div ref={ref}></div>;
+      <iframe src="https://www.amazon.com/" />
+    </div>
+  );
+};

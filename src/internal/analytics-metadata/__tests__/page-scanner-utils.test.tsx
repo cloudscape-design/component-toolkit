@@ -5,7 +5,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { getComponentsTree } from '../utils';
 import { METADATA_ATTRIBUTE, activateAnalyticsMetadata, getAnalyticsMetadataAttribute } from '../attributes';
-import { ComponentOne, ComponentTwo, ComponentThree } from './components';
+import { AppWithIframe, ComponentOne, ComponentTwo, ComponentThree } from './components';
 
 describe('getComponentsTree', () => {
   describe('with active analytics metadata', () => {
@@ -195,6 +195,31 @@ describe('getComponentsTree', () => {
           },
         ]);
       });
+    });
+    test('with iframes', () => {
+      const { container } = render(<AppWithIframe />);
+      expect(getComponentsTree()).toEqual([
+        {
+          name: 'ComponentOne',
+          children: [
+            {
+              name: 'ComponentTwo',
+              label: 'Nested title',
+              children: [
+                { name: 'ComponentTwoInPortal' },
+                { name: 'ComponentThree', children: [{ name: 'ComponentThreeInPortal' }] },
+              ],
+            },
+          ],
+        },
+      ]);
+      const subTarget = (container.querySelector('#iframe-1') as HTMLIFrameElement)!.contentDocument!.querySelector(
+        '#sub-target'
+      )!;
+      expect(getComponentsTree(subTarget as HTMLElement)).toEqual([
+        { name: 'ComponentTwoInPortal' },
+        { name: 'ComponentThree', children: [{ name: 'ComponentThreeInPortal' }] },
+      ]);
     });
   });
 
