@@ -1,19 +1,25 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { isModifierKey } from '../keycode';
+
+const frames = new Map<Document, { componentsCount: number; abortController: AbortController }>();
 
 function setIsKeyboard(active: boolean) {
   if (active) {
-    document.body.setAttribute('data-awsui-focus-visible', 'true');
+    for (const currentDocument of frames.keys()) {
+      currentDocument.body.setAttribute('data-awsui-focus-visible', 'true');
+    }
   } else {
-    document.body.removeAttribute('data-awsui-focus-visible');
+    for (const currentDocument of frames.keys()) {
+      currentDocument.body.removeAttribute('data-awsui-focus-visible');
+    }
   }
 }
 
 function handleMousedown() {
-  return setIsKeyboard(false);
+  setIsKeyboard(false);
 }
 
 function handleKeydown(event: KeyboardEvent) {
@@ -22,29 +28,32 @@ function handleKeydown(event: KeyboardEvent) {
   }
 }
 
-let componentsCount = 0;
-
-function addListeners() {
-  document.addEventListener('mousedown', handleMousedown);
-  document.addEventListener('keydown', handleKeydown);
+function addListeners(currentDocument: Document): AbortController {
+  const abortController = new AbortController();
+  currentDocument.addEventListener('mousedown', handleMousedown, { signal: abortController.signal });
+  currentDocument.addEventListener('keydown', handleKeydown, { signal: abortController.signal });
+  return abortController;
 }
 
-function removeListeners() {
-  document.removeEventListener('mousedown', handleMousedown);
-  document.removeEventListener('keydown', handleKeydown);
-}
-
-export function useFocusVisible() {
+export function useFocusVisible(componentRef?: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
-    if (componentsCount === 0) {
-      addListeners();
+    const currentDocument = componentRef?.current?.ownerDocument ?? document;
+
+    let frame = frames.get(currentDocument);
+    if (frame) {
+      frame.componentsCount++;
+    } else {
+      const abortController = addListeners(currentDocument);
+      frame = { componentsCount: 1, abortController };
+      frames.set(currentDocument, frame);
     }
-    componentsCount++;
+
     return () => {
-      componentsCount--;
-      if (componentsCount === 0) {
-        removeListeners();
+      frame.componentsCount--;
+      if (frame.componentsCount === 0) {
+        frame.abortController.abort();
+        frames.delete(currentDocument);
       }
     };
-  }, []);
+  }, [componentRef]);
 }
