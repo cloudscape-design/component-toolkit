@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { getComponentsTree } from '../utils';
 import { METADATA_ATTRIBUTE, activateAnalyticsMetadata, getAnalyticsMetadataAttribute } from '../attributes';
 import { AppWithIframe, ComponentOne, ComponentTwo, ComponentThree } from './components';
@@ -196,15 +196,8 @@ describe('getComponentsTree', () => {
         ]);
       });
     });
-    test('with iframes', async () => {
+    test('with iframes', () => {
       const { container } = render(<AppWithIframe />);
-      await waitFor(() => {
-        (
-          (document.querySelector('#iframe-1') as HTMLIFrameElement)?.contentDocument?.querySelector(
-            '#iframe-2'
-          ) as HTMLIFrameElement
-        )?.contentDocument?.querySelector('#sub-sub-target');
-      });
       expect(getComponentsTree()).toEqual([
         {
           name: 'ComponentOne',
