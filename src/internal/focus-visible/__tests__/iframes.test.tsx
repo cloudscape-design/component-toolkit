@@ -132,4 +132,5 @@ test('should remove listeners only from frame when the frame is unmounted', () =
     </>
   );
   expect(innerSignal.aborted).toBe(true);
+  expect(outerSignal.aborted).toBe(false);
 });

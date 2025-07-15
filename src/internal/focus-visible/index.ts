@@ -8,13 +8,10 @@ const frames = new Map<Document, { componentsCount: number; abortController: Abo
 
 function setIsKeyboard(active: boolean) {
   if (active) {
-    // For backwards compatibility if a ref isn't provided to useFocusVisible();
-    document.body.setAttribute('data-awsui-focus-visible', 'true');
     for (const currentDocument of frames.keys()) {
       currentDocument.body.setAttribute('data-awsui-focus-visible', 'true');
     }
   } else {
-    document.body.removeAttribute('data-awsui-focus-visible');
     for (const currentDocument of frames.keys()) {
       currentDocument.body.removeAttribute('data-awsui-focus-visible');
     }
