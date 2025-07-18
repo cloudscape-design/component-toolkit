@@ -66,6 +66,7 @@ describe('getGeneratedAnalyticsMetadata', () => {
             type: 'component',
             detail: {
               name: 'ComponentThree',
+              properties: { arr: ['a', 'b'] },
               innerContext: {
                 position: '2',
                 columnLabel: '',

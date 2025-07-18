@@ -45,7 +45,7 @@ export const ComponentTwo = () => (
 );
 
 export const ComponentThree = ({ children }: { children?: ReactNode }) => (
-  <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentThree' } })}>
+  <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentThree', properties: { arr: ['a', 'b'] } } })}>
     <div
       {...getAnalyticsMetadataAttribute({
         component: {
@@ -55,6 +55,7 @@ export const ComponentThree = ({ children }: { children?: ReactNode }) => (
             anotherLabel: { root: 'self' },
             yetAnotherLabel: { rootSelector: '.root-class-name' },
           },
+          properties: { arr: ['c', 'd'] },
         },
       })}
     >
