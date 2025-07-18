@@ -63,11 +63,13 @@ describe('getRawAnalyticsMetadata', () => {
                 rootSelector: '.root-class-name',
               },
             },
+            properties: { arr: ['c', 'd'] },
           },
         },
         {
           component: {
             name: 'ComponentThree',
+            properties: { arr: ['a', 'b'] },
           },
         },
       ],
