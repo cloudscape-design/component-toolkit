@@ -20,7 +20,7 @@ export const processMetadata = (node: HTMLElement | null, localMetadata: any): G
   return Object.keys(localMetadata).reduce((acc: any, key: string) => {
     if (key.toLowerCase().match(/label$/)) {
       acc[key] = processLabel(node, localMetadata[key]);
-    } else if (typeof localMetadata[key] !== 'string') {
+    } else if (typeof localMetadata[key] !== 'string' && !Array.isArray(localMetadata[key])) {
       acc[key] = processMetadata(node, localMetadata[key]);
     } else {
       acc[key] = localMetadata[key];
@@ -45,7 +45,7 @@ export const merge = (inputTarget: any, inputSource: any): any => {
       merged[key] = target[key];
     } else if (!target[key] && !isNil(source[key])) {
       merged[key] = source[key];
-    } else if (typeof target[key] === 'string') {
+    } else if (typeof target[key] === 'string' || Array.isArray(target[key])) {
       merged[key] = source[key];
     } else {
       merged[key] = merge(target[key], source[key]);

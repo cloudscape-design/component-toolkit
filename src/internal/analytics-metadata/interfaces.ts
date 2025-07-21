@@ -23,7 +23,7 @@ interface GeneratedAnalyticsMetadataComponent {
   instanceIdentifier?: string;
 
   // relevant properties of the component. For example: {variant: 'primary'} for Button, {external: 'true', href: '...'} for Link
-  properties?: Record<string, string>;
+  properties?: Record<string, string | Array<string>>;
 
   // relevant information on the specific area of the component in which the interaction happened
   innerContext?: Record<string, string>;

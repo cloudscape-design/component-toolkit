@@ -54,6 +54,7 @@ describe('getComponentsTree', () => {
       expect(getComponentsTree(container.querySelector('#outer-target-1') as HTMLElement)).toEqual([
         {
           name: 'ComponentThree',
+          properties: { arr: ['a', 'b'] },
           children: [
             {
               name: 'ComponentTwo',
@@ -76,6 +77,7 @@ describe('getComponentsTree', () => {
       expect(getComponentsTree(container.querySelector('#outer-target-1') as HTMLElement)).toEqual([
         {
           name: 'ComponentThree',
+          properties: { arr: ['a', 'b'] },
           children: [
             {
               name: 'ComponentTwo',
@@ -97,6 +99,7 @@ describe('getComponentsTree', () => {
       expect(getComponentsTree()).toEqual([
         {
           name: 'ComponentThree',
+          properties: { arr: ['a', 'b'] },
           children: [
             {
               name: 'ComponentTwo',

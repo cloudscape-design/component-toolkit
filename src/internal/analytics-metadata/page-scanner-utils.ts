@@ -8,7 +8,7 @@ import { getGeneratedAnalyticsMetadata } from './utils';
 interface GeneratedAnalyticsMetadataComponentTree {
   name: string;
   label: string;
-  properties?: Record<string, string>;
+  properties?: Record<string, string | Array<string>>;
   children?: Array<GeneratedAnalyticsMetadataComponentTree>;
 }
 
