@@ -11,12 +11,12 @@ test('should pass validation', () => {
 
 test('should throw error when excluded prop is used', () => {
   expect(() => validateProps('TestComponent', { variant: 'foo' }, ['variant'], {})).toThrow(
-    new Error('TestComponent does not support "variant" property when used in default theme')
+    new Error('TestComponent does not support "variant" property when used in default system')
   );
 });
 
 test('should throw error when invalid prop is used', () => {
   expect(() => validateProps('TestComponent', { variant: 'foo' }, [], { variant: ['bar'] })).toThrow(
-    new Error('TestComponent does not support "variant" with value "foo" when used in default theme')
+    new Error('TestComponent does not support "variant" with value "foo" when used in default system')
   );
 });
