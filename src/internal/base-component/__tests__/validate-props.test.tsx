@@ -1,0 +1,26 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+import { validateProps } from '../validate-props';
+
+test('should pass validation', () => {
+  expect(() => validateProps('TestComponent', {}, [], {}, 'default')).not.toThrow();
+  expect(() =>
+    validateProps('TestComponent', { variant: 'foo' }, ['bar'], { variant: ['foo'] }, 'default')
+  ).not.toThrow();
+  expect(() =>
+    validateProps('TestComponent', { variant: undefined }, ['bar'], { variant: ['foo'] }, 'default')
+  ).not.toThrow();
+});
+
+test('should throw error when excluded prop is used', () => {
+  expect(() => validateProps('TestComponent', { variant: 'foo' }, ['variant'], {}, 'default')).toThrow(
+    new Error('TestComponent does not support "variant" property when used in default system')
+  );
+});
+
+test('should throw error when invalid prop is used', () => {
+  expect(() => validateProps('TestComponent', { variant: 'foo' }, [], { variant: ['bar'] }, 'default')).toThrow(
+    new Error('TestComponent does not support "variant" with value "foo" when used in default system')
+  );
+});
