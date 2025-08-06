@@ -8,7 +8,7 @@ export function validateProps(
   props: Record<string, any>,
   excludedProps: Array<string>,
   allowedEnums: Record<string, Array<string>>,
-  systemName: string
+  systemName = 'default'
 ) {
   if (!isDevelopment) {
     return;
