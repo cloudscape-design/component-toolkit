@@ -46,13 +46,9 @@ interface SingletonStateOptions<T> {
 
 export function createSingletonState<T>({ factory, initialState }: SingletonStateOptions<T>) {
   const useSingleton = createSingletonHandler(factory);
-  let value = initialState;
   return function useSingletonState() {
-    const [state, setState] = useState<T>(value);
-    useSingleton(newValue => {
-      value = newValue;
-      setState(newValue);
-    });
+    const [state, setState] = useState<T>(initialState);
+    useSingleton(setState);
     return state;
   };
 }

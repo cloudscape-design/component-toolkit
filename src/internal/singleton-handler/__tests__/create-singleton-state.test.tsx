@@ -7,13 +7,17 @@ import { createSingletonState } from '../index';
 
 function setup() {
   const state = {
+    value: 0,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handler: (value: number) => {},
   };
   const useSingletonState = createSingletonState({
-    initialState: 0,
+    initialState: () => state.value,
     factory: handler => {
-      state.handler = handler;
+      state.handler = value => {
+        handler(value);
+        state.value = value;
+      };
       return () => {};
     },
   });
@@ -61,4 +65,17 @@ test('should use updated value for late-rendered components', () => {
   );
   expect(container).toHaveTextContent('first: 123');
   expect(container).toHaveTextContent('second: 123');
+});
+
+test('should use latest value from the global state', () => {
+  const { Demo, state } = setup();
+  const { container, rerender } = render(<Demo id="first" />);
+  expect(container).toHaveTextContent('first: 0');
+  state.handler(123);
+  expect(container).toHaveTextContent('first: 123');
+  rerender(<></>);
+  // value changes when there are no active listeners
+  state.value = 456;
+  rerender(<Demo id="first" />);
+  expect(container).toHaveTextContent('first: 456');
 });
