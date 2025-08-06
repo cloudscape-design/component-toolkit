@@ -4,7 +4,7 @@
 import { validateProps } from '../../../../lib/internal/base-component/validate-props';
 import { isDevelopment } from '../../../../lib/internal/is-development';
 
-jest.mock('../../../../lib/components/internal/is-development', () => ({ isDevelopment: false }));
+jest.mock('../../../../lib/internal/is-development', () => ({ isDevelopment: false }));
 
 test('does nothing in production builds', () => {
   expect(isDevelopment).toBe(false);
