@@ -8,5 +8,5 @@ jest.mock('../../is-development', () => ({ isDevelopment: false }));
 
 test('does nothing in production builds', () => {
   expect(isDevelopment).toBe(false);
-  expect(() => validateProps('TestComponent', { variant: 'foo' }, ['variant'], {})).not.toThrow();
+  expect(() => validateProps('TestComponent', { variant: 'foo' }, ['variant'], {}, 'default')).not.toThrow();
 });
