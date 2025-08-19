@@ -51,7 +51,7 @@ export class Metrics {
     this.panorama.sendMetric(metric);
   }
 
-  sendOpsMetricObject(metricName: string, detail: Record<string, string>) {
+  sendOpsMetricObject(metricName: string, detail: Record<string, string | number | boolean>) {
     this.sendMetricOnce(metricName, 1, buildMetricDetail(detail, this.context));
   }
 
