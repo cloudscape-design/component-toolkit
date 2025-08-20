@@ -222,6 +222,17 @@ describe('Client Metrics support', () => {
       });
     });
 
+    test('supports string, number and boolean details', () => {
+      metrics.sendOpsMetricObject('awsui-ops-demo', { count: 1, value: 'a', enabled: true });
+      expect(window.panorama).toHaveBeenCalledWith('trackCustomEvent', {
+        eventType: 'awsui',
+        eventContext: 'awsui-ops-demo',
+        eventDetail: '{"o":"main","t":"default","f":"react","v":"1.0","count":1,"value":"a","enabled":true}',
+        eventValue: '1',
+        timestamp: expect.any(Number),
+      });
+    });
+
     test('deduplicates metrics with same details', () => {
       metrics.sendOpsMetricObject('awsui-ops-demo', { foo: 'something' });
       metrics.sendOpsMetricObject('awsui-ops-demo', { foo: 'something' });
