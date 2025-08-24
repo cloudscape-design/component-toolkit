@@ -4,7 +4,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import useContainerQuery from '../use-container-query';
-import { ResizeObserver } from '@juggle/resize-observer';
 import { ContainerQueryEntry } from '../interfaces';
 
 function TestComponent({ mapFn = () => '' }: { mapFn?: (entry: ContainerQueryEntry) => string }) {
