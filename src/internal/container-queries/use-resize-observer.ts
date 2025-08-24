@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { unstable_batchedUpdates } from 'react-dom';
-import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
 import { useEffect, useLayoutEffect } from 'react';
 import { ContainerQueryEntry, ElementReference } from './interfaces';
 import { useStableCallback } from '../stable-callback';
@@ -42,7 +41,8 @@ export function useResizeObserver(elementRef: ElementReference, onObserve: (entr
     () => {
       const element = typeof elementRef === 'function' ? elementRef() : elementRef?.current;
       if (element) {
-        onObserve(convertResizeObserverEntry(new ResizeObserverEntry(element)));
+        const rect = element.getBoundingClientRect();
+        onObserve(convertElementToEntry(element, rect));
       }
     },
     // This effect is only needed for the first render to provide a synchronous update.
@@ -78,5 +78,21 @@ function convertResizeObserverEntry(entry: ResizeObserverEntry): ContainerQueryE
     contentBoxHeight: entry.contentBoxSize[0].blockSize,
     borderBoxWidth: entry.borderBoxSize[0].inlineSize,
     borderBoxHeight: entry.borderBoxSize[0].blockSize,
+  };
+}
+
+function convertElementToEntry(element: Element, rect: DOMRect): ContainerQueryEntry {
+  const computedStyle = window.getComputedStyle(element);
+  const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
+  const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
+  const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
+  const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
+
+  return {
+    target: element,
+    contentBoxWidth: rect.width - paddingLeft - paddingRight,
+    contentBoxHeight: rect.height - paddingTop - paddingBottom,
+    borderBoxWidth: rect.width,
+    borderBoxHeight: rect.height,
   };
 }
