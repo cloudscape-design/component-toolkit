@@ -16,7 +16,7 @@ import nodeBelongs from '../../dom/node-belongs';
 
 export type FocusableChangeHandler = (isFocusable: boolean) => void;
 
-export const defaultValue: {
+const defaultValue: {
   navigationActive: boolean;
   registerFocusable(focusable: HTMLElement, handler: FocusableChangeHandler): () => void;
   resetFocusTarget(): void;
@@ -69,6 +69,12 @@ export interface SingleTabStopNavigationAPI {
   updateFocusTarget(): void;
   getFocusTarget(): null | HTMLElement;
   isRegistered(element: Element): boolean;
+}
+
+export function SingleTabStopNavigationReset({ children }: { children: React.ReactNode }) {
+  return (
+    <SingleTabStopNavigationContext.Provider value={defaultValue}>{children}</SingleTabStopNavigationContext.Provider>
+  );
 }
 
 export const SingleTabStopNavigationProvider = forwardRef(
@@ -158,7 +164,7 @@ export const SingleTabStopNavigationProvider = forwardRef(
     const parentContext = useContext(SingleTabStopNavigationContext);
     const value = parentContext.navigationActive
       ? parentContext
-      : { navigationActive, registerFocusable, updateFocusTarget, resetFocusTarget };
+      : { navigationReset: false, navigationActive, registerFocusable, updateFocusTarget, resetFocusTarget };
 
     // When contexts switching occurs, it is essential that the now-active one updates the focus target
     // to ensure the tab indices are correctly set.
