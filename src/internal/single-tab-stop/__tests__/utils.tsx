@@ -37,7 +37,7 @@ const FakeSingleTabStopNavigationProvider = forwardRef(
 
     return (
       <SingleTabStopNavigationContext.Provider
-        value={{ navigationActive, registerFocusable, resetFocusTarget: () => {} }}
+        value={{ registerFocusable, navigationActive, resetFocusTarget: () => {} }}
       >
         {children}
       </SingleTabStopNavigationContext.Provider>

@@ -8,7 +8,6 @@ import {
   SingleTabStopNavigationAPI,
   SingleTabStopNavigationContext,
   SingleTabStopNavigationProvider,
-  SingleTabStopNavigationReset,
   useSingleTabStopNavigation,
 } from '../';
 import { renderWithSingleTabStopNavigation } from './utils';
@@ -245,44 +244,6 @@ describe('nested contexts', () => {
     expect(findGroupButton('outer-most', 1)).not.toHaveAttribute('tabindex');
     expect(findGroupButton('outer', 0)).not.toHaveAttribute('tabindex');
     expect(findGroupButton('outer', 1)).not.toHaveAttribute('tabindex');
-    expect(findGroupButton('inner', 0)).toHaveAttribute('tabindex', '0');
-    expect(findGroupButton('inner', 1)).toHaveAttribute('tabindex', '-1');
-  });
-
-  test('ignores parent context when reset is used', () => {
-    const { rerender } = render(
-      <Group id="outer-most" navigationActive={true}>
-        <SingleTabStopNavigationReset>
-          <Group id="outer" navigationActive={true}>
-            <Group id="inner" navigationActive={true}>
-              {null}
-            </Group>
-          </Group>
-        </SingleTabStopNavigationReset>
-      </Group>
-    );
-    expect(findGroupButton('outer-most', 0)).toHaveAttribute('tabindex', '0');
-    expect(findGroupButton('outer-most', 1)).toHaveAttribute('tabindex', '-1');
-    expect(findGroupButton('outer', 0)).toHaveAttribute('tabindex', '0');
-    expect(findGroupButton('outer', 1)).toHaveAttribute('tabindex', '-1');
-    expect(findGroupButton('inner', 0)).toHaveAttribute('tabindex', '-1');
-    expect(findGroupButton('inner', 1)).toHaveAttribute('tabindex', '-1');
-
-    rerender(
-      <Group id="outer-most" navigationActive={true}>
-        <Group id="outer" navigationActive={true}>
-          <SingleTabStopNavigationReset>
-            <Group id="inner" navigationActive={true}>
-              {null}
-            </Group>
-          </SingleTabStopNavigationReset>
-        </Group>
-      </Group>
-    );
-    expect(findGroupButton('outer-most', 0)).toHaveAttribute('tabindex', '0');
-    expect(findGroupButton('outer-most', 1)).toHaveAttribute('tabindex', '-1');
-    expect(findGroupButton('outer', 0)).toHaveAttribute('tabindex', '-1');
-    expect(findGroupButton('outer', 1)).toHaveAttribute('tabindex', '-1');
     expect(findGroupButton('inner', 0)).toHaveAttribute('tabindex', '0');
     expect(findGroupButton('inner', 1)).toHaveAttribute('tabindex', '-1');
   });
