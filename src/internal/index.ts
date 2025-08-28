@@ -31,7 +31,6 @@ export { getGlobalFlag } from './global-flags';
 export {
   SingleTabStopNavigationAPI,
   SingleTabStopNavigationProvider,
-  SingleTabStopNavigationReset,
   useSingleTabStopNavigation,
 } from './single-tab-stop';
 export { isFocusable, getAllFocusables, getFirstFocusable, getLastFocusable } from './focus-lock-utils/utils';
