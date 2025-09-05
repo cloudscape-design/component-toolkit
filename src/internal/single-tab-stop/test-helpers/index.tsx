@@ -1,20 +1,22 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { createRef, forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import { render } from '@testing-library/react';
 
 import { FocusableChangeHandler, SingleTabStopNavigationContext } from '../';
+import { useUniqueId } from '../../use-unique-id';
 
-interface ProviderRef {
-  setCurrentTarget(focusTarget: null | Element, suppressed?: (null | Element)[]): void;
+type SetTarget = (focusTarget: null | Element, suppressed?: (null | Element)[]) => void;
+
+interface TestProviderAPI {
+  setCurrentTarget: SetTarget;
 }
 
-const FakeSingleTabStopNavigationProvider = forwardRef(
-  (
-    { children, navigationActive }: { children: React.ReactNode; navigationActive: boolean },
-    ref: React.Ref<ProviderRef>
-  ) => {
+const providerRegistry = new Map<string, TestProviderAPI>();
+
+export const TestSingleTabStopNavigationProvider = forwardRef(
+  ({ children, navigationActive }: { children: React.ReactNode; navigationActive: boolean }) => {
     const focusablesRef = useRef(new Set<Element>());
     const focusHandlersRef = useRef(new Map<Element, FocusableChangeHandler>());
     const registerFocusable = useCallback((focusable: HTMLElement, changeHandler: FocusableChangeHandler) => {
@@ -26,14 +28,21 @@ const FakeSingleTabStopNavigationProvider = forwardRef(
       };
     }, []);
 
-    useImperativeHandle(ref, () => ({
-      setCurrentTarget: (focusTarget: null | Element, suppressed: Element[] = []) => {
+    const providerId = useUniqueId();
+    providerRegistry.set(providerId, {
+      setCurrentTarget: (focusTarget, suppressed = []) => {
         focusablesRef.current.forEach(focusable => {
           const handler = focusHandlersRef.current.get(focusable)!;
           handler(focusTarget === focusable || suppressed.includes(focusable));
         });
       },
-    }));
+    });
+    useEffect(
+      () => () => {
+        providerRegistry.delete(providerId);
+      },
+      [providerId]
+    );
 
     return (
       <SingleTabStopNavigationContext.Provider
@@ -45,24 +54,23 @@ const FakeSingleTabStopNavigationProvider = forwardRef(
   }
 );
 
+export const setTestSingleTabStopNavigationTarget: SetTarget = (focusTarget, suppressed) => {
+  Array.from(providerRegistry).forEach(([, provider]) => provider.setCurrentTarget(focusTarget, suppressed));
+};
+
+/**
+ * @deprecated - Use TestSingleTabStopNavigationProvider instead
+ */
 export function renderWithSingleTabStopNavigation(
   ui: React.ReactNode,
   { navigationActive = true }: { navigationActive?: boolean } = {}
 ) {
-  const providerRef = createRef<ProviderRef>();
   const { container, rerender } = render(
-    <FakeSingleTabStopNavigationProvider ref={providerRef} navigationActive={navigationActive}>
-      {ui}
-    </FakeSingleTabStopNavigationProvider>
+    <TestSingleTabStopNavigationProvider navigationActive={navigationActive}>{ui}</TestSingleTabStopNavigationProvider>
   );
   return {
     container,
     rerender,
-    setCurrentTarget: (focusTarget: null | Element, suppressed: (null | Element)[] = []) => {
-      if (!providerRef.current) {
-        throw new Error('Provider is not ready');
-      }
-      providerRef.current.setCurrentTarget(focusTarget, suppressed);
-    },
+    setCurrentTarget: setTestSingleTabStopNavigationTarget,
   };
 }
