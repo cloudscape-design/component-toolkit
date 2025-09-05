@@ -5,4 +5,8 @@ export { clearOneTimeMetricsCache } from './base-component/metrics/metrics';
 export { clearMessageCache } from './logging';
 export { setGlobalFlag } from './global-flags';
 export { clearVisualRefreshState } from './visual-mode';
-export { renderWithSingleTabStopNavigation } from './single-tab-stop/__tests__/utils';
+export {
+  renderWithSingleTabStopNavigation,
+  TestSingleTabStopNavigationProvider,
+  setTestSingleTabStopNavigationTarget,
+} from './single-tab-stop/test-helpers';
