@@ -78,6 +78,7 @@ export class Metrics {
       action: 'used',
       componentName,
       configuration,
+      packageSource: this.context.packageSource,
     });
   }
 }

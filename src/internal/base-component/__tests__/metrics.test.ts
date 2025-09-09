@@ -276,6 +276,7 @@ describe('Client Metrics support', () => {
             v: testCase[1][1],
             a: 'used',
             s: 'DummyComponentName',
+            p: 'pkg',
             c: { props: {} },
           });
         });
@@ -293,6 +294,7 @@ describe('Client Metrics support', () => {
         v: '1.0',
         a: 'used',
         s: 'DummyComponentName',
+        p: 'dummy-package',
         c: { props: {} },
       });
     });
@@ -306,6 +308,7 @@ describe('Client Metrics support', () => {
         v: '1.0',
         a: 'used',
         s: 'DummyComponentName',
+        p: 'dummy-package',
         c: { props: { variant: 'primary' }, metadata: { isMobile: true } },
       });
     });
@@ -322,6 +325,7 @@ describe('Client Metrics support', () => {
         v: '1.0',
         a: 'used',
         s: 'DummyComponentName',
+        p: 'dummy-package',
         c: { props: {}, metadata: { nullValue: null } },
       });
     });
@@ -337,6 +341,7 @@ describe('Client Metrics support', () => {
         v: '1.0',
         a: 'used',
         s: 'DummyComponentName',
+        p: 'dummy-package',
         c: { props: { count: 123, notANumber: 'NaN', maxSize: 'Infinity' } },
       });
     });

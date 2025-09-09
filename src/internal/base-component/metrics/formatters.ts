@@ -20,13 +20,14 @@ export function buildMetricDetail(detail: JSONObject, context: PackageSettings):
 }
 
 export function buildComponentMetricDetail(
-  { componentName, action, configuration }: ComponentMetricDetail,
+  { componentName, action, configuration, packageSource }: ComponentMetricDetail,
   context: PackageSettings
 ): string {
   return buildMetricDetail(
     {
       a: action,
       s: componentName,
+      p: packageSource,
       c: configuration as JSONObject | undefined,
     },
     context

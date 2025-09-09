@@ -27,6 +27,7 @@ export interface ComponentMetricDetail {
   // "used" – individual component used
   action: 'loaded' | 'used';
   configuration?: ComponentConfiguration;
+  packageSource?: string;
 }
 
 export interface ComponentMetricMinified {
@@ -44,4 +45,6 @@ export interface ComponentMetricMinified {
   v: string;
   // component configuration
   c?: JSONObject;
+  // package name
+  p?: string;
 }
