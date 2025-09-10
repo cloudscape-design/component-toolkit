@@ -11,11 +11,7 @@ import {
   SingleTabStopNavigationReset,
   useSingleTabStopNavigation,
 } from '../';
-import {
-  setTestSingleTabStopNavigationTarget,
-  renderWithSingleTabStopNavigation,
-  TestSingleTabStopNavigationProvider,
-} from '../test-helpers';
+import { setTestSingleTabStopNavigationTarget, TestSingleTabStopNavigationProvider } from '../test-helpers';
 
 // Simple STSN subscriber component
 function Button(props: React.HTMLAttributes<HTMLButtonElement>) {
@@ -69,22 +65,25 @@ test('does not override tab index when keyboard navigation is not active', () =>
 });
 
 test('(legacy coverage) does not override tab index when keyboard navigation is not active', () => {
-  renderWithSingleTabStopNavigation(<Button id="button" />, { navigationActive: false });
+  render(
+    <TestSingleTabStopNavigationProvider navigationActive={false}>
+      <Button id="button" />
+    </TestSingleTabStopNavigationProvider>
+  );
   expect(document.querySelector('#button')).not.toHaveAttribute('tabIndex');
 });
 
 test('does not override tab index for suppressed elements', () => {
-  const { setCurrentTarget } = renderWithSingleTabStopNavigation(
-    <div>
+  render(
+    <TestSingleTabStopNavigationProvider navigationActive={true}>
       <Button id="button1" />
       <Button id="button2" />
       <Button id="button3" tabIndex={-1} />
       <Button id="button4" />
       <Button id="button5" tabIndex={-1} />
-    </div>,
-    { navigationActive: true }
+    </TestSingleTabStopNavigationProvider>
   );
-  setCurrentTarget(document.querySelector('#button1'), [
+  setTestSingleTabStopNavigationTarget(document.querySelector('#button1'), [
     document.querySelector('#button1'),
     document.querySelector('#button2'),
     document.querySelector('#button3'),
@@ -109,25 +108,25 @@ test('overrides tab index when keyboard navigation is active', () => {
 });
 
 test('(legacy coverage) overrides tab index when keyboard navigation is active', () => {
-  const { setCurrentTarget } = renderWithSingleTabStopNavigation(
-    <div>
+  render(
+    <TestSingleTabStopNavigationProvider navigationActive={true}>
       <Button id="button1" />
       <Button id="button2" />
-    </div>
+    </TestSingleTabStopNavigationProvider>
   );
-  setCurrentTarget(document.querySelector('#button1'));
+  setTestSingleTabStopNavigationTarget(document.querySelector('#button1'));
   expect(document.querySelector('#button1')).toHaveAttribute('tabIndex', '0');
   expect(document.querySelector('#button2')).toHaveAttribute('tabIndex', '-1');
 });
 
 test('does not override explicit tab index with 0', () => {
-  const { setCurrentTarget } = renderWithSingleTabStopNavigation(
-    <div>
+  render(
+    <TestSingleTabStopNavigationProvider navigationActive={true}>
       <Button id="button1" tabIndex={-2} />
       <Button id="button2" tabIndex={-2} />
-    </div>
+    </TestSingleTabStopNavigationProvider>
   );
-  setCurrentTarget(document.querySelector('#button1'));
+  setTestSingleTabStopNavigationTarget(document.querySelector('#button1'));
   expect(document.querySelector('#button1')).toHaveAttribute('tabIndex', '-2');
   expect(document.querySelector('#button2')).toHaveAttribute('tabIndex', '-2');
 });
