@@ -87,6 +87,7 @@ describe('useComponentMetrics', () => {
         v: '3.0.0',
         a: 'used',
         s: 'test-component-1',
+        p: 'toolkit',
         c: { props: {} },
       })
     );
@@ -113,6 +114,7 @@ describe('useComponentMetrics', () => {
         v: '3.0.0',
         a: 'used',
         s: 'test-component-2',
+        p: 'toolkit',
         c: { props: {} },
       })
     );
@@ -133,6 +135,7 @@ describe('useComponentMetrics', () => {
       v: '3.0.0',
       a: 'used',
       s: 'test-component-with-props',
+      p: 'toolkit',
     };
     expect(window.AWSC.Clog.log).toHaveBeenCalledTimes(1);
     expect(window.AWSC.Clog.log).toHaveBeenCalledWith(
@@ -165,6 +168,7 @@ describe('useComponentMetrics', () => {
         v: '3.0.0',
         a: 'used',
         s: 'test-component-1',
+        p: 'toolkit',
         c: { props: {} },
       })
     );
