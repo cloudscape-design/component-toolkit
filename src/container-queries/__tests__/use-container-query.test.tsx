@@ -5,6 +5,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import useContainerQuery from '../use-container-query';
 import { ContainerQueryEntry } from '../interfaces';
+import '../../internal/container-queries/__tests__/resize-observer-mock';
 
 function TestComponent({ mapFn = () => '' }: { mapFn?: (entry: ContainerQueryEntry) => string }) {
   const [value, ref] = useContainerQuery(mapFn);

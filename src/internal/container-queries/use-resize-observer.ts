@@ -52,7 +52,7 @@ export function useResizeObserver(elementRef: ElementReference, onObserve: (entr
 
   useEffect(() => {
     const element = typeof elementRef === 'function' ? elementRef() : elementRef?.current;
-    if (element) {
+    if (element && typeof ResizeObserver !== 'undefined') {
       let connected = true;
       const observer = new ResizeObserver(entries => {
         // Prevent observe notifications on already unmounted component.
