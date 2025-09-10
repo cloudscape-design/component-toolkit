@@ -6,7 +6,6 @@ export { clearMessageCache } from './logging';
 export { setGlobalFlag } from './global-flags';
 export { clearVisualRefreshState } from './visual-mode';
 export {
-  renderWithSingleTabStopNavigation,
   TestSingleTabStopNavigationProvider,
   setTestSingleTabStopNavigationTarget,
 } from './single-tab-stop/test-helpers';

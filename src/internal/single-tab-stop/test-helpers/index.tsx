@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
-import { render } from '@testing-library/react';
 
 import { FocusableChangeHandler, SingleTabStopNavigationContext } from '../';
 import { useUniqueId } from '../../use-unique-id';
@@ -57,20 +56,3 @@ export const TestSingleTabStopNavigationProvider = forwardRef(
 export const setTestSingleTabStopNavigationTarget: SetTarget = (focusTarget, suppressed) => {
   Array.from(providerRegistry).forEach(([, provider]) => provider.setCurrentTarget(focusTarget, suppressed));
 };
-
-/**
- * @deprecated - Use TestSingleTabStopNavigationProvider instead
- */
-export function renderWithSingleTabStopNavigation(
-  ui: React.ReactNode,
-  { navigationActive = true }: { navigationActive?: boolean } = {}
-) {
-  const { container, rerender } = render(
-    <TestSingleTabStopNavigationProvider navigationActive={navigationActive}>{ui}</TestSingleTabStopNavigationProvider>
-  );
-  return {
-    container,
-    rerender,
-    setCurrentTarget: setTestSingleTabStopNavigationTarget,
-  };
-}
