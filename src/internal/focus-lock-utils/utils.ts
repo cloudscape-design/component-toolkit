@@ -30,7 +30,7 @@ export function isFocusable(element: HTMLElement): boolean {
 }
 
 export function getAllFocusables(container: HTMLElement): HTMLElement[] {
-  return Array.prototype.slice.call(container.querySelectorAll(tabbables));
+  return [...container.querySelectorAll(tabbables)] as HTMLElement[];
 }
 
 function getFocusables(container: HTMLElement): HTMLElement[] {
