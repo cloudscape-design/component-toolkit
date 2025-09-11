@@ -4,8 +4,8 @@
 import React, { useState, useRef } from 'react';
 import { render } from '@testing-library/react';
 import { useResizeObserver } from '../use-resize-observer';
-import { ResizeObserver } from '@juggle/resize-observer';
 import { ContainerQueryEntry } from '../interfaces';
+import './resize-observer-mock';
 
 function TestComponent({ mapFn = () => '' }: { mapFn?: (entry: ContainerQueryEntry) => string }) {
   const ref = useRef<HTMLDivElement>(null);
