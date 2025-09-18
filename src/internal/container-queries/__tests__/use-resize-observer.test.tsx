@@ -26,7 +26,7 @@ function TestComponent({ mapFn = () => '' }: { mapFn?: (entry: ContainerQueryEnt
 
 test('should create a resize observer and observe the attached element', () => {
   const component = render(<TestComponent />);
-  expect(ResizeObserver.prototype.observe).toHaveBeenCalledWith(component.getByTestId('test'));
+  expect(ResizeObserver.prototype.observe).toHaveBeenCalledWith(component.getByTestId('test'), { box: 'border-box' });
 });
 
 test('should call the map function with the content box when the resize observer is triggered', () => {
