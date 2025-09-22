@@ -87,11 +87,15 @@ function convertElementToEntry(element: Element, rect: DOMRect): ContainerQueryE
   const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
   const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
   const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
+  const borderLeft = parseFloat(computedStyle.borderLeftWidth) || 0;
+  const borderRight = parseFloat(computedStyle.borderRightWidth) || 0;
+  const borderTop = parseFloat(computedStyle.borderTopWidth) || 0;
+  const borderBottom = parseFloat(computedStyle.borderBottomWidth) || 0;
 
   return {
     target: element,
-    contentBoxWidth: rect.width - paddingLeft - paddingRight,
-    contentBoxHeight: rect.height - paddingTop - paddingBottom,
+    contentBoxWidth: rect.width - paddingLeft - paddingRight - borderLeft - borderRight,
+    contentBoxHeight: rect.height - paddingTop - paddingBottom - borderTop - borderBottom,
     borderBoxWidth: rect.width,
     borderBoxHeight: rect.height,
   };
