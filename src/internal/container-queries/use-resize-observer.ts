@@ -62,7 +62,7 @@ export function useResizeObserver(elementRef: ElementReference, onObserve: (entr
           });
         }
       });
-      observer.observe(element);
+      observer.observe(element, { box: 'border-box' });
       return () => {
         connected = false;
         observer.disconnect();
