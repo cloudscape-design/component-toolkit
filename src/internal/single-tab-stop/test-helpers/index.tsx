@@ -50,7 +50,14 @@ export const TestSingleTabStopNavigationProvider = ({
 
   return (
     <SingleTabStopNavigationContext.Provider
-      value={{ navigationActive, registerFocusable, resetFocusTarget: () => {} }}
+      value={{
+        navigationActive,
+        registerFocusable,
+        // The reset target feature is not needed in the test provider, and it is
+        // already tested with the actual provider implementation instead.
+        // istanbul ignore next
+        resetFocusTarget: () => {},
+      }}
     >
       {children}
     </SingleTabStopNavigationContext.Provider>
