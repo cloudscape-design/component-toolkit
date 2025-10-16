@@ -64,15 +64,6 @@ test('does not override tab index when keyboard navigation is not active', () =>
   expect(document.querySelector('#button')).not.toHaveAttribute('tabIndex');
 });
 
-test('(legacy coverage) does not override tab index when keyboard navigation is not active', () => {
-  render(
-    <TestSingleTabStopNavigationProvider navigationActive={false}>
-      <Button id="button" />
-    </TestSingleTabStopNavigationProvider>
-  );
-  expect(document.querySelector('#button')).not.toHaveAttribute('tabIndex');
-});
-
 test('does not override tab index for suppressed elements', () => {
   render(
     <TestSingleTabStopNavigationProvider navigationActive={true}>
@@ -96,18 +87,6 @@ test('does not override tab index for suppressed elements', () => {
 });
 
 test('overrides tab index when keyboard navigation is active', () => {
-  render(
-    <TestSingleTabStopNavigationProvider navigationActive={true}>
-      <Button id="button1" />
-      <Button id="button2" />
-    </TestSingleTabStopNavigationProvider>
-  );
-  setTestSingleTabStopNavigationTarget(document.querySelector('#button1'));
-  expect(document.querySelector('#button1')).toHaveAttribute('tabIndex', '0');
-  expect(document.querySelector('#button2')).toHaveAttribute('tabIndex', '-1');
-});
-
-test('(legacy coverage) overrides tab index when keyboard navigation is active', () => {
   render(
     <TestSingleTabStopNavigationProvider navigationActive={true}>
       <Button id="button1" />
