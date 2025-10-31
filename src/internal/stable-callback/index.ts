@@ -35,5 +35,5 @@ export function useStableCallback<Callback extends (...args: any[]) => any>(fn: 
     ref.current = fn;
   });
 
-  return useCallback((...args: any[]) => ref.current?.apply(undefined, args), []) as Callback;
+  return useCallback((...args: any[]) => ref.current?.(...args), []) as Callback;
 }
