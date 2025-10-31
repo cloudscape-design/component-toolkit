@@ -19,7 +19,7 @@ export const getGeneratedAnalyticsMetadata = (target: HTMLElement | null): Gener
         const currentMetadata = JSON.parse(currentMetadataString);
         metadata = mergeMetadata(metadata, processMetadata(currentNode, currentMetadata));
       }
-    } catch (ex) {
+    } catch {
       /* empty */
     } finally {
       currentNode = findLogicalParent(currentNode);

@@ -10,7 +10,7 @@ export const findLogicalParent = (node: HTMLElement): HTMLElement | null => {
       return (node.ownerDocument || node).querySelector(`[id="${referrer}"]`);
     }
     return node.parentElement;
-  } catch (ex) {
+  } catch {
     return null;
   }
 };
@@ -31,7 +31,7 @@ export const isNodeComponent = (node: HTMLElement): boolean => {
   try {
     const metadata = JSON.parse(metadataString);
     return !!metadata.component && !!metadata.component.name;
-  } catch (ex) {
+  } catch {
     return false;
   }
 };

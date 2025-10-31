@@ -23,7 +23,7 @@ export const getRawAnalyticsMetadata = (target: HTMLElement | null): RawAnalytic
         output.metadata.push(currentMetadata);
         output.labelSelectors = [...output.labelSelectors, ...getLabelSelectors(currentMetadata)];
       }
-    } catch (ex) {
+    } catch {
       /* empty */
     } finally {
       currentNode = findLogicalParent(currentNode);
