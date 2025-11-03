@@ -26,12 +26,9 @@ export function isMotionDisabled(element: HTMLElement): boolean {
   );
 }
 
-// Note that this hook doesn't take into consideration @media print (unlike the dark mode CSS),
-// due to challenges with cross-browser implementations of media/print state change listeners.
-// This means that components using this hook will render in dark mode even when printing.
-// Generic hook for detecting visual mode changes via DOM mutation observation.
+// Generic hook for detecting mode changes via DOM mutation observation.
 // Prevents unnecessary re-renders by only updating state when the value actually changes.
-function useVisualModeDetector<T>(
+function useModeDetector<T>(
   elementRef: React.RefObject<HTMLElement>,
   detector: (node: HTMLElement) => T,
   initialValue: T
@@ -39,6 +36,14 @@ function useVisualModeDetector<T>(
   const [value, setValue] = useState<T>(initialValue);
   useMutationObserver(elementRef, node => {
     const newValue = detector(node);
+    /**
+     * React has a behavior that triggers a re-render even if the same value is provided in the setState, while it does not
+     * commit any changes to the DOM (commit phase) the function rerenders. This causes a false react act warnings in testing
+     * and any component using the Transition component which in return uses this hook will possibly have false react warnings.
+     *
+     * To fix this, we manually stop setting the state ourselves if we see the same value.
+     * References:  https://www.reddit.com/r/reactjs/comments/1ej505e/why_does_it_rerender_even_when_state_is_same/#:~:text=If%20the%20new%20value%20you,shouldn't%20affect%20your%20code
+     */
     if (newValue !== value) {
       setValue(newValue);
     }
@@ -66,15 +71,15 @@ function detectDensityMode(node: HTMLElement): 'comfortable' | 'compact' {
 // due to challenges with cross-browser implementations of media/print state change listeners.
 // This means that components using this hook will render in dark mode even when printing.
 export function useCurrentMode(elementRef: React.RefObject<HTMLElement>) {
-  return useVisualModeDetector(elementRef, detectCurrentMode, 'light');
+  return useModeDetector(elementRef, detectCurrentMode, 'light');
 }
 
 export function useDensityMode(elementRef: React.RefObject<HTMLElement>) {
-  return useVisualModeDetector(elementRef, detectDensityMode, 'comfortable');
+  return useModeDetector(elementRef, detectDensityMode, 'comfortable');
 }
 
 export function useReducedMotion(elementRef: React.RefObject<HTMLElement>) {
-  return useVisualModeDetector(elementRef, isMotionDisabled, false);
+  return useModeDetector(elementRef, isMotionDisabled, false);
 }
 
 const useMutationSingleton = createSingletonHandler<void>(handler => {
