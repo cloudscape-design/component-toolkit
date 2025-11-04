@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useState } from 'react';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { warnOnce } from '../../logging';
 import Portal, { PortalProps } from '../index';
@@ -106,6 +106,30 @@ describe('Portal', () => {
       expect(removeContainer).toHaveBeenCalledWith(container);
       expect(screen.queryByTestId('portal-content')).toBeFalsy();
       expect(document.body.contains(container)).toBe(false);
+    });
+
+    test('should support aborting async container setup', async () => {
+      const container = document.createElement('div');
+      const onAbort = jest.fn();
+      const onContinue = jest.fn();
+      const getContainer: PortalProps['getContainer'] = async ({ abortSignal }) => {
+        abortSignal.addEventListener('abort', onAbort);
+        await Promise.resolve();
+        onContinue(abortSignal.aborted);
+        return container;
+      };
+      const removeContainer = jest.fn();
+      const { unmount } = renderPortal({
+        children: <p data-testid="portal-content">Hello!</p>,
+        getContainer,
+        removeContainer,
+      });
+      unmount();
+      await waitFor(() => {
+        expect(onContinue).not.toHaveBeenCalled();
+        expect(onAbort).toHaveBeenCalled();
+        expect(removeContainer).toHaveBeenCalledWith(null);
+      });
     });
 
     test('allows conditional change of getContainer/removeContainer', async () => {
