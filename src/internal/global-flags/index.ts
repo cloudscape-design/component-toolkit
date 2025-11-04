@@ -34,7 +34,7 @@ export const getGlobalFlag = (flagName: keyof GlobalFlags): GlobalFlags[keyof Gl
       return ownFlag;
     }
     return readFlag(getTopWindow(), flagName);
-  } catch (e) {
+  } catch {
     return undefined;
   }
 };

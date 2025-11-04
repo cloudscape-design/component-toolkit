@@ -80,7 +80,7 @@ export class CLogClient {
       }
 
       return this.findAWSC(currentWindow.parent);
-    } catch (ex) {
+    } catch {
       // Most likely a cross-origin access error
       return undefined;
     }
@@ -154,7 +154,7 @@ export class PanoramaClient {
       }
 
       return this.findPanorama(currentWindow.parent);
-    } catch (ex) {
+    } catch {
       // Most likely a cross-origin access error
       return undefined;
     }
