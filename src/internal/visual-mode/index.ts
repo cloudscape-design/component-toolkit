@@ -26,47 +26,16 @@ export function isMotionDisabled(element: HTMLElement): boolean {
   );
 }
 
-// Note that this hook doesn't take into consideration @media print (unlike the dark mode CSS),
-// due to challenges with cross-browser implementations of media/print state change listeners.
-// This means that components using this hook will render in dark mode even when printing.
-export function useCurrentMode(elementRef: React.RefObject<HTMLElement>) {
-  const [value, setValue] = useState<'light' | 'dark'>('light');
+// Generic hook for detecting mode changes via DOM mutation observation.
+// Prevents unnecessary re-renders by only updating state when the value actually changes.
+function useModeDetector<T>(
+  elementRef: React.RefObject<HTMLElement>,
+  detector: (node: HTMLElement) => T,
+  initialValue: T
+): T {
+  const [value, setValue] = useState<T>(initialValue);
   useMutationObserver(elementRef, node => {
-    const darkModeParent = findUpUntil(
-      node,
-      node => node.classList.contains('awsui-polaris-dark-mode') || node.classList.contains('awsui-dark-mode')
-    );
-    const newValue = darkModeParent ? 'dark' : 'light';
-
-    // refer to the comment below in `useReducedMotion`
-    if (newValue !== value) {
-      setValue(newValue);
-    }
-  });
-  return value;
-}
-
-export function useDensityMode(elementRef: React.RefObject<HTMLElement>) {
-  const [value, setValue] = useState<'comfortable' | 'compact'>('comfortable');
-  useMutationObserver(elementRef, node => {
-    const compactModeParent = findUpUntil(
-      node,
-      node => node.classList.contains('awsui-polaris-compact-mode') || node.classList.contains('awsui-compact-mode')
-    );
-    const newValue = compactModeParent ? 'compact' : 'comfortable';
-
-    // refer to the comment below in `useReducedMotion`
-    if (newValue !== value) {
-      setValue(newValue);
-    }
-  });
-  return value;
-}
-
-export function useReducedMotion(elementRef: React.RefObject<HTMLElement>) {
-  const [value, setValue] = useState(false);
-  useMutationObserver(elementRef, node => {
-    const newValue = isMotionDisabled(node);
+    const newValue = detector(node);
     /**
      * React has a behavior that triggers a re-render even if the same value is provided in the setState, while it does not
      * commit any changes to the DOM (commit phase) the function rerenders. This causes a false react act warnings in testing
@@ -80,6 +49,37 @@ export function useReducedMotion(elementRef: React.RefObject<HTMLElement>) {
     }
   });
   return value;
+}
+
+function detectCurrentMode(node: HTMLElement): 'light' | 'dark' {
+  const darkModeParent = findUpUntil(
+    node,
+    node => node.classList.contains('awsui-polaris-dark-mode') || node.classList.contains('awsui-dark-mode')
+  );
+  return darkModeParent ? 'dark' : 'light';
+}
+
+function detectDensityMode(node: HTMLElement): 'comfortable' | 'compact' {
+  const compactModeParent = findUpUntil(
+    node,
+    node => node.classList.contains('awsui-polaris-compact-mode') || node.classList.contains('awsui-compact-mode')
+  );
+  return compactModeParent ? 'compact' : 'comfortable';
+}
+
+// Note that this hook doesn't take into consideration @media print (unlike the dark mode CSS),
+// due to challenges with cross-browser implementations of media/print state change listeners.
+// This means that components using this hook will render in dark mode even when printing.
+export function useCurrentMode(elementRef: React.RefObject<HTMLElement>) {
+  return useModeDetector(elementRef, detectCurrentMode, 'light');
+}
+
+export function useDensityMode(elementRef: React.RefObject<HTMLElement>) {
+  return useModeDetector(elementRef, detectDensityMode, 'comfortable');
+}
+
+export function useReducedMotion(elementRef: React.RefObject<HTMLElement>) {
+  return useModeDetector(elementRef, isMotionDisabled, false);
 }
 
 const useMutationSingleton = createSingletonHandler<void>(handler => {
