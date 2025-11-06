@@ -8,8 +8,8 @@ import { warnOnce } from '../logging';
 
 export interface PortalProps {
   container?: null | Element;
-  getContainer?: () => Promise<HTMLElement>;
-  removeContainer?: (container: HTMLElement) => void;
+  getContainer?: (options: { abortSignal: AbortSignal }) => Promise<HTMLElement>;
+  removeContainer?: (container: HTMLElement | null) => void;
   children: React.ReactNode;
 }
 
@@ -23,13 +23,17 @@ function manageDefaultContainer(setState: React.Dispatch<React.SetStateAction<El
 }
 
 function manageAsyncContainer(
-  getContainer: () => Promise<HTMLElement>,
-  removeContainer: (container: HTMLElement) => void,
+  getContainer: (options: { abortSignal: AbortSignal }) => Promise<HTMLElement>,
+  removeContainer: (container: HTMLElement | null) => void,
   setState: React.Dispatch<React.SetStateAction<Element | null>>
 ) {
-  let newContainer: HTMLElement;
-  getContainer().then(
+  let newContainer: HTMLElement | null = null;
+  const abortController = new AbortController();
+  getContainer({ abortSignal: abortController.signal }).then(
     container => {
+      if (abortController.signal.aborted) {
+        return;
+      }
       newContainer = container;
       setState(container);
     },
@@ -38,6 +42,7 @@ function manageAsyncContainer(
     }
   );
   return () => {
+    abortController.abort();
     removeContainer(newContainer);
   };
 }
