@@ -8,16 +8,7 @@ import { useStableCallback } from '../stable-callback';
 import { isDevelopment } from '../is-development';
 import { warnOnce } from '../logging';
 import { awsuiVisualRefreshFlag, getGlobal } from '../global-flags';
-
-function safeMatchMedia(element: HTMLElement, query: string) {
-  try {
-    const targetWindow = element.ownerDocument?.defaultView ?? window;
-    return targetWindow.matchMedia?.(query).matches ?? false;
-  } catch (error) {
-    console.warn(error);
-    return false;
-  }
-}
+import { safeMatchMedia } from '../utils/safe-match-media';
 
 export function isMotionDisabled(element: HTMLElement): boolean {
   return (
