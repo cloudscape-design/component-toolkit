@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { warnOnce } from '../internal/logging';
+import { warnOnce } from '../logging';
 
 import { mergeLocales } from './merge-locales';
 

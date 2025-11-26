@@ -6,8 +6,3 @@ export { default as useControllableState } from './use-controllable-state/use-co
 
 export type { ContainerQueryEntry } from './container-queries/interfaces';
 export type { PropertyDescriptions } from './use-controllable-state/interfaces';
-
-// Locale utils
-export { mergeLocales } from './locale/merge-locales';
-export { normalizeLocale } from './locale/normalize-locale';
-export { normalizeStartOfWeek, DayIndex } from './locale/normalize-start-of-week';
