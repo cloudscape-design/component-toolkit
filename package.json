@@ -16,6 +16,7 @@
     "./internal": "./internal/index.js",
     "./internal/metrics": "./internal/metrics.js",
     "./internal/testing": "./internal/testing.js",
+    "./internal/locale": "./internal/locale.js",
     "./internal/analytics-metadata": "./internal/analytics-metadata/index.js",
     "./internal/analytics-metadata/utils": "./internal/analytics-metadata/utils.js",
     "./package.json": "./package.json"
@@ -40,7 +41,8 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "tslib": "^2.3.1"
+    "tslib": "^2.3.1",
+    "weekstart": "^2.0.0"
   },
   "devDependencies": {
     "@cloudscape-design/browser-test-tools": "^3.0.0",
