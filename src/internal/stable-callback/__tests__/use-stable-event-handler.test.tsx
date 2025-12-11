@@ -33,7 +33,7 @@ const Component = React.forwardRef(({ onChange }: Props, ref: React.Ref<Ref>) =>
   return null;
 });
 
-let consoleWarnSpy: jest.SpyInstance;
+let consoleWarnSpy: jest.SpyInstance | undefined;
 afterEach(() => {
   consoleWarnSpy?.mockRestore();
 });

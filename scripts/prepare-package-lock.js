@@ -21,9 +21,5 @@ Object.keys(packageLock.packages).forEach(dependencyName => {
   removeDependencies(dependencyName, packageLock.packages);
 });
 
-Object.keys(packageLock.dependencies).forEach(dependencyName => {
-  removeDependencies(dependencyName, packageLock.dependencies);
-});
-
 fs.writeFileSync(filename, JSON.stringify(packageLock, null, 2) + '\n');
 console.log('Removed @cloudscape-design/ dependencies from package-lock file');

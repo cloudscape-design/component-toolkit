@@ -71,7 +71,7 @@ export interface SingleTabStopNavigationAPI {
   isRegistered(element: Element): boolean;
 }
 
-export function SingleTabStopNavigationReset({ children }: { children: React.ReactNode }) {
+export function SingleTabStopNavigationReset({ children }: { children: React.ReactNode }): JSX.Element {
   return (
     <SingleTabStopNavigationContext.Provider value={defaultValue}>{children}</SingleTabStopNavigationContext.Provider>
   );
