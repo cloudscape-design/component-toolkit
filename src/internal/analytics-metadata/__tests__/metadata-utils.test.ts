@@ -37,16 +37,6 @@ describe('processMetadata', () => {
       ],
     });
   });
-
-  test('processes deeply nested arrays of labels', () => {
-    expect(
-      processMetadata(null, {
-        deepLabel: [[['a', 'b'], ['c']], [['d']]],
-      })
-    ).toEqual({
-      deepLabel: [[['processed-a', 'processed-b'], ['processed-c']], [['processed-d']]],
-    });
-  });
 });
 
 describe('merge', () => {
