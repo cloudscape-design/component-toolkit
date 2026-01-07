@@ -23,7 +23,7 @@ interface GeneratedAnalyticsMetadataComponent {
   instanceIdentifier?: string;
 
   // relevant properties of the component. For example: {variant: 'primary'} for Button, {external: 'true', href: '...'} for Link
-  properties?: Record<string, string | Array<string>>;
+  properties?: Record<string, string | Array<string> | Array<Array<string>>>;
 
   // relevant information on the specific area of the component in which the interaction happened
   innerContext?: Record<string, string>;
@@ -42,8 +42,9 @@ export interface LabelIdentifier {
 
 export interface GeneratedAnalyticsMetadataFragment extends Omit<Partial<GeneratedAnalyticsMetadata>, 'detail'> {
   detail?: Record<string, string | LabelIdentifier>;
-  component?: Omit<Partial<GeneratedAnalyticsMetadataComponent>, 'innerContext' | 'label'> & {
+  component?: Omit<Partial<GeneratedAnalyticsMetadataComponent>, 'innerContext' | 'label' | 'properties'> & {
     label?: string | LabelIdentifier;
     innerContext?: Record<string, string | LabelIdentifier>;
+    properties?: Record<string, string | Array<string | LabelIdentifier> | Array<Array<string | LabelIdentifier>>>;
   };
 }

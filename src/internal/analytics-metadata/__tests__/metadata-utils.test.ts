@@ -15,6 +15,38 @@ describe('processMetadata', () => {
       entry: { columnLabel: 'processed-b', notLabelEnding: 'c' },
     });
   });
+
+  test('processes arrays of labels', () => {
+    expect(processMetadata(null, { itemLabel: ['label1', 'label2', 'label3'] })).toEqual({
+      itemLabel: ['processed-label1', 'processed-label2', 'processed-label3'],
+    });
+  });
+
+  test('processes nested arrays of labels (Array<Array<string>>)', () => {
+    expect(
+      processMetadata(null, {
+        selectedItemLabel: [
+          ['cell1', 'cell2', 'cell3'],
+          ['cell4', 'cell5', 'cell6'],
+        ],
+      })
+    ).toEqual({
+      selectedItemLabel: [
+        ['processed-cell1', 'processed-cell2', 'processed-cell3'],
+        ['processed-cell4', 'processed-cell5', 'processed-cell6'],
+      ],
+    });
+  });
+
+  test('processes deeply nested arrays of labels', () => {
+    expect(
+      processMetadata(null, {
+        deepLabel: [[['a', 'b'], ['c']], [['d']]],
+      })
+    ).toEqual({
+      deepLabel: [[['processed-a', 'processed-b'], ['processed-c']], [['processed-d']]],
+    });
+  });
 });
 
 describe('merge', () => {
