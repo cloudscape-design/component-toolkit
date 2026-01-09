@@ -42,8 +42,9 @@ export interface LabelIdentifier {
 
 export interface GeneratedAnalyticsMetadataFragment extends Omit<Partial<GeneratedAnalyticsMetadata>, 'detail'> {
   detail?: Record<string, string | LabelIdentifier>;
-  component?: Omit<Partial<GeneratedAnalyticsMetadataComponent>, 'innerContext' | 'label'> & {
+  component?: Omit<Partial<GeneratedAnalyticsMetadataComponent>, 'innerContext' | 'label' | 'properties'> & {
     label?: string | LabelIdentifier;
     innerContext?: Record<string, string | LabelIdentifier>;
+    properties?: Record<string, string | LabelIdentifier>;
   };
 }
