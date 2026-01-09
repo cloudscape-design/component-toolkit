@@ -5,7 +5,10 @@ import { LABEL_DATA_ATTRIBUTE } from './attributes';
 import { findSelectorUp, findComponentUpUntil } from './dom-utils';
 import { LabelIdentifier } from './interfaces';
 
-export const processLabel = (node: HTMLElement | null, labelIdentifier: string | LabelIdentifier | null): string => {
+export const processLabel = (
+  node: HTMLElement | null,
+  labelIdentifier: string | LabelIdentifier | null
+): string | string[][] => {
   if (labelIdentifier === null) {
     return '';
   }
@@ -44,7 +47,7 @@ const processSingleLabel = (
   labelSelector: string,
   root: LabelIdentifier['root'] = 'self',
   rootSelector?: string
-): string => {
+): string | string[][] => {
   if (!node) {
     return '';
   }
@@ -59,6 +62,43 @@ const processSingleLabel = (
   }
   let labelElement: HTMLElement | null = node;
   if (labelSelector) {
+    // Handle :all suffix for collecting multiple elements
+    if (labelSelector.endsWith(':all')) {
+      const baseSelector = labelSelector.slice(0, -4);
+      const elements = Array.from(labelElement.querySelectorAll(baseSelector)) as HTMLElement[];
+      return elements
+        .map(el => {
+          if (el.dataset[LABEL_DATA_ATTRIBUTE]) {
+            return processLabel(el, el.dataset[LABEL_DATA_ATTRIBUTE]);
+          }
+          return getLabelFromElement(el);
+        })
+        .filter(label => label)
+        .join(', ');
+    }
+
+    // Handle :rows suffix for table row structure
+    if (labelSelector.endsWith(':rows')) {
+      const baseSelector = labelSelector.slice(0, -5);
+      const selectedRows = Array.from(labelElement.querySelectorAll('tr')).filter(row =>
+        row.querySelector(baseSelector)
+      );
+
+      const rowsData = selectedRows.map(row => {
+        const cells = Array.from(row.querySelectorAll(baseSelector)) as HTMLElement[];
+        return cells
+          .map(cell => {
+            if (cell.dataset[LABEL_DATA_ATTRIBUTE]) {
+              return processLabel(cell, cell.dataset[LABEL_DATA_ATTRIBUTE]) as string;
+            }
+            return getLabelFromElement(cell);
+          })
+          .filter(label => label);
+      });
+
+      return rowsData;
+    }
+
     labelElement = labelElement.querySelector(labelSelector) as HTMLElement | null;
   }
   if (labelElement && labelElement.dataset[LABEL_DATA_ATTRIBUTE]) {
