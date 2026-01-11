@@ -16,10 +16,23 @@ export const mergeMetadata = (
   return output;
 };
 
+const processLabelArray = (node: HTMLElement | null, labelArray: any): any => {
+  return labelArray.map((item: any) => {
+    if (Array.isArray(item)) {
+      return processLabelArray(node, item);
+    }
+    return processLabel(node, item);
+  });
+};
+
 export const processMetadata = (node: HTMLElement | null, localMetadata: any): GeneratedAnalyticsMetadataFragment => {
   return Object.keys(localMetadata).reduce((acc: any, key: string) => {
     if (key.toLowerCase().match(/label$/)) {
-      acc[key] = processLabel(node, localMetadata[key]);
+      if (Array.isArray(localMetadata[key])) {
+        acc[key] = processLabelArray(node, localMetadata[key]);
+      } else {
+        acc[key] = processLabel(node, localMetadata[key]);
+      }
     } else if (typeof localMetadata[key] !== 'string' && !Array.isArray(localMetadata[key])) {
       acc[key] = processMetadata(node, localMetadata[key]);
     } else {
