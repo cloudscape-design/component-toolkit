@@ -41,3 +41,5 @@ export { default as Portal, PortalProps } from './portal';
 export { useMergeRefs } from './use-merge-refs';
 export { useRandomId, useUniqueId } from './use-unique-id';
 export { validateProps } from './base-component/validate-props';
+export { useMobile } from './use-mobile';
+export { Breakpoint, breakpoints } from './breakpoints';
