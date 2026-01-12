@@ -74,10 +74,10 @@ export function useResizeObserver(elementRef: ElementReference, onObserve: (entr
 function convertResizeObserverEntry(entry: ResizeObserverEntry): ContainerQueryEntry {
   return {
     target: entry.target,
-    contentBoxWidth: entry.contentBoxSize[0].inlineSize,
-    contentBoxHeight: entry.contentBoxSize[0].blockSize,
-    borderBoxWidth: entry.borderBoxSize[0].inlineSize,
-    borderBoxHeight: entry.borderBoxSize[0].blockSize,
+    contentBoxWidth: entry.contentBoxSize[0]?.inlineSize || 0,
+    contentBoxHeight: entry.contentBoxSize[0]?.blockSize || 0,
+    borderBoxWidth: entry.borderBoxSize[0]?.inlineSize || 0,
+    borderBoxHeight: entry.borderBoxSize[0]?.blockSize || 0,
   };
 }
 
