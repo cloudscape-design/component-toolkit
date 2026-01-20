@@ -149,6 +149,17 @@ describe('processMetadata', () => {
 
     document.body.removeChild(mockTable);
   });
+
+  test('handles null node for Table component gracefully', () => {
+    const result: any = processMetadata(null, {
+      name: 'awsui.Table',
+      properties: { variant: 'default' },
+    });
+
+    expect(result.properties.variant).toEqual('default');
+    expect(result.properties.selectedItemsLabels).toBeUndefined();
+    expect(result.properties.columnLabels).toBeUndefined();
+  });
 });
 
 describe('merge', () => {
