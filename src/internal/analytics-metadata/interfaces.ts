@@ -34,6 +34,13 @@ interface GeneratedAnalyticsMetadataComponentContext {
   detail: GeneratedAnalyticsMetadataComponent;
 }
 
+/**
+ * Determines how elements are selected when extracting labels.
+ * - 'single': Selects a single element matching the selector (default)
+ * - 'multi': Selects all elements matching the selector and returns an array of labels
+ */
+export type LabelSelectionMode = 'single' | 'multi';
+
 export interface LabelIdentifier {
   selector?: string | Array<string>;
   root?: 'component' | 'self' | 'body';
@@ -42,8 +49,9 @@ export interface LabelIdentifier {
 
 export interface GeneratedAnalyticsMetadataFragment extends Omit<Partial<GeneratedAnalyticsMetadata>, 'detail'> {
   detail?: Record<string, string | LabelIdentifier>;
-  component?: Omit<Partial<GeneratedAnalyticsMetadataComponent>, 'innerContext' | 'label'> & {
+  component?: Omit<Partial<GeneratedAnalyticsMetadataComponent>, 'innerContext' | 'label' | 'properties'> & {
     label?: string | LabelIdentifier;
     innerContext?: Record<string, string | LabelIdentifier>;
+    properties?: Record<string, string | Array<string> | Array<Array<string>> | LabelIdentifier>; 
   };
 }

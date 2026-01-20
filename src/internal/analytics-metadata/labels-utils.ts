@@ -3,14 +3,19 @@
 
 import { LABEL_DATA_ATTRIBUTE } from './attributes';
 import { findSelectorUp, findComponentUpUntil } from './dom-utils';
-import { LabelIdentifier } from './interfaces';
+import { LabelIdentifier, LabelSelectionMode } from './interfaces';
 
-export const processLabel = (node: HTMLElement | null, labelIdentifier: string | LabelIdentifier | null): string => {
+export const processLabel = (
+  node: HTMLElement | null,
+  labelIdentifier: string | LabelIdentifier | null,
+  selectionMode: LabelSelectionMode = 'single'
+): string | string[] | string[][] => {
   if (labelIdentifier === null) {
     return '';
   }
   const formattedLabelIdentifier = formatLabelIdentifier(labelIdentifier);
   const selector = formattedLabelIdentifier.selector;
+
   if (Array.isArray(selector)) {
     for (const labelSelector of selector) {
       const label = processSingleLabel(
@@ -28,7 +33,8 @@ export const processLabel = (node: HTMLElement | null, labelIdentifier: string |
     node,
     selector as string,
     formattedLabelIdentifier.root,
-    formattedLabelIdentifier.rootSelector
+    formattedLabelIdentifier.rootSelector,
+    selectionMode
   );
 };
 
@@ -43,8 +49,9 @@ const processSingleLabel = (
   node: HTMLElement | null,
   labelSelector: string,
   root: LabelIdentifier['root'] = 'self',
-  rootSelector?: string
-): string => {
+  rootSelector?: string,
+  selectionMode: LabelSelectionMode = 'single'
+): string | string[] | string[][] => {
   if (!node) {
     return '';
   }
@@ -58,11 +65,24 @@ const processSingleLabel = (
     return processSingleLabel(node.ownerDocument.body, labelSelector);
   }
   let labelElement: HTMLElement | null = node;
+
+  if (selectionMode === 'multi') {
+    const elements = Array.from(labelElement.querySelectorAll(labelSelector)) as HTMLElement[];
+    return elements
+      .map(el => {
+        if (el.dataset[LABEL_DATA_ATTRIBUTE]) {
+          return processLabel(el, el.dataset[LABEL_DATA_ATTRIBUTE], selectionMode);
+        }
+        return getLabelFromElement(el);
+      })
+      .filter(label => label) as string[];
+  }
+
   if (labelSelector) {
     labelElement = labelElement.querySelector(labelSelector) as HTMLElement | null;
   }
   if (labelElement && labelElement.dataset[LABEL_DATA_ATTRIBUTE]) {
-    return processLabel(labelElement, labelElement.dataset[LABEL_DATA_ATTRIBUTE]);
+    return processLabel(labelElement, labelElement.dataset[LABEL_DATA_ATTRIBUTE], selectionMode);
   }
   return getLabelFromElement(labelElement);
 };
