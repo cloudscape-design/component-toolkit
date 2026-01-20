@@ -160,6 +160,28 @@ describe('processMetadata', () => {
     expect(result.properties.selectedItemsLabels).toBeUndefined();
     expect(result.properties.columnLabels).toBeUndefined();
   });
+
+  test('handles table without header row', () => {
+    const mockTable = document.createElement('table');
+    mockTable.innerHTML = `
+      <tbody>
+        <tr data-selection-item="item">
+          <td><input type="checkbox" /></td>
+          <td>Item without header</td>
+        </tr>
+      </tbody>
+    `;
+    document.body.appendChild(mockTable);
+
+    const result: any = processMetadata(mockTable, {
+      name: 'awsui.Table',
+      properties: {},
+    });
+
+    expect(result.properties.columnLabels).toBeUndefined();
+
+    document.body.removeChild(mockTable);
+  });
 });
 
 describe('merge', () => {
