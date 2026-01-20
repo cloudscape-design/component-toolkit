@@ -67,23 +67,31 @@ export const merge = (inputTarget: any, inputSource: any): any => {
 };
 
 const getTableSelectedItems = (node: HTMLElement | null): string[][] => {
-  if (!node) return [];
+  if (!node) {
+    return [];
+  }
 
   return Array.from(node.querySelectorAll('tr[data-selection-item="item"]'))
     .filter(row => row.querySelector('input:checked') || row.getAttribute('aria-selected') === 'true')
-    .map(row => Array.from(row.querySelectorAll('td, th'))
-      .filter(cell => !cell.querySelector('input'))
-      .map(cell => cell.textContent?.trim() || '')
-      .filter(Boolean))
+    .map(row =>
+      Array.from(row.querySelectorAll('td, th'))
+        .filter(cell => !cell.querySelector('input'))
+        .map(cell => cell.textContent?.trim() || '')
+        .filter(Boolean)
+    )
     .filter(row => row.length > 0);
 };
 
 const getTableColumns = (node: HTMLElement | null): string[] => {
-  if (!node) return [];
-  
+  if (!node) {
+    return [];
+  }
+
   const headerRow = node.querySelector('thead tr, tr:first-child');
-  return headerRow ? Array.from(headerRow.querySelectorAll('th, td'))
-    .filter(cell => !(cell as HTMLElement).className.includes('selection-control'))
-    .map(cell => cell.textContent?.trim() || '')
-    .filter(Boolean) : [];
+  return headerRow
+    ? Array.from(headerRow.querySelectorAll('th, td'))
+        .filter(cell => !(cell as HTMLElement).className.includes('selection-control'))
+        .map(cell => cell.textContent?.trim() || '')
+        .filter(Boolean)
+    : [];
 };

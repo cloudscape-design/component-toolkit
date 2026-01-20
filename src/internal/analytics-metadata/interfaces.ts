@@ -52,6 +52,6 @@ export interface GeneratedAnalyticsMetadataFragment extends Omit<Partial<Generat
   component?: Omit<Partial<GeneratedAnalyticsMetadataComponent>, 'innerContext' | 'label' | 'properties'> & {
     label?: string | LabelIdentifier;
     innerContext?: Record<string, string | LabelIdentifier>;
-    properties?: Record<string, string | Array<string> | Array<Array<string>> | LabelIdentifier>; 
+    properties?: Record<string, string | Array<string> | Array<Array<string>> | LabelIdentifier>;
   };
 }
