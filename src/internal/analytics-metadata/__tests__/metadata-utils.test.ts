@@ -161,15 +161,10 @@ describe('processMetadata', () => {
     expect(result.properties.columnLabels).toBeUndefined();
   });
 
-  test('handles table without header row', () => {
+  test('handles table without any rows', () => {
     const mockTable = document.createElement('table');
     mockTable.innerHTML = `
-      <tbody>
-        <tr data-selection-item="item">
-          <td><input type="checkbox" /></td>
-          <td>Item without header</td>
-        </tr>
-      </tbody>
+      <caption>Empty table</caption>
     `;
     document.body.appendChild(mockTable);
 
