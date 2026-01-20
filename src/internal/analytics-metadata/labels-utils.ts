@@ -75,6 +75,7 @@ const processSingleLabel = (
         }
         return getLabelFromElement(el);
       })
+      .flat()
       .filter(label => label) as string[];
   }
 
