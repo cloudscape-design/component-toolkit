@@ -5,7 +5,8 @@ import { GeneratedAnalyticsMetadataFragment } from '../interfaces';
 import { merge, mergeMetadata, processMetadata } from '../metadata-utils';
 
 jest.mock('../labels-utils', () => ({
-  processLabel: (node: HTMLElement | null, label: string) => `processed-${label}`,
+  processLabel: (node: HTMLElement | null, label: string, mode?: string) =>
+    mode === 'multi' ? [`processed-${label}-multi`] : `processed-${label}`,
 }));
 
 describe('processMetadata', () => {
@@ -14,6 +15,139 @@ describe('processMetadata', () => {
       label: 'processed-a',
       entry: { columnLabel: 'processed-b', notLabelEnding: 'c' },
     });
+  });
+
+  test('handles keys ending with "labels" in multi mode', () => {
+    expect(processMetadata(null, { labels: 'items', entry: { columnLabels: 'cols' } })).toEqual({
+      labels: ['processed-items-multi'],
+      entry: { columnLabels: ['processed-cols-multi'] },
+    });
+  });
+
+  test('distinguishes between "label" (single) and "labels" (multi)', () => {
+    expect(processMetadata(null, { label: 'single', labels: 'multi' })).toEqual({
+      label: 'processed-single',
+      labels: ['processed-multi-multi'],
+    });
+  });
+
+  test('handles table metadata for awsui.Table components', () => {
+    // Create a mock table structure
+    const mockTable = document.createElement('table');
+    mockTable.innerHTML = `
+      <thead>
+        <tr>
+          <th class="selection-control"><input type="checkbox" /></th>
+          <th>Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-selection-item="item">
+          <td><input type="checkbox" checked /></td>
+          <td>Item 1</td>
+          <td>Active</td>
+        </tr>
+        <tr data-selection-item="item">
+          <td><input type="checkbox" /></td>
+          <td>Item 2</td>
+          <td>Inactive</td>
+        </tr>
+        <tr data-selection-item="item" aria-selected="true">
+          <td><input type="checkbox" /></td>
+          <td>Item 3</td>
+          <td>Active</td>
+        </tr>
+      </tbody>
+    `;
+    document.body.appendChild(mockTable);
+
+    const result: any = processMetadata(mockTable, {
+      name: 'awsui.Table',
+      properties: { variant: 'default' },
+    });
+
+    expect(result.properties.variant).toEqual('default');
+    expect(result.properties.selectedItemsLabels).toEqual([
+      ['Item 1', 'Active'],
+      ['Item 3', 'Active'],
+    ]);
+    expect(result.properties.columnLabels).toEqual(['Name', 'Status']);
+
+    document.body.removeChild(mockTable);
+  });
+
+  test('does not add table metadata for non-Table components', () => {
+    const mockDiv = document.createElement('div');
+    const result: any = processMetadata(mockDiv, {
+      name: 'awsui.Button',
+      properties: { variant: 'primary' },
+    });
+
+    expect(result.properties.variant).toEqual('primary');
+    expect(result.properties.selectedItemsLabels).toBeUndefined();
+    expect(result.properties.columnLabels).toBeUndefined();
+  });
+
+  test('handles empty table without selected items', () => {
+    const mockTable = document.createElement('table');
+    mockTable.innerHTML = `
+      <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-selection-item="item">
+          <td><input type="checkbox" /></td>
+          <td>Item 1</td>
+        </tr>
+      </tbody>
+    `;
+    document.body.appendChild(mockTable);
+
+    const result: any = processMetadata(mockTable, {
+      name: 'awsui.Table',
+      properties: {},
+    });
+
+    expect(result.properties.selectedItemsLabels).toBeUndefined();
+    expect(result.properties.columnLabels).toEqual(['Name']);
+
+    document.body.removeChild(mockTable);
+  });
+
+  test('handles table with nested tables correctly', () => {
+    const mockTable = document.createElement('table');
+    mockTable.innerHTML = `
+      <tbody>
+        <tr data-selection-item="item">
+          <td><input type="checkbox" checked /></td>
+          <td>Outer Item</td>
+          <td>
+            <table>
+              <tr data-selection-item="item">
+                <td><input type="checkbox" checked /></td>
+                <td>Inner Item</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    `;
+    document.body.appendChild(mockTable);
+
+    const result: any = processMetadata(mockTable, {
+      name: 'awsui.Table',
+      properties: {},
+    });
+
+    // Both outer and inner table items should be included
+    expect(result.properties.selectedItemsLabels).toHaveLength(2);
+    expect(result.properties.selectedItemsLabels[0]).toContain('Outer Item');
+    expect(result.properties.selectedItemsLabels[1]).toContain('Inner Item');
+
+    document.body.removeChild(mockTable);
   });
 });
 

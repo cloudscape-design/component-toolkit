@@ -306,4 +306,136 @@ describe('processLabel', () => {
     expect(processLabel(target, '.redirect-label-class-four')).toEqual('content inside header');
     expect(processLabel(target, '.redirect-label-class-five')).toEqual('');
   });
+
+  describe('with selectionMode parameter', () => {
+    test('returns single label when selectionMode is "single" (default)', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item">Item 1</div>
+            <div className="item">Item 2</div>
+            <div className="item">Item 3</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, '.item', 'single')).toEqual('Item 1');
+      expect(processLabel(target, '.item')).toEqual('Item 1'); // default is 'single'
+    });
+
+    test('returns array of labels when selectionMode is "multi"', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item">Item 1</div>
+            <div className="item">Item 2</div>
+            <div className="item">Item 3</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, '.item', 'multi')).toEqual(['Item 1', 'Item 2', 'Item 3']);
+    });
+
+    test('returns empty array when no elements match in multi mode', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item">Item 1</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, '.nonexistent', 'multi')).toEqual([]);
+    });
+
+    test('filters out empty labels in multi mode', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item">Item 1</div>
+            <div className="item"></div>
+            <div className="item">Item 3</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, '.item', 'multi')).toEqual(['Item 1', 'Item 3']);
+    });
+
+    test('handles nested label resolution in multi mode', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item" {...getAnalyticsLabelAttribute('.nested')}>
+              <span className="nested">Nested 1</span>
+            </div>
+            <div className="item" {...getAnalyticsLabelAttribute('.nested')}>
+              <span className="nested">Nested 2</span>
+            </div>
+            <div className="item">Direct 3</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, '.item', 'multi')).toEqual(['Nested 1', 'Nested 2', 'Direct 3']);
+    });
+
+    test('flattens nested arrays from recursive processing in multi mode', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item" {...getAnalyticsLabelAttribute('.nested')}>
+              <span className="nested">Nested 1</span>
+              <span className="nested">Nested 2</span>
+            </div>
+            <div className="item">Direct</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      const result = processLabel(target, '.item', 'multi');
+      expect(Array.isArray(result)).toBe(true);
+      expect((result as string[]).every(item => typeof item === 'string')).toBe(true);
+    });
+
+    test('handles aria-label in multi mode', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item" aria-label="Label 1">
+              Content 1
+            </div>
+            <div className="item" aria-label="Label 2">
+              Content 2
+            </div>
+            <div className="item">Content 3</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, '.item', 'multi')).toEqual(['Label 1', 'Label 2', 'Content 3']);
+    });
+
+    test('works with LabelIdentifier object in multi mode', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item">Item 1</div>
+            <div className="item">Item 2</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, { selector: '.item' }, 'multi')).toEqual(['Item 1', 'Item 2']);
+    });
+  });
 });
