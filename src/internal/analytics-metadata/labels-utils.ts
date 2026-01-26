@@ -61,7 +61,7 @@ const processMultiLabels = (node: HTMLElement | null, labelIdentifier: string | 
         formattedLabelIdentifier.rootSelector
       );
 
-      if (labels) {
+      if (labels.length > 0) {
         return labels;
       }
     }
