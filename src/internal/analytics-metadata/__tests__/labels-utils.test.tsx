@@ -437,5 +437,149 @@ describe('processLabel', () => {
 
       expect(processLabel(target, { selector: '.item' }, 'multi')).toEqual(['Item 1', 'Item 2']);
     });
+
+    test('returns empty array when selector is undefined in multi mode', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item">Item 1</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, { selector: undefined }, 'multi')).toEqual([]);
+    });
+
+    test('returns empty array when labelIdentifier is null in multi mode', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item">Item 1</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, null, 'multi')).toEqual([]);
+    });
+
+    test('returns empty array when node is null in multi mode', () => {
+      expect(processLabel(null, '.item', 'multi')).toEqual([]);
+    });
+
+    test('returns first non-empty labels when selector is an array in multi mode', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="wrong-class">Wrong 1</div>
+            <div className="item">Item 1</div>
+            <div className="item">Item 2</div>
+            <div className="other">Other 1</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      // Should return first successful selector's results
+      expect(processLabel(target, { selector: ['.nonexistent', '.item', '.other'] }, 'multi')).toEqual([
+        'Item 1',
+        'Item 2',
+      ]);
+    });
+
+    test('returns empty array when all selectors in array fail in multi mode', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item">Item 1</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, { selector: ['.nonexistent1', '.nonexistent2', '.nonexistent3'] }, 'multi')).toEqual(
+        []
+      );
+    });
+
+    test('respects rootSelector property in multi mode', () => {
+      const { container } = render(
+        <div className="root-class">
+          <div className="item">Root Item 1</div>
+          <div className="item">Root Item 2</div>
+          <div id="target">
+            <div className="item">Inner Item 1</div>
+            <div className="item">Inner Item 2</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, { selector: '.item', rootSelector: '.root-class' }, 'multi')).toEqual([
+        'Root Item 1',
+        'Root Item 2',
+        'Inner Item 1',
+        'Inner Item 2',
+      ]);
+    });
+
+    test('respects root="component" property in multi mode', () => {
+      const { container } = render(
+        <>
+          <div {...getAnalyticsMetadataAttribute({ component: { name: 'ComponentName' } })}>
+            <div className="item">Component Item 1</div>
+            <div className="item">Component Item 2</div>
+            <div id="target">
+              <div className="item">Inner Item 1</div>
+              <div className="item">Inner Item 2</div>
+            </div>
+          </div>
+        </>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      // querySelectorAll finds ALL descendants from the component root
+      expect(processLabel(target, { selector: '.item', root: 'component' }, 'multi')).toEqual([
+        'Component Item 1',
+        'Component Item 2',
+        'Inner Item 1',
+        'Inner Item 2',
+      ]);
+    });
+
+    test('respects root="body" property in multi mode', () => {
+      const { container } = render(
+        <>
+          <div className="outer-item">Outer Item 1</div>
+          <div className="outer-item">Outer Item 2</div>
+          <div id="target">
+            <div className="outer-item">Inner Item 1</div>
+          </div>
+        </>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, { selector: '.outer-item', root: 'body' }, 'multi')).toEqual([
+        'Outer Item 1',
+        'Outer Item 2',
+        'Inner Item 1',
+      ]);
+    });
+  });
+
+  describe('edge cases with array selectors in single mode', () => {
+    test('returns empty string when all selectors in array fail', () => {
+      const { container } = render(
+        <div>
+          <div id="target">
+            <div className="item">Item 1</div>
+          </div>
+        </div>
+      );
+      const target = container.querySelector('#target') as HTMLElement;
+
+      expect(processLabel(target, { selector: ['.nonexistent1', '.nonexistent2'] })).toEqual('');
+    });
   });
 });
