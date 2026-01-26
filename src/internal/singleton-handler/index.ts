@@ -9,7 +9,9 @@ type CleanupCallback = () => void;
 export type UseSingleton<T> = (listener: ValueCallback<T>) => void;
 
 export function createSingletonHandler<T>(factory: (handler: ValueCallback<T>) => CleanupCallback): UseSingleton<T> {
-  const listeners: Array<ValueCallback<T>> = [];
+  // Using Set for O(1) add/delete operations instead of Array's O(n) indexOf + splice.
+  // Sets maintain insertion order (ES2015+), preserving iteration consistency.
+  const listeners = new Set<ValueCallback<T>>();
   const callback: ValueCallback<T> = value => {
     unstable_batchedUpdates(() => {
       for (const listener of listeners) {
@@ -21,14 +23,14 @@ export function createSingletonHandler<T>(factory: (handler: ValueCallback<T>) =
 
   return function useSingleton(listener: ValueCallback<T>) {
     useEffect(() => {
-      if (listeners.length === 0) {
+      if (listeners.size === 0) {
         cleanup = factory(callback);
       }
-      listeners.push(listener);
+      listeners.add(listener);
 
       return () => {
-        listeners.splice(listeners.indexOf(listener), 1);
-        if (listeners.length === 0) {
+        listeners.delete(listener);
+        if (listeners.size === 0) {
           cleanup!();
           cleanup = undefined;
         }
