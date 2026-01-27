@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { isHTMLElement } from './element-types';
+import { isHTMLElement } from './element-types.js';
 
 /**
  * Checks if the current element or any of its parent is matched with `test` function.

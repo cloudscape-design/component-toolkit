@@ -1,6 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+'use client';
 import React, {
   createContext,
   forwardRef,
@@ -11,8 +12,8 @@ import React, {
   useState,
 } from 'react';
 
-import { useEffectOnUpdate } from '../use-effect-on-update';
-import nodeBelongs from '../../dom/node-belongs';
+import { useEffectOnUpdate } from '../use-effect-on-update/index.js';
+import nodeBelongs from '../../dom/node-belongs.js';
 
 export type FocusableChangeHandler = (isFocusable: boolean) => void;
 

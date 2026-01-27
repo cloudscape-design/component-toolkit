@@ -1,9 +1,9 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { warnOnce } from '../logging';
+import { warnOnce } from '../logging.js';
 
-import { mergeLocales } from './merge-locales';
+import { mergeLocales } from './merge-locales.js';
 
 export function normalizeLocale(component: string, locale: string | null): string {
   locale = checkLocale(component, locale);

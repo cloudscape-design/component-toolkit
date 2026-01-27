@@ -16,9 +16,9 @@ module.exports = {
   },
   testTimeout: 60_000, // 1min
   maxWorkers: os.cpus().length,
-  globalSetup: '<rootDir>/jest/global-setup.js',
-  globalTeardown: '<rootDir>/jest/global-teardown.js',
-  setupFilesAfterEnv: ['<rootDir>/jest/integ-setup.js'],
+  globalSetup: '<rootDir>/jest/global-setup.cjs',
+  globalTeardown: '<rootDir>/jest/global-teardown.cjs',
+  setupFilesAfterEnv: ['<rootDir>/jest/integ-setup.cjs'],
   moduleFileExtensions: ['js', 'ts'],
   testRegex: '(/(__integ__)/.*(\\.|/)test)\\.[jt]sx?$',
 };

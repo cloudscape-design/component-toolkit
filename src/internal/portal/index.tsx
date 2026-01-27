@@ -3,8 +3,8 @@
 
 import React, { useLayoutEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { isDevelopment } from '../is-development';
-import { warnOnce } from '../logging';
+import { isDevelopment } from '../is-development.js';
+import { warnOnce } from '../logging.js';
 
 export interface PortalProps {
   container?: null | Element;

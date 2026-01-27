@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { METADATA_DATA_ATTRIBUTE, REFERRER_DATA_ATTRIBUTE } from './attributes';
+import { METADATA_DATA_ATTRIBUTE, REFERRER_DATA_ATTRIBUTE } from './attributes.js';
 
 export const findLogicalParent = (node: HTMLElement): HTMLElement | null => {
   try {

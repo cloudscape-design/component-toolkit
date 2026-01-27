@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useState, useEffect, useCallback } from 'react';
-import { useStableCallback } from '../internal/stable-callback';
-import { isDevelopment } from '../internal/is-development';
-import { warnOnce } from '../internal/logging';
-import { PropertyDescriptions } from './interfaces';
+import { useStableCallback } from '../internal/stable-callback/index.js';
+import { isDevelopment } from '../internal/is-development.js';
+import { warnOnce } from '../internal/logging.js';
+import { PropertyDescriptions } from './interfaces.js';
 
 /**
  * This hook allows you to make a component that can be used both in controlled

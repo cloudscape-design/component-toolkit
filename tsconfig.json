@@ -10,7 +10,7 @@
     "declaration": true,
     "jsx": "react",
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib/mjs"
   },
   "include": ["src"],
   "exclude": ["**/__tests__/**", "**/__integ__/**"]
