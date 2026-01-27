@@ -18,10 +18,22 @@ export const mergeMetadata = (
 
 export const processMetadata = (node: HTMLElement | null, localMetadata: any): GeneratedAnalyticsMetadataFragment => {
   return Object.keys(localMetadata).reduce((acc: any, key: string) => {
-    if (key.toLowerCase().match(/label$/)) {
-      acc[key] = processLabel(node, localMetadata[key]);
+    if (key.toLowerCase().match(/labels$/)) {
+      acc[key] = processLabel(node, localMetadata[key], 'multi');
+    } else if (key.toLowerCase().match(/label$/)) {
+      acc[key] = processLabel(node, localMetadata[key], 'single');
     } else if (typeof localMetadata[key] !== 'string' && !Array.isArray(localMetadata[key])) {
       acc[key] = processMetadata(node, localMetadata[key]);
+      if (key === 'properties' && localMetadata.name === 'awsui.Table') {
+        const selectedItems = getTableSelectedItems(node);
+        if (selectedItems.length) {
+          acc[key].selectedItemsLabels = selectedItems;
+        }
+        const columns = getTableColumns(node);
+        if (columns.length) {
+          acc[key].columnLabels = columns;
+        }
+      }
     } else {
       acc[key] = localMetadata[key];
     }
@@ -52,4 +64,34 @@ export const merge = (inputTarget: any, inputSource: any): any => {
     }
   }
   return JSON.parse(JSON.stringify(merged));
+};
+
+const getTableSelectedItems = (node: HTMLElement | null): string[][] => {
+  if (!node) {
+    return [];
+  }
+
+  return Array.from(node.querySelectorAll('tr[data-selection-item="item"]'))
+    .filter(row => row.querySelector('input:checked') || row.getAttribute('aria-selected') === 'true')
+    .map(row =>
+      Array.from(row.querySelectorAll('td, th'))
+        .filter(cell => !cell.querySelector('input'))
+        .map(cell => cell.textContent?.trim() || '')
+        .filter(Boolean)
+    )
+    .filter(row => row.length > 0);
+};
+
+const getTableColumns = (node: HTMLElement | null): string[] => {
+  if (!node) {
+    return [];
+  }
+
+  const headerRow = node.querySelector('thead tr, tr:first-child');
+  return headerRow
+    ? Array.from(headerRow.querySelectorAll('th, td'))
+        .filter(cell => !(cell as HTMLElement).className.includes('selection-control'))
+        .map(cell => cell.textContent?.trim() || '')
+        .filter(Boolean)
+    : [];
 };
