@@ -12,7 +12,7 @@ import {
   activateAnalyticsMetadata,
 } from '../attributes';
 
-describe.each([true, false])('With activate analitycs metadata = %s', active => {
+describe.each([true, false])('With activate analytics metadata = %s', active => {
   beforeAll(() => {
     activateAnalyticsMetadata(active);
   });

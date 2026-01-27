@@ -1,4 +1,4 @@
-## Development toolkit for building components compliant with Cloudscape Design System
+## Development toolkit for building components compliant with the Cloudscape Design System
 
 This package contains the source code of the React component toolkit for the [Cloudscape Design System](https://cloudscape.design/).
 
