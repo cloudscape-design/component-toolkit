@@ -79,3 +79,55 @@ test('should remove listeners when component unmounts', () => {
   expect(onChangeFirst).toHaveBeenCalledTimes(2);
   expect(onChangeSecond).toHaveBeenCalledTimes(1);
 });
+
+test('should notify listeners in registration order', () => {
+  const { Demo, state } = setup();
+  const callOrder: string[] = [];
+  const onChangeFirst = jest.fn(() => callOrder.push('first'));
+  const onChangeSecond = jest.fn(() => callOrder.push('second'));
+  const onChangeThird = jest.fn(() => callOrder.push('third'));
+  render(
+    <>
+      <Demo onChange={onChangeFirst} />
+      <Demo onChange={onChangeSecond} />
+      <Demo onChange={onChangeThird} />
+    </>
+  );
+  state.handler(42);
+  expect(callOrder).toEqual(['first', 'second', 'third']);
+});
+
+test('should handle rapid mount/unmount cycles correctly', () => {
+  const { Demo, state } = setup();
+  const onChange1 = jest.fn();
+  const onChange2 = jest.fn();
+  const onChange3 = jest.fn();
+
+  const { rerender, unmount } = render(<Demo onChange={onChange1} />);
+  expect(state.subscriptions).toEqual(1);
+
+  // Rapid additions
+  rerender(
+    <>
+      <Demo onChange={onChange1} />
+      <Demo onChange={onChange2} />
+    </>
+  );
+  rerender(
+    <>
+      <Demo onChange={onChange1} />
+      <Demo onChange={onChange2} />
+      <Demo onChange={onChange3} />
+    </>
+  );
+  expect(state.subscriptions).toEqual(1);
+
+  state.handler(100);
+  expect(onChange1).toHaveBeenCalledWith(100);
+  expect(onChange2).toHaveBeenCalledWith(100);
+  expect(onChange3).toHaveBeenCalledWith(100);
+
+  // Complete cleanup
+  unmount();
+  expect(state.subscriptions).toEqual(0);
+});
