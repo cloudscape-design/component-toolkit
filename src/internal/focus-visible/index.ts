@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useEffect } from 'react';
-import { isModifierKey } from '../keycode';
+import { isModifierKey } from '../keycode.js';
 
 const frames = new Map<Document, { componentsCount: number; abortController: AbortController }>();
 

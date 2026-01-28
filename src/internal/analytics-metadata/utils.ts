@@ -1,13 +1,13 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-export { getRawAnalyticsMetadata } from './testing-utils';
-export { getComponentsTree } from './page-scanner-utils';
+export { getRawAnalyticsMetadata } from './testing-utils.js';
+export { getComponentsTree } from './page-scanner-utils.js';
 
-import { METADATA_DATA_ATTRIBUTE } from './attributes';
-import { GeneratedAnalyticsMetadata, GeneratedAnalyticsMetadataFragment } from './interfaces';
-import { findLogicalParent } from './dom-utils';
-import { mergeMetadata, processMetadata } from './metadata-utils';
+import { METADATA_DATA_ATTRIBUTE } from './attributes.js';
+import { GeneratedAnalyticsMetadata, GeneratedAnalyticsMetadataFragment } from './interfaces.js';
+import { findLogicalParent } from './dom-utils.js';
+import { mergeMetadata, processMetadata } from './metadata-utils.js';
 
 export const getGeneratedAnalyticsMetadata = (target: HTMLElement | null): GeneratedAnalyticsMetadata => {
   let metadata: GeneratedAnalyticsMetadataFragment = {};

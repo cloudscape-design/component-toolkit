@@ -1,9 +1,9 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { METADATA_ATTRIBUTE, REFERRER_ATTRIBUTE, REFERRER_DATA_ATTRIBUTE } from './attributes';
-import { findComponentUpUntil, isNodeComponent } from './dom-utils';
-import { getGeneratedAnalyticsMetadata } from './utils';
+import { METADATA_ATTRIBUTE, REFERRER_ATTRIBUTE, REFERRER_DATA_ATTRIBUTE } from './attributes.js';
+import { findComponentUpUntil, isNodeComponent } from './dom-utils.js';
+import { getGeneratedAnalyticsMetadata } from './utils.js';
 
 interface GeneratedAnalyticsMetadataComponentTree {
   name: string;

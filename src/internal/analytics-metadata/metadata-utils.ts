@@ -1,8 +1,8 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { GeneratedAnalyticsMetadataFragment } from './interfaces';
-import { processLabel } from './labels-utils';
+import { GeneratedAnalyticsMetadataFragment } from './interfaces.js';
+import { processLabel } from './labels-utils.js';
 
 export const mergeMetadata = (
   metadata: GeneratedAnalyticsMetadataFragment | null,

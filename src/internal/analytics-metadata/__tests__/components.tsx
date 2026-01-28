@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { ReactNode, useEffect, useRef } from 'react';
-import { METADATA_ATTRIBUTE, getAnalyticsMetadataAttribute, getAnalyticsLabelAttribute } from '../attributes';
+import { METADATA_ATTRIBUTE, getAnalyticsMetadataAttribute, getAnalyticsLabelAttribute } from '../attributes.js';
 import ReactDOM from 'react-dom';
 
 export const ComponentOne = ({ malformed }: { malformed?: boolean }) => (

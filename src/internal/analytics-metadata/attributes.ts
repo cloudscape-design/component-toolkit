@@ -1,8 +1,8 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { GeneratedAnalyticsMetadataFragment } from './interfaces';
-import { getGlobalFlag } from '../global-flags';
+import { GeneratedAnalyticsMetadataFragment } from './interfaces.js';
+import { getGlobalFlag } from '../global-flags/index.js';
 
 export const METADATA_DATA_ATTRIBUTE = 'awsuiAnalytics';
 export const METADATA_ATTRIBUTE = 'data-awsui-analytics';

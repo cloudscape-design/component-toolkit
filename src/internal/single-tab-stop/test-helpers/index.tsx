@@ -3,8 +3,8 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { FocusableChangeHandler, SingleTabStopNavigationContext } from '../';
-import { useUniqueId } from '../../use-unique-id';
+import { FocusableChangeHandler, SingleTabStopNavigationContext } from '../index.js';
+import { useUniqueId } from '../../use-unique-id/index.js';
 
 type SetTarget = (focusTarget: null | Element, suppressed?: (null | Element)[]) => void;
 

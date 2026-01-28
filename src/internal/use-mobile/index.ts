@@ -1,10 +1,10 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { createSingletonState } from '../singleton-handler';
+import { createSingletonState } from '../singleton-handler/index.js';
 
-import { mobileBreakpoint } from '../breakpoints';
-import { safeMatchMedia } from '../utils/safe-match-media';
+import { mobileBreakpoint } from '../breakpoints.js';
+import { safeMatchMedia } from '../utils/safe-match-media.js';
 
 export const forceMobileModeSymbol = Symbol.for('awsui-force-mobile-mode');
 
