@@ -1,27 +1,54 @@
 {
   "name": "@cloudscape-design/component-toolkit",
   "version": "1.0.0-beta",
-  "files": [
-    "container-queries",
-    "dom",
-    "internal",
-    "use-controllable-state",
-    "*.js",
-    "*.d.ts"
-  ],
+  "type": "module",
   "main": "./index.js",
+  "module": "./mjs/index.js",
+  "sideEffects": false,
   "exports": {
-    ".": "./index.js",
-    "./dom": "./dom/index.js",
-    "./internal": "./internal/index.js",
-    "./internal/metrics": "./internal/metrics.js",
-    "./internal/testing": "./internal/testing.js",
-    "./internal/locale": "./internal/locale/index.js",
-    "./internal/analytics-metadata": "./internal/analytics-metadata/index.js",
-    "./internal/analytics-metadata/utils": "./internal/analytics-metadata/utils.js",
+    ".": {
+      "require": "./index.js",
+      "default": "./mjs/index.js"
+    },
+    "./dom": {
+      "require": "./dom/index.js",
+      "default": "./mjs/dom/index.js"
+    },
+    "./internal": {
+      "require": "./internal/index.js",
+      "default": "./mjs/internal/index.js"
+    },
+    "./internal/metrics": {
+      "require": "./internal/metrics.js",
+      "default": "./mjs/internal/metrics.js"
+    },
+    "./internal/testing": {
+      "require": "./internal/testing.js",
+      "default": "./mjs/internal/testing.js"
+    },
+    "./internal/locale": {
+      "require": "./internal/locale/index.js",
+      "default": "./mjs/internal/locale/index.js"
+    },
+    "./internal/analytics-metadata": {
+      "require": "./internal/analytics-metadata/index.js",
+      "default": "./mjs/internal/analytics-metadata/index.js"
+    },
+    "./internal/analytics-metadata/utils": {
+      "require": "./internal/analytics-metadata/utils.js",
+      "default": "./mjs/internal/analytics-metadata/utils.js"
+    },
     "./package.json": "./package.json"
   },
-  "sideEffects": false,
+  "types": "./mjs/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "internal": ["./mjs/internal/index.d.ts"],
+      "internal/*": ["./mjs/internal/*"],
+      "dom": ["./mjs/dom/index.d.ts"],
+      "dom/*": ["./mjs/dom/*"]
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/cloudscape-design/component-toolkit.git"
@@ -29,13 +56,13 @@
   "homepage": "https://cloudscape.design",
   "scripts": {
     "prebuild": "rm -rf lib",
-    "build": "tsc",
-    "postbuild": "npm run postbuild:root && npm run postbuild:focus-visible",
-    "postbuild:root": "cp package.json README.md LICENSE lib",
-    "postbuild:focus-visible": "cp ./src/internal/focus-visible/index.scss lib/internal/focus-visible",
+    "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.cjs.json",
+    "postbuild": "npm run postbuild:root && npm run postbuild:focus-visible && node ./scripts/generate-deep-package.js",
+    "postbuild:root": "cp package.json README.md LICENSE NOTICE lib",
+    "postbuild:focus-visible": "cp ./src/internal/focus-visible/index.scss lib/internal/focus-visible/index.scss",
     "test-pages": "vite --config ./test-pages/vite.config.mts",
-    "test:unit": "jest -c jest.unit.config.js",
-    "test:integ": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest -c jest.integ.config.js",
+    "test:unit": "jest -c jest.unit.config.cjs",
+    "test:integ": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest -c jest.integ.config.cjs",
     "test": "npm run test:unit && npm-run-all -r -p test-pages test:integ",
     "lint": "eslint --ignore-path .gitignore --ext ts,tsx,js .",
     "prepare": "husky"
@@ -43,6 +70,9 @@
   "dependencies": {
     "tslib": "^2.3.1",
     "weekstart": "^2.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
   },
   "devDependencies": {
     "@cloudscape-design/browser-test-tools": "^3.0.0",
@@ -58,6 +88,7 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-header": "3.1.0",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-no-unsanitized": "^4.0.0",
     "eslint-plugin-prettier": "^3.4.1",
     "eslint-plugin-react": "^7.26.1",
@@ -86,7 +117,7 @@
       "eslint --fix"
     ],
     "package-lock.json": [
-      "./scripts/prepare-package-lock.js"
+      "./scripts/prepare-package-lock.cjs"
     ]
   }
 }

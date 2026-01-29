@@ -1,9 +1,9 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { LABEL_DATA_ATTRIBUTE } from './attributes';
-import { findSelectorUp, findComponentUpUntil } from './dom-utils';
-import { LabelIdentifier, LabelSelectionMode } from './interfaces';
+import { LABEL_DATA_ATTRIBUTE } from './attributes.js';
+import { findSelectorUp, findComponentUpUntil } from './dom-utils.js';
+import { LabelIdentifier, LabelSelectionMode } from './interfaces.js';
 
 export const processLabel = (
   node: HTMLElement | null,

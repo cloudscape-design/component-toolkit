@@ -14,7 +14,7 @@
       "jsx": true
     }
   },
-  "plugins": ["unicorn", "react-hooks", "no-unsanitized", "header"],
+  "plugins": ["unicorn", "react-hooks", "no-unsanitized", "header", "import"],
   "rules": {
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-namespace": "off",
@@ -59,7 +59,8 @@
       [" Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.", " SPDX-License-Identifier: Apache-2.0"],
       2
     ],
-    "no-warning-comments": "warn"
+    "no-warning-comments": "warn",
+    "import/extensions": ["error", "ignorePackages"]
   },
   "settings": {
     "react": {
@@ -77,7 +78,7 @@
   },
   "overrides": [
     {
-      "files": ["*.js"],
+      "files": ["*.js", "*.cjs"],
       "rules": {
         "@typescript-eslint/no-var-requires": "off"
       },
@@ -90,6 +91,12 @@
       "files": ["jest*.js", "jest/*.js"],
       "env": {
         "jest": true
+      }
+    },
+    {
+      "files": ["**/__tests__/**", "./test-pages/**"],
+      "rules": {
+        "import/extensions": ["off"]
       }
     },
     {
