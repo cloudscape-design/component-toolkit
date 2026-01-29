@@ -21,8 +21,11 @@ export enum KeyCode {
   meta = 91,
 }
 
+// Pre-created Set for O(1) lookup instead of creating a new array on every call
+const modifierKeyCodes = new Set([KeyCode.shift, KeyCode.alt, KeyCode.control, KeyCode.meta]);
+
 export function isModifierKey(event: KeyboardEvent) {
   // we do not want to highlight focused element
   // when special keys are pressed
-  return [KeyCode.shift, KeyCode.alt, KeyCode.control, KeyCode.meta].includes(event.keyCode);
+  return modifierKeyCodes.has(event.keyCode);
 }
