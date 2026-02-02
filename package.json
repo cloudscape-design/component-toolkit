@@ -76,6 +76,7 @@
   },
   "devDependencies": {
     "@cloudscape-design/browser-test-tools": "^3.0.0",
+    "@cloudscape-design/build-tools": "github:cloudscape-design/build-tools#main",
     "@cloudscape-design/jest-preset": "^2.0.0",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^11.2.7",
@@ -117,7 +118,7 @@
       "eslint --fix"
     ],
     "package-lock.json": [
-      "./scripts/prepare-package-lock.cjs"
+      "prepare-package-lock"
     ]
   }
 }
