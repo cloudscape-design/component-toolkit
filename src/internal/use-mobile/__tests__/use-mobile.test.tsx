@@ -6,6 +6,7 @@ import { act, render } from '@testing-library/react';
 
 // eslint-disable-next-line import/extensions
 import { useMobile } from '../index';
+import * as safeMatchMediaModule from '../../utils/safe-match-media';
 
 function Demo() {
   const renderCount = useRef(0);
@@ -21,7 +22,14 @@ function Demo() {
 
 function resizeWindow(width: number) {
   act(() => {
-    Object.defineProperty(window, 'innerWidth', { value: width });
+    // Mock safeMatchMedia to return the result of a passed-in `max-width` query based on the width the window wasjust resized to
+    jest.spyOn(safeMatchMediaModule, 'safeMatchMedia').mockImplementation((element, query) => {
+      // Extract the max-width value from the query
+      const match = query.match(/max-width:\s*(\d+)px/);
+      const maxWidth = match ? parseInt(match[1], 10) : Infinity;
+      return width <= maxWidth;
+    });
+
     window.dispatchEvent(new CustomEvent('resize'));
   });
 }
