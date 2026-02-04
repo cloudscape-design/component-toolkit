@@ -43,3 +43,5 @@ export { useRandomId, useUniqueId } from './use-unique-id/index.js';
 export { validateProps } from './base-component/validate-props.js';
 export { TrackBy, getTrackableValue } from './track-by/index.js';
 export { SelectionTree, SelectionTreeProps, GroupSelectionState } from './selection-tree/index.js';
+export { useMobile } from './use-mobile/index.js';
+export { Breakpoint, breakpoints } from './breakpoints.js';
