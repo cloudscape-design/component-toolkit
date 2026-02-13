@@ -65,7 +65,8 @@
     "test:integ": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest -c jest.integ.config.cjs",
     "test": "npm run test:unit && npm-run-all -r -p test-pages test:integ",
     "lint": "eslint --ignore-path .gitignore --ext ts,tsx,js .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "prepare-package-lock"
   },
   "dependencies": {
     "tslib": "^2.3.1",
