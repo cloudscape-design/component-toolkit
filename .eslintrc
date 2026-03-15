@@ -14,7 +14,7 @@
       "jsx": true
     }
   },
-  "plugins": ["unicorn", "react-hooks", "no-unsanitized", "header", "import"],
+  "plugins": ["unicorn", "react-hooks", "no-unsanitized", "@tony.ganchev/header", "import"],
   "rules": {
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-namespace": "off",
@@ -53,11 +53,29 @@
     "eqeqeq": "error",
     "no-return-await": "error",
     "require-await": "error",
-    "header/header": [
+    "@tony.ganchev/header/header": [
       "error",
-      "line",
-      [" Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.", " SPDX-License-Identifier: Apache-2.0"],
-      2
+      {
+        "header": {
+          "commentType": "line",
+          "lines": [" Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.", " SPDX-License-Identifier: Apache-2.0"]
+        },
+        "leadingComments": {
+          "comments": [
+            {
+              "commentType": "block",
+              "lines": [
+                "*",
+                " * @jest-environment node",
+                " "
+              ]
+            }
+          ]
+        },
+        "trailingEmptyLines": {
+          "minimum": 2
+        }
+      }
     ],
     "no-warning-comments": "warn",
     "import/extensions": ["error", "ignorePackages"]
