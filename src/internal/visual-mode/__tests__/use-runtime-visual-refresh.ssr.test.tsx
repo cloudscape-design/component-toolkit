@@ -1,9 +1,9 @@
 /**
  * @jest-environment node
  */
-/* eslint-disable header/header */
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
+
 import React from 'react';
 import { useRuntimeVisualRefresh, clearVisualRefreshState } from '../index';
 import { clearMessageCache } from '../../logging';
