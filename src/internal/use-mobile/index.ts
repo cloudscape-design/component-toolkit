@@ -3,10 +3,12 @@
 
 import { createSingletonState } from '../singleton-handler/index.js';
 
-import { mobileBreakpoint } from '../breakpoints.js';
+import { breakpoints } from '../breakpoints.js';
 import { safeMatchMedia } from '../utils/safe-match-media.js';
 
 export const forceMobileModeSymbol = Symbol.for('awsui-force-mobile-mode');
+
+const mobileBreakpoint = breakpoints.filter(b => b[0] === 'xs')[0][1];
 
 function getIsMobile() {
   // allow overriding the mobile mode in tests
