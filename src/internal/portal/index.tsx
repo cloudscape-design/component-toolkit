@@ -13,12 +13,15 @@ export interface PortalProps {
   children: React.ReactNode;
 }
 
-function manageDefaultContainer(setState: React.Dispatch<React.SetStateAction<Element | null>>) {
-  const newContainer = document.createElement('div');
-  document.body.appendChild(newContainer);
+function manageDefaultContainer(
+  ownerDocument: Document,
+  setState: React.Dispatch<React.SetStateAction<Element | null>>
+) {
+  const newContainer = ownerDocument.createElement('div');
+  ownerDocument.body.appendChild(newContainer);
   setState(newContainer);
   return () => {
-    document.body.removeChild(newContainer);
+    ownerDocument.body.removeChild(newContainer);
   };
 }
 
@@ -49,10 +52,12 @@ function manageAsyncContainer(
 
 /**
  * A safe react portal component that renders to a provided node.
- * If a node isn't provided, it creates one under document.body.
+ * If a node isn't provided, it creates one under the owner document's body,
+ * ensuring correct behavior inside iframes.
  */
 export default function Portal({ container, getContainer, removeContainer, children }: PortalProps) {
   const [activeContainer, setActiveContainer] = useState<Element | null>(container ?? null);
+  const ref = React.useRef<HTMLSpanElement>(null);
 
   useLayoutEffect(() => {
     if (container) {
@@ -70,8 +75,14 @@ export default function Portal({ container, getContainer, removeContainer, child
     if (getContainer && removeContainer) {
       return manageAsyncContainer(getContainer, removeContainer, setActiveContainer);
     }
-    return manageDefaultContainer(setActiveContainer);
+
+    const ownerDocument = ref.current?.ownerDocument ?? document;
+    return manageDefaultContainer(ownerDocument, setActiveContainer);
   }, [container, getContainer, removeContainer]);
 
-  return activeContainer && createPortal(children, activeContainer);
+  if (!activeContainer) {
+    return <span ref={ref} style={{ display: 'none' }} />;
+  }
+
+  return createPortal(children, activeContainer);
 }
