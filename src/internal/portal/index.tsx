@@ -55,7 +55,12 @@ function manageAsyncContainer(
  * If a node isn't provided, it creates one under the owner document's body,
  * ensuring correct behavior inside iframes.
  */
-export default function Portal({ container, getContainer, removeContainer, children }: PortalProps) {
+export default function Portal({
+  container,
+  getContainer,
+  removeContainer,
+  children,
+}: PortalProps): React.ReactPortal | React.ReactElement {
   const [activeContainer, setActiveContainer] = useState<Element | null>(container ?? null);
   const ref = React.useRef<HTMLSpanElement>(null);
 
