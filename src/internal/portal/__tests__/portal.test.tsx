@@ -7,9 +7,12 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { warnOnce } from '../../logging';
 import Portal, { PortalProps } from '../index';
 
-function renderPortal(props: PortalProps) {
-  const { rerender, unmount } = render(<Portal {...props} />);
-  return { unmount, rerender: (props: PortalProps) => rerender(<Portal {...props} />) };
+function renderPortal(props: PortalProps, options?: { container?: HTMLElement }) {
+  const { rerender, unmount } = render(<Portal {...props} />, options);
+  return {
+    unmount,
+    rerender: (props: PortalProps) => rerender(<Portal {...props} />),
+  };
 }
 
 jest.mock('../../logging', () => ({
@@ -229,6 +232,56 @@ describe('Portal', () => {
       unmount();
       expect(document.querySelectorAll('body > div').length).toBe(1);
       expect(document.querySelector('body > div')?.innerHTML).toBe('');
+    });
+  });
+
+  describe('iframe support', () => {
+    let iframe: HTMLIFrameElement;
+    let iframeDocument: Document;
+
+    beforeEach(() => {
+      iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      iframeDocument = iframe.contentDocument!;
+    });
+
+    afterEach(() => {
+      iframe.remove();
+    });
+
+    function renderInIframe(props: PortalProps) {
+      const iframeRoot = iframeDocument.createElement('div');
+      iframeDocument.body.appendChild(iframeRoot);
+      return renderPortal(props, { container: iframeRoot });
+    }
+
+    test('renders to the ownerDocument when mounted inside an iframe', () => {
+      const { unmount } = renderInIframe({ children: <p data-testid="iframe-content">Inside iframe</p> });
+
+      expect(iframeDocument.querySelector('p[data-testid="iframe-content"]')).toBeTruthy();
+      expect(iframeDocument.body.contains(iframeDocument.querySelector('p[data-testid="iframe-content"]'))).toBe(true);
+
+      unmount();
+    });
+
+    test('does not render to the parent document when inside an iframe', () => {
+      const { unmount } = renderInIframe({ children: <p data-testid="iframe-content">Inside iframe</p> });
+
+      expect(document.querySelectorAll('p[data-testid="iframe-content"]').length).toBe(0);
+
+      unmount();
+    });
+
+    test('cleans up container from iframe document on unmount', () => {
+      const { unmount } = renderInIframe({ children: <p>Inside iframe</p> });
+
+      const containersBefore = iframeDocument.querySelectorAll('body > div').length;
+      expect(containersBefore).toBeGreaterThanOrEqual(2);
+
+      unmount();
+
+      const containersAfter = iframeDocument.querySelectorAll('body > div').length;
+      expect(containersAfter).toBe(containersBefore - 1);
     });
   });
 });
