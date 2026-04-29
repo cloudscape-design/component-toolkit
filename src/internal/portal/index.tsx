@@ -60,7 +60,7 @@ export default function Portal({
   getContainer,
   removeContainer,
   children,
-}: PortalProps): React.ReactPortal | React.ReactElement {
+}: PortalProps): React.ReactPortal | React.ReactElement | null {
   const [activeContainer, setActiveContainer] = useState<Element | null>(container ?? null);
   const ref = React.useRef<HTMLSpanElement>(null);
 
@@ -85,9 +85,9 @@ export default function Portal({
     return manageDefaultContainer(ownerDocument, setActiveContainer);
   }, [container, getContainer, removeContainer]);
 
-  if (!activeContainer) {
+  if (!activeContainer && typeof document !== 'undefined') {
     return <span ref={ref} style={{ display: 'none' }} />;
   }
 
-  return createPortal(children, activeContainer);
+  return activeContainer && createPortal(children, activeContainer);
 }
