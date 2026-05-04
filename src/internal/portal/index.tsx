@@ -85,6 +85,10 @@ export default function Portal({
     return manageDefaultContainer(ownerDocument, setActiveContainer);
   }, [container, getContainer, removeContainer]);
 
+  // On the first render, activeContainer is null because the layout effect hasn't
+  // created it yet. We render a hidden probe span so the effect can read
+  // ref.current.ownerDocument to discover the correct document (e.g. inside iframes).
+  // In SSR there's no document, so we return null to match the previous behavior.
   if (!activeContainer && typeof document !== 'undefined') {
     return <span ref={ref} style={{ display: 'none' }} />;
   }
