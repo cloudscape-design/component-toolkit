@@ -8,6 +8,7 @@ interface GlobalFlags {
   appLayoutWidget?: boolean;
   appLayoutToolbar?: boolean;
   analyticsMetadata?: boolean;
+  oneTheme?: boolean;
 }
 
 export interface FlagsHolder {
