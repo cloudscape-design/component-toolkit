@@ -3,13 +3,18 @@
 
 export { getRawAnalyticsMetadata } from './testing-utils.js';
 export { getComponentsTree } from './page-scanner-utils.js';
+export type { GetComponentsTreeOptions, OptionItem, TabItem } from './page-scanner-utils.js';
 
 import { METADATA_DATA_ATTRIBUTE } from './attributes.js';
 import { GeneratedAnalyticsMetadata, GeneratedAnalyticsMetadataFragment } from './interfaces.js';
 import { findLogicalParent } from './dom-utils.js';
 import { mergeMetadata, processMetadata } from './metadata-utils.js';
+import type { GetComponentsTreeOptions } from './page-scanner-utils.js';
 
-export const getGeneratedAnalyticsMetadata = (target: HTMLElement | null): GeneratedAnalyticsMetadata => {
+export const getGeneratedAnalyticsMetadata = (
+  target: HTMLElement | null,
+  options?: GetComponentsTreeOptions
+): GeneratedAnalyticsMetadata => {
   let metadata: GeneratedAnalyticsMetadataFragment = {};
   let currentNode = target;
   while (currentNode) {
@@ -17,7 +22,7 @@ export const getGeneratedAnalyticsMetadata = (target: HTMLElement | null): Gener
       const currentMetadataString = currentNode.dataset[METADATA_DATA_ATTRIBUTE];
       if (currentMetadataString) {
         const currentMetadata = JSON.parse(currentMetadataString);
-        metadata = mergeMetadata(metadata, processMetadata(currentNode, currentMetadata));
+        metadata = mergeMetadata(metadata, processMetadata(currentNode, currentMetadata, options));
       }
     } catch {
       /* empty */

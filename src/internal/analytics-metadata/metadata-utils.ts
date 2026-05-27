@@ -3,6 +3,7 @@
 
 import { GeneratedAnalyticsMetadataFragment } from './interfaces.js';
 import { processLabel } from './labels-utils.js';
+import type { GetComponentsTreeOptions, OptionItem, TabItem } from './page-scanner-utils.js';
 
 export const mergeMetadata = (
   metadata: GeneratedAnalyticsMetadataFragment | null,
@@ -16,14 +17,18 @@ export const mergeMetadata = (
   return output;
 };
 
-export const processMetadata = (node: HTMLElement | null, localMetadata: any): GeneratedAnalyticsMetadataFragment => {
+export const processMetadata = (
+  node: HTMLElement | null,
+  localMetadata: any,
+  options?: GetComponentsTreeOptions
+): GeneratedAnalyticsMetadataFragment => {
   return Object.keys(localMetadata).reduce((acc: any, key: string) => {
     if (key.toLowerCase().match(/labels$/)) {
       acc[key] = processLabel(node, localMetadata[key], 'multi');
     } else if (key.toLowerCase().match(/label$/)) {
       acc[key] = processLabel(node, localMetadata[key], 'single');
     } else if (typeof localMetadata[key] !== 'string' && !Array.isArray(localMetadata[key])) {
-      acc[key] = processMetadata(node, localMetadata[key]);
+      acc[key] = processMetadata(node, localMetadata[key], options);
       if (key === 'properties' && localMetadata.name === 'awsui.Table') {
         const selectedItems = getTableSelectedItems(node);
         if (selectedItems.length) {
@@ -32,6 +37,30 @@ export const processMetadata = (node: HTMLElement | null, localMetadata: any): G
         const columns = getTableColumns(node);
         if (columns.length) {
           acc[key].columnLabels = columns;
+        }
+        if (options?.includeAllTableRows) {
+          const rows = getTableRows(node!);
+          if (rows.length) {
+            acc[key].rows = rows;
+          }
+        }
+      }
+      if (key === 'properties' && (localMetadata.name === 'awsui.RadioGroup' || localMetadata.name === 'awsui.Tiles')) {
+        const items = getRadioGroupOptions(node!);
+        if (items.length) {
+          acc[key].options = items;
+        }
+      }
+      if (key === 'properties' && localMetadata.name === 'awsui.Cards') {
+        const items = getCardsItems(node!);
+        if (items.length) {
+          acc[key].options = items;
+        }
+      }
+      if (key === 'properties' && localMetadata.name === 'awsui.Tabs') {
+        const tabs = getTabsItems(node!);
+        if (tabs.length) {
+          acc[key].tabs = tabs;
         }
       }
     } else {
@@ -94,4 +123,97 @@ const getTableColumns = (node: HTMLElement | null): string[] => {
         .map(cell => cell.textContent?.trim() || '')
         .filter(Boolean)
     : [];
+};
+
+const getTableRows = (node: HTMLElement): string[][] => {
+  const rows = Array.from(node.querySelectorAll('tbody tr'));
+  return rows
+    .map(row =>
+      Array.from(row.querySelectorAll('td, th'))
+        .filter(cell => !(cell as HTMLElement).querySelector('input[type="checkbox"], input[type="radio"]'))
+        .map(cell => cell.textContent?.trim() || '')
+        .filter(Boolean)
+    )
+    .filter(row => row.length > 0);
+};
+
+const resolveInputLabel = (root: HTMLElement, input: HTMLElement): string => {
+  const labelledBy = input.getAttribute('aria-labelledby');
+  if (labelledBy) {
+    const doc = root.ownerDocument || document;
+    const labelEl = doc.getElementById(labelledBy.split(' ')[0]);
+    if (labelEl?.textContent?.trim()) {
+      return labelEl.textContent.trim();
+    }
+  }
+  return input.getAttribute('aria-label') || '';
+};
+
+const resolveInputDescription = (root: HTMLElement, input: HTMLElement): string => {
+  const describedBy = input.getAttribute('aria-describedby');
+  if (describedBy) {
+    const doc = root.ownerDocument || document;
+    const descEl = doc.getElementById(describedBy.split(' ')[0]);
+    return descEl?.textContent?.trim() || '';
+  }
+  return '';
+};
+
+const getRadioGroupOptions = (node: HTMLElement): Array<OptionItem> => {
+  const inputs = Array.from(node.querySelectorAll('input[type="radio"]')) as HTMLElement[];
+  return inputs
+    .map(input => {
+      const value = input.getAttribute('value') || '';
+      const label = resolveInputLabel(node, input);
+      const description = resolveInputDescription(node, input);
+      const option: OptionItem = { value, label };
+      if (description) {
+        option.description = description;
+      }
+      return option;
+    })
+    .filter(opt => opt.value || opt.label);
+};
+
+const getCardsItems = (node: HTMLElement): Array<OptionItem> => {
+  const inputs = Array.from(node.querySelectorAll('input[type="checkbox"], input[type="radio"]')) as HTMLElement[];
+  return inputs
+    .map(input => {
+      const label = resolveInputLabel(node, input);
+      const description = resolveInputDescription(node, input);
+      let value = '';
+      const li = input.closest('li');
+      if (li) {
+        const metadataStr = (li as HTMLElement).dataset?.awsuiAnalytics;
+        if (metadataStr) {
+          try {
+            const meta = JSON.parse(metadataStr);
+            value = meta?.component?.innerContext?.item || '';
+          } catch {
+            /* empty */
+          }
+        }
+      }
+      const item: OptionItem = { value, label };
+      if (description) {
+        item.description = description;
+      }
+      return item;
+    })
+    .filter(opt => opt.value || opt.label);
+};
+
+const getTabsItems = (node: HTMLElement): Array<TabItem> => {
+  const tabs = Array.from(node.querySelectorAll('[role="tab"]')) as HTMLElement[];
+  return tabs
+    .map(tab => {
+      const id = tab.getAttribute('data-testid') || tab.id || '';
+      const label = tab.textContent?.trim() || tab.getAttribute('aria-label') || '';
+      const item: TabItem = { value: id, label };
+      if (tab.getAttribute('aria-disabled') === 'true') {
+        item.disabled = 'true';
+      }
+      return item;
+    })
+    .filter(tab => tab.label);
 };
