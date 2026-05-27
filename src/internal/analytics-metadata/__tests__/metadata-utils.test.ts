@@ -337,6 +337,110 @@ describe('processMetadata', () => {
 
     document.body.removeChild(mockDiv);
   });
+
+  test('extracts component description from aria-describedby on label element', () => {
+    const mockDiv = document.createElement('div');
+    mockDiv.innerHTML = `
+      <span id="desc-1">Must be 3-20 characters</span>
+      <input aria-describedby="desc-1" />
+    `;
+    document.body.appendChild(mockDiv);
+
+    const result: any = processMetadata(mockDiv, { name: 'awsui.Input', label: 'input' });
+    expect(result.description).toBe('Must be 3-20 characters');
+
+    document.body.removeChild(mockDiv);
+  });
+
+  test('concatenates multiple aria-describedby IDs', () => {
+    const mockDiv = document.createElement('div');
+    mockDiv.innerHTML = `
+      <span id="desc-a">Enter your work email</span>
+      <span id="desc-b">Must end with @amazon.com</span>
+      <input aria-describedby="desc-a desc-b" />
+    `;
+    document.body.appendChild(mockDiv);
+
+    const result: any = processMetadata(mockDiv, { name: 'awsui.Input', label: 'input' });
+    expect(result.description).toBe('Enter your work email Must end with @amazon.com');
+
+    document.body.removeChild(mockDiv);
+  });
+
+  test('does not extract description when label element has no aria-describedby', () => {
+    const mockDiv = document.createElement('div');
+    mockDiv.innerHTML = `
+      <label class="label">Form field label</label>
+      <div id="ff-desc">This is a description</div>
+      <input aria-describedby="ff-desc" />
+    `;
+    document.body.appendChild(mockDiv);
+
+    const result: any = processMetadata(mockDiv, { name: 'awsui.FormField', label: '.label' });
+    expect(result.description).toBeUndefined();
+
+    document.body.removeChild(mockDiv);
+  });
+
+  test('does not extract description when component has no label selector', () => {
+    const mockDiv = document.createElement('div');
+    mockDiv.innerHTML = `
+      <span id="desc-1">Some description</span>
+      <input aria-describedby="desc-1" />
+    `;
+    document.body.appendChild(mockDiv);
+
+    const result: any = processMetadata(mockDiv, { name: 'awsui.Input' });
+    expect(result.description).toBeUndefined();
+
+    document.body.removeChild(mockDiv);
+  });
+
+  test('does not extract description from child elements', () => {
+    const mockDiv = document.createElement('div');
+    mockDiv.innerHTML = `
+      <div id="ff-desc">This is a description</div>
+      <input aria-describedby="ff-desc" />
+    `;
+    document.body.appendChild(mockDiv);
+
+    const result: any = processMetadata(mockDiv, { name: 'awsui.FormField', label: '.label' });
+    expect(result.description).toBeUndefined();
+
+    document.body.removeChild(mockDiv);
+  });
+
+  test('skips missing IDs in aria-describedby', () => {
+    const mockDiv = document.createElement('div');
+    mockDiv.innerHTML = `
+      <span id="desc-exists">Constraint text</span>
+      <input aria-describedby="desc-missing desc-exists" />
+    `;
+    document.body.appendChild(mockDiv);
+
+    const result: any = processMetadata(mockDiv, { name: 'awsui.Input', label: 'input' });
+    expect(result.description).toBe('Constraint text');
+
+    document.body.removeChild(mockDiv);
+  });
+
+  test('extracts description when label is a LabelIdentifier with array selector', () => {
+    const mockDiv = document.createElement('div');
+    mockDiv.innerHTML = `
+      <span id="desc-1">Help text</span>
+      <span class="header">Title</span>
+      <button class="trigger" aria-describedby="desc-1">Select</button>
+    `;
+    document.body.appendChild(mockDiv);
+
+    const result: any = processMetadata(mockDiv, {
+      name: 'awsui.Select',
+      label: { selector: ['.header', '.trigger'] },
+    });
+    expect(result.description).toBe('Help text');
+
+    document.body.removeChild(mockDiv);
+  });
 });
 
 describe('merge', () => {
