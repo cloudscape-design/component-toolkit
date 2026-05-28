@@ -137,3 +137,32 @@ export function useRuntimeVisualRefresh() {
   }
   return visualRefreshState;
 }
+
+export enum Theme {
+  VisualRefresh = 'visual-refresh',
+  OneTheme = 'one-theme',
+}
+
+interface ThemeConfig {
+  className: string;
+  isFlagActive: () => boolean;
+}
+
+const THEMES: Record<Theme, ThemeConfig> = {
+  [Theme.VisualRefresh]: {
+    className: 'awsui-visual-refresh',
+    isFlagActive: () => !!getGlobal()?.[awsuiVisualRefreshFlag]?.(),
+  },
+  [Theme.OneTheme]: {
+    className: 'awsui-one-theme',
+    isFlagActive: () => !!getGlobalFlag('oneTheme'),
+  },
+};
+
+export function isThemeActive(theme: Theme): boolean {
+  const config = THEMES[theme];
+  if (typeof document !== 'undefined' && document.querySelector(`.${config.className}`)) {
+    return true;
+  }
+  return config.isFlagActive();
+}
