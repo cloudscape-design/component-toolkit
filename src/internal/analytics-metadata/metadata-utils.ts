@@ -22,7 +22,7 @@ export const processMetadata = (
   localMetadata: any,
   options?: GetComponentsTreeOptions
 ): GeneratedAnalyticsMetadataFragment => {
-  return Object.keys(localMetadata).reduce((acc: any, key: string) => {
+  const result: any = Object.keys(localMetadata).reduce((acc: any, key: string) => {
     if (key.toLowerCase().match(/labels$/)) {
       acc[key] = processLabel(node, localMetadata[key], 'multi');
     } else if (key.toLowerCase().match(/label$/)) {
@@ -68,6 +68,15 @@ export const processMetadata = (
     }
     return acc;
   }, {});
+
+  if (result.name && node && localMetadata.label) {
+    const description = resolveComponentDescription(node, localMetadata.label);
+    if (description) {
+      result.description = description;
+    }
+  }
+
+  return result;
 };
 
 const isNil = (value: any) => {
@@ -155,6 +164,31 @@ const resolveInputDescription = (root: HTMLElement, input: HTMLElement): string 
     const doc = root.ownerDocument || document;
     const descEl = doc.getElementById(describedBy.split(' ')[0]);
     return descEl?.textContent?.trim() || '';
+  }
+  return '';
+};
+
+const resolveComponentDescription = (node: HTMLElement, label: string | { selector?: string | string[] }): string => {
+  const selectors =
+    typeof label === 'string' ? [label] : Array.isArray(label.selector) ? label.selector : [label.selector || ''];
+  const doc = node.ownerDocument || document;
+  for (const selector of selectors) {
+    const el = selector ? node.querySelector(selector) : node;
+    if (!el) {
+      continue;
+    }
+    const describedBy = el.getAttribute('aria-describedby');
+    if (!describedBy) {
+      continue;
+    }
+    const description = describedBy
+      .split(' ')
+      .map(id => doc.getElementById(id)?.textContent?.trim() || '')
+      .filter(Boolean)
+      .join(' ');
+    if (description) {
+      return description;
+    }
   }
   return '';
 };

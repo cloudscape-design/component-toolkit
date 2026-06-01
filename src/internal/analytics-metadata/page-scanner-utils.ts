@@ -8,6 +8,7 @@ import { getGeneratedAnalyticsMetadata } from './utils.js';
 interface GeneratedAnalyticsMetadataComponentTree {
   name: string;
   label: string;
+  description?: string;
   properties?: Record<string, string | Array<string> | Array<Array<string>> | Array<OptionItem> | Array<TabItem>>;
   children?: Array<GeneratedAnalyticsMetadataComponentTree>;
 }
