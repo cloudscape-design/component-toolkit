@@ -21,6 +21,7 @@ describe('useVisualRefresh', () => {
   afterEach(() => {
     clearVisualRefreshState();
     expect(document.querySelector('.awsui-visual-refresh')).toBeFalsy();
+    expect(document.querySelector('.awsui-one-theme')).toBeFalsy();
   });
   afterEach(() => {
     clearMessageCache();
@@ -34,6 +35,12 @@ describe('useVisualRefresh', () => {
 
   test('should return true when class name is present', () => {
     document.body.classList.add('awsui-visual-refresh');
+    render(<App />);
+    expect(screen.getByTestId('current-mode')).toHaveTextContent('true');
+  });
+
+  test('should return true when awsui-one-theme class name is present', () => {
+    document.body.classList.add('awsui-one-theme');
     render(<App />);
     expect(screen.getByTestId('current-mode')).toHaveTextContent('true');
   });
@@ -79,6 +86,20 @@ describe('useVisualRefresh', () => {
     test('should return true when Window Symbol awsui-visual-refresh-flag returns false but class name is present', () => {
       document.body.classList.add('awsui-visual-refresh');
       window[awsuiVisualRefreshFlag] = () => false;
+      render(<App />);
+      expect(screen.getByTestId('current-mode')).toHaveTextContent('true');
+    });
+  });
+
+  describe('oneTheme global flag', () => {
+    const awsuiGlobalFlagsSymbol = Symbol.for('awsui-global-flags');
+
+    afterEach(() => {
+      delete (window as any)[awsuiGlobalFlagsSymbol];
+    });
+
+    test('should return true when oneTheme global flag is set', () => {
+      (window as any)[awsuiGlobalFlagsSymbol] = { oneTheme: true };
       render(<App />);
       expect(screen.getByTestId('current-mode')).toHaveTextContent('true');
     });

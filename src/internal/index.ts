@@ -14,6 +14,8 @@ export {
   useDensityMode,
   useReducedMotion,
   useRuntimeVisualRefresh,
+  isThemeActive,
+  Theme,
 } from './visual-mode/index.js';
 export { isDevelopment } from './is-development.js';
 export { warnOnce, clearMessageCache } from './logging.js';

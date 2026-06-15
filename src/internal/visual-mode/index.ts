@@ -7,7 +7,7 @@ import { createSingletonHandler } from '../singleton-handler/index.js';
 import { useStableCallback } from '../stable-callback/index.js';
 import { isDevelopment } from '../is-development.js';
 import { warnOnce } from '../logging.js';
-import { awsuiVisualRefreshFlag, getGlobal } from '../global-flags/index.js';
+import { awsuiVisualRefreshFlag, getGlobal, getGlobalFlag } from '../global-flags/index.js';
 import { safeMatchMedia } from '../utils/safe-match-media.js';
 
 export function isMotionDisabled(element: HTMLElement): boolean {
@@ -100,16 +100,17 @@ export function clearVisualRefreshState() {
   visualRefreshState = undefined;
   if (typeof document !== 'undefined') {
     document.body.classList.remove('awsui-visual-refresh');
+    document.body.classList.remove('awsui-one-theme');
   }
 }
 
 function detectVisualRefreshClassName() {
-  return typeof document !== 'undefined' && !!document.querySelector('.awsui-visual-refresh');
+  return typeof document !== 'undefined' && !!document.querySelector('.awsui-visual-refresh, .awsui-one-theme');
 }
 
 function detectVisualRefreshFlag() {
   const global = getGlobal();
-  return global?.[awsuiVisualRefreshFlag]?.() ?? false;
+  return global?.[awsuiVisualRefreshFlag]?.() ?? !!getGlobalFlag('oneTheme');
 }
 
 export function useRuntimeVisualRefresh() {
@@ -135,4 +136,33 @@ export function useRuntimeVisualRefresh() {
     }
   }
   return visualRefreshState;
+}
+
+export enum Theme {
+  VisualRefresh = 'visual-refresh',
+  OneTheme = 'one-theme',
+}
+
+interface ThemeConfig {
+  className: string;
+  isFlagActive: () => boolean;
+}
+
+const THEMES: Record<Theme, ThemeConfig> = {
+  [Theme.VisualRefresh]: {
+    className: 'awsui-visual-refresh',
+    isFlagActive: () => !!getGlobal()?.[awsuiVisualRefreshFlag]?.(),
+  },
+  [Theme.OneTheme]: {
+    className: 'awsui-one-theme',
+    isFlagActive: () => !!getGlobalFlag('oneTheme'),
+  },
+};
+
+export function isThemeActive(theme: Theme): boolean {
+  const config = THEMES[theme];
+  if (typeof document !== 'undefined' && document.querySelector(`.${config.className}`)) {
+    return true;
+  }
+  return config.isFlagActive();
 }

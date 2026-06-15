@@ -13,12 +13,15 @@ export interface PortalProps {
   children: React.ReactNode;
 }
 
-function manageDefaultContainer(setState: React.Dispatch<React.SetStateAction<Element | null>>) {
-  const newContainer = document.createElement('div');
-  document.body.appendChild(newContainer);
+function manageDefaultContainer(
+  ownerDocument: Document,
+  setState: React.Dispatch<React.SetStateAction<Element | null>>
+) {
+  const newContainer = ownerDocument.createElement('div');
+  ownerDocument.body.appendChild(newContainer);
   setState(newContainer);
   return () => {
-    document.body.removeChild(newContainer);
+    ownerDocument.body.removeChild(newContainer);
   };
 }
 
@@ -49,10 +52,17 @@ function manageAsyncContainer(
 
 /**
  * A safe react portal component that renders to a provided node.
- * If a node isn't provided, it creates one under document.body.
+ * If a node isn't provided, it creates one under the owner document's body,
+ * ensuring correct behavior inside iframes.
  */
-export default function Portal({ container, getContainer, removeContainer, children }: PortalProps) {
+export default function Portal({
+  container,
+  getContainer,
+  removeContainer,
+  children,
+}: PortalProps): React.ReactPortal | React.ReactElement | null {
   const [activeContainer, setActiveContainer] = useState<Element | null>(container ?? null);
+  const ref = React.useRef<HTMLSpanElement>(null);
 
   useLayoutEffect(() => {
     if (container) {
@@ -70,8 +80,18 @@ export default function Portal({ container, getContainer, removeContainer, child
     if (getContainer && removeContainer) {
       return manageAsyncContainer(getContainer, removeContainer, setActiveContainer);
     }
-    return manageDefaultContainer(setActiveContainer);
+
+    const ownerDocument = ref.current?.ownerDocument ?? document;
+    return manageDefaultContainer(ownerDocument, setActiveContainer);
   }, [container, getContainer, removeContainer]);
+
+  // On the first render, activeContainer is null because the layout effect hasn't
+  // created it yet. We render a hidden probe span so the effect can read
+  // ref.current.ownerDocument to discover the correct document (e.g. inside iframes).
+  // In SSR there's no document, so we return null to match the previous behavior.
+  if (!activeContainer && typeof document !== 'undefined') {
+    return <span ref={ref} style={{ display: 'none' }} />;
+  }
 
   return activeContainer && createPortal(children, activeContainer);
 }

@@ -8,8 +8,26 @@ import { getGeneratedAnalyticsMetadata } from './utils.js';
 interface GeneratedAnalyticsMetadataComponentTree {
   name: string;
   label: string;
-  properties?: Record<string, string | Array<string> | Array<Array<string>>>;
+  description?: string;
+  properties?: Record<string, string | Array<string> | Array<Array<string>> | Array<OptionItem> | Array<TabItem>>;
   children?: Array<GeneratedAnalyticsMetadataComponentTree>;
+}
+
+export interface OptionItem {
+  value: string;
+  label: string;
+  description?: string;
+}
+
+export interface TabItem {
+  value: string;
+  label: string;
+  disabled?: string;
+}
+
+export interface GetComponentsTreeOptions {
+  /** When true, include full table row data in awsui.Table properties. Default: false. */
+  includeAllTableRows?: boolean;
 }
 
 interface ComponentsMap {
@@ -85,15 +103,16 @@ const mergeComponentsMaps = (
 
 const getComponentsTreeRecursive = (
   componentNodes: Array<HTMLElement>,
-  parentsMap: Map<HTMLElement, Array<HTMLElement>>
+  parentsMap: Map<HTMLElement, Array<HTMLElement>>,
+  options?: GetComponentsTreeOptions
 ): Array<GeneratedAnalyticsMetadataComponentTree> => {
   const tree: Array<GeneratedAnalyticsMetadataComponentTree> = [];
   componentNodes.forEach(componentNode => {
     const treeItem: GeneratedAnalyticsMetadataComponentTree = {
-      ...getGeneratedAnalyticsMetadata(componentNode).contexts[0].detail,
+      ...getGeneratedAnalyticsMetadata(componentNode, options).contexts[0].detail,
     };
     const children = parentsMap.has(componentNode)
-      ? getComponentsTreeRecursive(parentsMap.get(componentNode)!, parentsMap)
+      ? getComponentsTreeRecursive(parentsMap.get(componentNode)!, parentsMap, options)
       : [];
     if (children.length > 0) {
       treeItem.children = children;
@@ -104,11 +123,12 @@ const getComponentsTreeRecursive = (
 };
 
 export const getComponentsTree = (
-  node: HTMLElement | Document | null = document
+  node: HTMLElement | Document | null = document,
+  options?: GetComponentsTreeOptions
 ): Array<GeneratedAnalyticsMetadataComponentTree> => {
   if (!node) {
     return [];
   }
   const { roots, parents } = buildComponentsMap(node);
-  return getComponentsTreeRecursive(roots, parents);
+  return getComponentsTreeRecursive(roots, parents, options);
 };
