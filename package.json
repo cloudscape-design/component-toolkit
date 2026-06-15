@@ -86,7 +86,7 @@
     "@types/react-dom": "^16.9.14",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^6.0.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.32.0",
@@ -107,7 +107,7 @@
     "sass": "^1.77.6",
     "ts-jest": "^29.1.5",
     "typescript": "^5.4.5",
-    "vite": "^6.4.2"
+    "vite": "^8.0.16"
   },
   "overrides": {
     "glob": "^10.5.0",
