@@ -92,63 +92,17 @@ function useMutationObserver(elementRef: React.RefObject<HTMLElement>, onChange:
   }, [handler]);
 }
 
-// We expect VR is to be set only once and before the application is rendered.
-let visualRefreshState: undefined | boolean = undefined;
-
-// for testing
-export function clearVisualRefreshState() {
-  visualRefreshState = undefined;
-  if (typeof document !== 'undefined') {
-    document.body.classList.remove('awsui-visual-refresh');
-    document.body.classList.remove('awsui-one-theme');
-  }
-}
-
-function detectVisualRefreshClassName() {
-  return typeof document !== 'undefined' && !!document.querySelector('.awsui-visual-refresh, .awsui-one-theme');
-}
-
-function detectVisualRefreshFlag() {
-  const global = getGlobal();
-  return global?.[awsuiVisualRefreshFlag]?.() ?? !!getGlobalFlag('oneTheme');
-}
-
-export function useRuntimeVisualRefresh() {
-  if (visualRefreshState === undefined) {
-    visualRefreshState = detectVisualRefreshClassName();
-    if (!visualRefreshState) {
-      if (detectVisualRefreshFlag()) {
-        visualRefreshState = true;
-        if (typeof document !== 'undefined') {
-          document.body.classList.add('awsui-visual-refresh');
-        }
-      }
-    }
-  }
-  if (isDevelopment) {
-    const newVisualRefreshState = detectVisualRefreshClassName() || detectVisualRefreshFlag();
-    if (newVisualRefreshState !== visualRefreshState) {
-      warnOnce(
-        'Visual Refresh',
-        'Dynamic visual refresh change detected. This is not supported. ' +
-          'Make sure `awsui-visual-refresh` is attached to the `<body>` element before initial React render'
-      );
-    }
-  }
-  return visualRefreshState;
-}
-
 export enum Theme {
   VisualRefresh = 'visual-refresh',
   OneTheme = 'one-theme',
 }
 
-interface ThemeConfig {
+interface ThemeDefinition {
   className: string;
   isFlagActive: () => boolean;
 }
 
-const THEMES: Record<Theme, ThemeConfig> = {
+const themeDefinitions: Record<Theme, ThemeDefinition> = {
   [Theme.VisualRefresh]: {
     className: 'awsui-visual-refresh',
     isFlagActive: () => !!getGlobal()?.[awsuiVisualRefreshFlag]?.(),
@@ -159,10 +113,54 @@ const THEMES: Record<Theme, ThemeConfig> = {
   },
 };
 
+const allThemes = Object.values(Theme);
+
+function hasThemeClassName(theme: Theme) {
+  return typeof document !== 'undefined' && !!document.querySelector(`.${themeDefinitions[theme].className}`);
+}
+
+// A theme is active if its body class or its global flag is set.
 export function isThemeActive(theme: Theme): boolean {
-  const config = THEMES[theme];
-  if (typeof document !== 'undefined' && document.querySelector(`.${config.className}`)) {
-    return true;
+  return hasThemeClassName(theme) || themeDefinitions[theme].isFlagActive();
+}
+
+function applyThemeClassName(theme: Theme) {
+  if (typeof document !== 'undefined' && !hasThemeClassName(theme) && themeDefinitions[theme].isFlagActive()) {
+    document.body.classList.add(themeDefinitions[theme].className);
   }
-  return config.isFlagActive();
+}
+
+export function initThemes() {
+  allThemes.forEach(applyThemeClassName);
+}
+
+let runtimeVisualRefresh: undefined | boolean = undefined;
+
+// for testing
+export function clearVisualRefreshState() {
+  runtimeVisualRefresh = undefined;
+  if (typeof document !== 'undefined') {
+    for (const theme of allThemes) {
+      document.body.classList.remove(themeDefinitions[theme].className);
+    }
+  }
+}
+
+export function useRuntimeVisualRefresh() {
+  if (runtimeVisualRefresh === undefined) {
+    initThemes();
+    // Visual refresh is active when either the visual refresh theme or the One Theme variant is active.
+    runtimeVisualRefresh = isThemeActive(Theme.VisualRefresh) || isThemeActive(Theme.OneTheme);
+  }
+  if (isDevelopment) {
+    const visualRefreshActive = isThemeActive(Theme.VisualRefresh) || isThemeActive(Theme.OneTheme);
+    if (visualRefreshActive !== runtimeVisualRefresh) {
+      warnOnce(
+        'Visual Refresh',
+        'Dynamic visual refresh change detected. This is not supported. ' +
+          'Make sure `awsui-visual-refresh` is attached to the `<body>` element before initial React render'
+      );
+    }
+  }
+  return runtimeVisualRefresh;
 }

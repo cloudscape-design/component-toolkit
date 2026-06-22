@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react';
-import { useRuntimeVisualRefresh, clearVisualRefreshState } from '../index';
+import { useRuntimeVisualRefresh, clearVisualRefreshState, initThemes } from '../index';
 import { render, screen } from '@testing-library/react';
 import { clearMessageCache } from '../../logging';
 
 const awsuiVisualRefreshFlag = Symbol.for('awsui-visual-refresh-flag');
+const awsuiGlobalFlagsSymbol = Symbol.for('awsui-global-flags');
 interface ExtendedWindow extends Window {
   [awsuiVisualRefreshFlag]?: () => boolean;
 }
@@ -92,8 +93,6 @@ describe('useVisualRefresh', () => {
   });
 
   describe('oneTheme global flag', () => {
-    const awsuiGlobalFlagsSymbol = Symbol.for('awsui-global-flags');
-
     afterEach(() => {
       delete (window as any)[awsuiGlobalFlagsSymbol];
     });
@@ -102,6 +101,46 @@ describe('useVisualRefresh', () => {
       (window as any)[awsuiGlobalFlagsSymbol] = { oneTheme: true };
       render(<App />);
       expect(screen.getByTestId('current-mode')).toHaveTextContent('true');
+    });
+
+    test('should add the awsui-one-theme body class when oneTheme global flag is set', () => {
+      (window as any)[awsuiGlobalFlagsSymbol] = { oneTheme: true };
+      render(<App />);
+      expect(document.body).toHaveClass('awsui-one-theme');
+    });
+
+    test('should not add the awsui-one-theme body class when oneTheme global flag is not set', () => {
+      window[awsuiVisualRefreshFlag] = () => true;
+      render(<App />);
+      expect(document.body).toHaveClass('awsui-visual-refresh');
+      expect(document.body).not.toHaveClass('awsui-one-theme');
+      window[awsuiVisualRefreshFlag] = undefined;
+    });
+  });
+
+  describe('initThemes', () => {
+    afterEach(() => {
+      delete (window as any)[awsuiGlobalFlagsSymbol];
+      window[awsuiVisualRefreshFlag] = undefined;
+    });
+
+    test('adds the visual refresh body class when its flag is set', () => {
+      window[awsuiVisualRefreshFlag] = () => true;
+      initThemes();
+      expect(document.body).toHaveClass('awsui-visual-refresh');
+      expect(document.body).not.toHaveClass('awsui-one-theme');
+    });
+
+    test('adds the one-theme body class when its flag is set', () => {
+      (window as any)[awsuiGlobalFlagsSymbol] = { oneTheme: true };
+      initThemes();
+      expect(document.body).toHaveClass('awsui-one-theme');
+    });
+
+    test('adds no theme body class when no flag is set', () => {
+      initThemes();
+      expect(document.body).not.toHaveClass('awsui-visual-refresh');
+      expect(document.body).not.toHaveClass('awsui-one-theme');
     });
   });
 });
