@@ -136,8 +136,8 @@ export function initThemes() {
 
 let runtimeVisualRefresh: undefined | boolean = undefined;
 
-// for testing
-export function clearVisualRefreshState() {
+// Resets applied theme state: removes every theme's body class and clears the memoized state.
+export function clearThemeState() {
   runtimeVisualRefresh = undefined;
   if (typeof document !== 'undefined') {
     for (const theme of allThemes) {
@@ -146,10 +146,16 @@ export function clearVisualRefreshState() {
   }
 }
 
+// @deprecated Use `clearThemeState` instead.
+export function clearVisualRefreshState() {
+  clearThemeState();
+}
+
 export function useRuntimeVisualRefresh() {
   if (runtimeVisualRefresh === undefined) {
     initThemes();
-    // Visual refresh is active when either the visual refresh theme or the One Theme variant is active.
+    // One Theme needs to activate the same visual refresh behavior as the
+    // Visual Refresh theme, so both themes count as visual refresh here.
     runtimeVisualRefresh = isThemeActive(Theme.VisualRefresh) || isThemeActive(Theme.OneTheme);
   }
   if (isDevelopment) {
@@ -157,8 +163,9 @@ export function useRuntimeVisualRefresh() {
     if (visualRefreshActive !== runtimeVisualRefresh) {
       warnOnce(
         'Visual Refresh',
-        'Dynamic visual refresh change detected. This is not supported. ' +
-          'Make sure `awsui-visual-refresh` is attached to the `<body>` element before initial React render'
+        'Dynamic theme change detected. This is not supported. ' +
+          'Make sure the theme class (e.g. `awsui-visual-refresh` or `awsui-one-theme`) is attached to ' +
+          'the `<body>` element before the initial React render.'
       );
     }
   }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react';
-import { useRuntimeVisualRefresh, clearVisualRefreshState, initThemes } from '../index';
+import { useRuntimeVisualRefresh, clearThemeState, initThemes } from '../index';
 import { render, screen } from '@testing-library/react';
 import { clearMessageCache } from '../../logging';
 
@@ -20,7 +20,7 @@ describe('useVisualRefresh', () => {
   }
 
   afterEach(() => {
-    clearVisualRefreshState();
+    clearThemeState();
     expect(document.querySelector('.awsui-visual-refresh')).toBeFalsy();
     expect(document.querySelector('.awsui-one-theme')).toBeFalsy();
   });
@@ -54,7 +54,7 @@ describe('useVisualRefresh', () => {
 
     document.body.classList.add('awsui-visual-refresh');
     rerender(<App />);
-    expect(console.warn).toHaveBeenCalledWith(expect.stringMatching(/Dynamic visual refresh change detected/));
+    expect(console.warn).toHaveBeenCalledWith(expect.stringMatching(/Dynamic theme change detected/));
     expect(screen.getByTestId('current-mode')).toHaveTextContent('false');
   });
 

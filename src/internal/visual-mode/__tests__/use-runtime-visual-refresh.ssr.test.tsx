@@ -41,5 +41,5 @@ test('prints a warning when feature flag changes between renders', () => {
   renderToStaticMarkup(<App />);
   globalWithFlags[awsuiVisualRefreshFlag] = () => false;
   renderToStaticMarkup(<App />);
-  expect(console.warn).toHaveBeenCalledWith(expect.stringMatching(/Dynamic visual refresh change detected/));
+  expect(console.warn).toHaveBeenCalledWith(expect.stringMatching(/Dynamic theme change detected/));
 });
