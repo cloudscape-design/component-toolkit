@@ -142,5 +142,21 @@ describe('useVisualRefresh', () => {
       expect(document.body).not.toHaveClass('awsui-visual-refresh');
       expect(document.body).not.toHaveClass('awsui-one-theme');
     });
+
+    test('applies only the highest-priority theme when multiple flags are set', () => {
+      window[awsuiVisualRefreshFlag] = () => true;
+      (window as any)[awsuiGlobalFlagsSymbol] = { oneTheme: true };
+      initThemes();
+      expect(document.body).toHaveClass('awsui-one-theme');
+      expect(document.body).not.toHaveClass('awsui-visual-refresh');
+    });
+
+    test('warns when multiple theme flags are enabled', () => {
+      jest.spyOn(console, 'warn').mockImplementation(() => {});
+      window[awsuiVisualRefreshFlag] = () => true;
+      (window as any)[awsuiGlobalFlagsSymbol] = { oneTheme: true };
+      initThemes();
+      expect(console.warn).toHaveBeenCalledWith(expect.stringMatching(/Multiple theme flags are enabled/));
+    });
   });
 });

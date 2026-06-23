@@ -97,6 +97,8 @@ export enum Theme {
   OneTheme = 'one-theme',
 }
 
+// When multiple theme flags are enabled, only the highest-priority (lower index) theme's body class is applied.
+const themePrecedence: Array<Theme> = [Theme.OneTheme, Theme.VisualRefresh];
 interface ThemeDefinition {
   className: string;
   isFlagActive: () => boolean;
@@ -131,7 +133,17 @@ function applyThemeClassName(theme: Theme) {
 }
 
 export function initThemes() {
-  allThemes.forEach(applyThemeClassName);
+  const flaggedThemes = themePrecedence.filter(theme => themeDefinitions[theme].isFlagActive());
+  if (isDevelopment && flaggedThemes.length > 1) {
+    warnOnce(
+      'Theme',
+      `Multiple theme flags are enabled (${flaggedThemes.join(', ')}). ` +
+        `Only the highest-priority theme (${flaggedThemes[0]}) is applied.`
+    );
+  }
+  if (flaggedThemes.length > 0) {
+    applyThemeClassName(flaggedThemes[0]);
+  }
 }
 
 let runtimeVisualRefresh: undefined | boolean = undefined;
