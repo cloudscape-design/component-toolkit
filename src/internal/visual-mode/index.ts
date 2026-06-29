@@ -92,63 +92,19 @@ function useMutationObserver(elementRef: React.RefObject<HTMLElement>, onChange:
   }, [handler]);
 }
 
-// We expect VR is to be set only once and before the application is rendered.
-let visualRefreshState: undefined | boolean = undefined;
-
-// for testing
-export function clearVisualRefreshState() {
-  visualRefreshState = undefined;
-  if (typeof document !== 'undefined') {
-    document.body.classList.remove('awsui-visual-refresh');
-    document.body.classList.remove('awsui-one-theme');
-  }
-}
-
-function detectVisualRefreshClassName() {
-  return typeof document !== 'undefined' && !!document.querySelector('.awsui-visual-refresh, .awsui-one-theme');
-}
-
-function detectVisualRefreshFlag() {
-  const global = getGlobal();
-  return global?.[awsuiVisualRefreshFlag]?.() ?? !!getGlobalFlag('oneTheme');
-}
-
-export function useRuntimeVisualRefresh() {
-  if (visualRefreshState === undefined) {
-    visualRefreshState = detectVisualRefreshClassName();
-    if (!visualRefreshState) {
-      if (detectVisualRefreshFlag()) {
-        visualRefreshState = true;
-        if (typeof document !== 'undefined') {
-          document.body.classList.add('awsui-visual-refresh');
-        }
-      }
-    }
-  }
-  if (isDevelopment) {
-    const newVisualRefreshState = detectVisualRefreshClassName() || detectVisualRefreshFlag();
-    if (newVisualRefreshState !== visualRefreshState) {
-      warnOnce(
-        'Visual Refresh',
-        'Dynamic visual refresh change detected. This is not supported. ' +
-          'Make sure `awsui-visual-refresh` is attached to the `<body>` element before initial React render'
-      );
-    }
-  }
-  return visualRefreshState;
-}
-
 export enum Theme {
   VisualRefresh = 'visual-refresh',
   OneTheme = 'one-theme',
 }
 
-interface ThemeConfig {
+// When multiple theme flags are enabled, only the highest-priority (lower index) theme's body class is applied.
+const themePrecedence: Array<Theme> = [Theme.OneTheme, Theme.VisualRefresh];
+interface ThemeDefinition {
   className: string;
   isFlagActive: () => boolean;
 }
 
-const THEMES: Record<Theme, ThemeConfig> = {
+const themeDefinitions: Record<Theme, ThemeDefinition> = {
   [Theme.VisualRefresh]: {
     className: 'awsui-visual-refresh',
     isFlagActive: () => !!getGlobal()?.[awsuiVisualRefreshFlag]?.(),
@@ -159,10 +115,71 @@ const THEMES: Record<Theme, ThemeConfig> = {
   },
 };
 
+const allThemes = Object.values(Theme);
+
+function hasThemeClassName(theme: Theme) {
+  return typeof document !== 'undefined' && !!document.querySelector(`.${themeDefinitions[theme].className}`);
+}
+
+// A theme is active if its body class or its global flag is set.
 export function isThemeActive(theme: Theme): boolean {
-  const config = THEMES[theme];
-  if (typeof document !== 'undefined' && document.querySelector(`.${config.className}`)) {
-    return true;
+  return hasThemeClassName(theme) || themeDefinitions[theme].isFlagActive();
+}
+
+function applyThemeClassName(theme: Theme) {
+  if (typeof document !== 'undefined' && !hasThemeClassName(theme) && themeDefinitions[theme].isFlagActive()) {
+    document.body.classList.add(themeDefinitions[theme].className);
   }
-  return config.isFlagActive();
+}
+
+export function initThemes() {
+  const flaggedThemes = themePrecedence.filter(theme => themeDefinitions[theme].isFlagActive());
+  if (isDevelopment && flaggedThemes.length > 1) {
+    warnOnce(
+      'Theme',
+      `Multiple theme flags are enabled (${flaggedThemes.join(', ')}). ` +
+        `Only the highest-priority theme (${flaggedThemes[0]}) is applied.`
+    );
+  }
+  if (flaggedThemes.length > 0) {
+    applyThemeClassName(flaggedThemes[0]);
+  }
+}
+
+let runtimeVisualRefresh: undefined | boolean = undefined;
+
+// Resets applied theme state: removes every theme's body class and clears the memoized state.
+export function clearThemeState() {
+  runtimeVisualRefresh = undefined;
+  if (typeof document !== 'undefined') {
+    for (const theme of allThemes) {
+      document.body.classList.remove(themeDefinitions[theme].className);
+    }
+  }
+}
+
+// @deprecated Use `clearThemeState` instead.
+export function clearVisualRefreshState() {
+  clearThemeState();
+}
+
+export function useRuntimeVisualRefresh() {
+  if (runtimeVisualRefresh === undefined) {
+    initThemes();
+    // One Theme needs to activate the same visual refresh behavior as the
+    // Visual Refresh theme, so both themes count as visual refresh here.
+    runtimeVisualRefresh = isThemeActive(Theme.VisualRefresh) || isThemeActive(Theme.OneTheme);
+  }
+  if (isDevelopment) {
+    const visualRefreshActive = isThemeActive(Theme.VisualRefresh) || isThemeActive(Theme.OneTheme);
+    if (visualRefreshActive !== runtimeVisualRefresh) {
+      warnOnce(
+        'Visual Refresh',
+        'Dynamic theme change detected. This is not supported. ' +
+          'Make sure the theme class (e.g. `awsui-visual-refresh` or `awsui-one-theme`) is attached to ' +
+          'the `<body>` element before the initial React render.'
+      );
+    }
+  }
+  return runtimeVisualRefresh;
 }

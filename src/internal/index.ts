@@ -14,6 +14,7 @@ export {
   useDensityMode,
   useReducedMotion,
   useRuntimeVisualRefresh,
+  initThemes,
   isThemeActive,
   Theme,
 } from './visual-mode/index.js';

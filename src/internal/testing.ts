@@ -4,7 +4,7 @@
 export { clearOneTimeMetricsCache } from './base-component/metrics/metrics.js';
 export { clearMessageCache } from './logging.js';
 export { setGlobalFlag } from './global-flags/index.js';
-export { clearVisualRefreshState } from './visual-mode/index.js';
+export { clearThemeState, clearVisualRefreshState } from './visual-mode/index.js';
 export {
   TestSingleTabStopNavigationProvider,
   setTestSingleTabStopNavigationTarget,
