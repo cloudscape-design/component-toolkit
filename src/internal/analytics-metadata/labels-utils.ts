@@ -160,5 +160,14 @@ export const getLabelFromElement = (element: HTMLElement | null): string => {
     }
   }
 
+  const id = element.getAttribute('id');
+  if (id) {
+    const associatedLabel = element.ownerDocument.querySelector(`label[for="${CSS.escape(id)}"]`);
+    const associatedText = associatedLabel?.textContent?.trim();
+    if (associatedText) {
+      return associatedText;
+    }
+  }
+
   return element.textContent ? element.textContent.trim() : '';
 };
