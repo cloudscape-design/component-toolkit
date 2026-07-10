@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { getTrackableValue, TrackBy } from '../track-by';
+import { getTrackableValue, TrackBy } from '../track-by/index.js';
 
 const ROOT_KEY = Symbol('selection-tree-root');
 

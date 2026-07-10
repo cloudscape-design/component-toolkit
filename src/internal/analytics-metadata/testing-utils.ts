@@ -1,9 +1,9 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { METADATA_DATA_ATTRIBUTE } from './attributes';
-import { GeneratedAnalyticsMetadataFragment, LabelIdentifier } from './interfaces';
-import { findLogicalParent } from './dom-utils';
+import { METADATA_DATA_ATTRIBUTE } from './attributes.js';
+import { GeneratedAnalyticsMetadataFragment, LabelIdentifier } from './interfaces.js';
+import { findLogicalParent } from './dom-utils.js';
 
 interface RawAnalyticsMetadata {
   metadata: Array<GeneratedAnalyticsMetadataFragment>;

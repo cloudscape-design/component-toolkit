@@ -1,9 +1,9 @@
 /**
  * @jest-environment node
  */
-/* eslint-disable header/header */
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
+
 import React from 'react';
 import { useRuntimeVisualRefresh, clearVisualRefreshState } from '../index';
 import { clearMessageCache } from '../../logging';
@@ -41,5 +41,5 @@ test('prints a warning when feature flag changes between renders', () => {
   renderToStaticMarkup(<App />);
   globalWithFlags[awsuiVisualRefreshFlag] = () => false;
   renderToStaticMarkup(<App />);
-  expect(console.warn).toHaveBeenCalledWith(expect.stringMatching(/Dynamic visual refresh change detected/));
+  expect(console.warn).toHaveBeenCalledWith(expect.stringMatching(/Dynamic theme change detected/));
 });

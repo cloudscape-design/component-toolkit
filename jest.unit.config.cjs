@@ -17,6 +17,9 @@ module.exports = merge({}, cloudscapePreset, {
       },
     ],
   },
-  setupFilesAfterEnv: ['<rootDir>/jest/unit-setup.js'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+  setupFilesAfterEnv: ['<rootDir>/jest/unit-setup.cjs'],
   testRegex: '(/__tests__/.*(\\.|/)test)\\.[jt]sx?$',
 });

@@ -1,9 +1,9 @@
 /**
  * @jest-environment node
  */
-/* eslint-disable header/header */
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
+
 import * as globalFlags from '../';
 import { awsuiGlobalFlagsSymbol, FlagsHolder } from '../';
 const { getGlobalFlag, setGlobalFlag } = globalFlags;

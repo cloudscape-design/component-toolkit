@@ -1,10 +1,10 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { getIsRtl } from '../direction';
+import { getIsRtl } from '../direction/index.js';
 
-import { KeyCode } from '../keycode';
-import { isHTMLElement, isSVGElement } from '../../dom/element-types';
+import { KeyCode } from '../keycode.js';
+import { isHTMLElement, isSVGElement } from '../../dom/element-types.js';
 
 export function isEventLike(event: any): event is EventLike {
   return isHTMLElement(event.currentTarget) || isSVGElement(event.currentTarget);

@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { isNode } from './element-types';
+import { isNode } from './element-types.js';
 
 /**
  * Checks whether the given node is a parent of the other descendant node.

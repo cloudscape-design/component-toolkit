@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useEffect } from 'react';
-import { Metrics } from './metrics/metrics';
-import { ComponentConfiguration, PackageSettings } from './metrics/interfaces';
+import { Metrics } from './metrics/metrics.js';
+import { ComponentConfiguration, PackageSettings } from './metrics/interfaces.js';
 
 export { ComponentConfiguration };
 

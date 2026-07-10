@@ -1,13 +1,8 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "target": "es2018",
-    "lib": ["es2018", "dom"],
     "types": ["node", "jest", "@testing-library/jest-dom"],
-    "moduleResolution": "node",
     "downlevelIteration": true,
-    "esModuleInterop": true,
-    "strict": true,
-    "jsx": "react",
     "noEmit": true,
     "resolveJsonModule": true
   },
