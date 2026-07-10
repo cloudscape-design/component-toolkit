@@ -118,6 +118,26 @@ describe('getLabelFromElement', () => {
     const target2 = container.querySelector('#target2');
     expect(getLabelFromElement(target2 as HTMLElement)).toEqual('content');
   });
+  test('returns text of an associated <label for> when the element has no text of its own', () => {
+    const { container } = render(
+      <div>
+        <label htmlFor="target">Column name</label>
+        <input id="target" type="checkbox" />
+      </div>
+    );
+    const target = container.querySelector('#target');
+    expect(getLabelFromElement(target as HTMLElement)).toEqual('Column name');
+  });
+  test('prefers aria-label over an associated <label for>', () => {
+    const { container } = render(
+      <div>
+        <label htmlFor="target">from label for</label>
+        <input id="target" type="checkbox" aria-label="from aria-label" />
+      </div>
+    );
+    const target = container.querySelector('#target');
+    expect(getLabelFromElement(target as HTMLElement)).toEqual('from aria-label');
+  });
 });
 
 describe('processLabel', () => {
