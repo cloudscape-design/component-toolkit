@@ -1,0 +1,74 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+@use '../../../src/internal/style-api' as style-api;
+
+// Two demo components exercise the two layers:
+//  - .panel uses the CARRIER layer, so descendants (.title/.body) read the re-anchored tokens.
+//  - .pill uses the PUBLIC layer, reading the tokens directly on the element the consumer themes.
+$panel-props: (
+  color-background,
+  color-border,
+  border-width,
+  border-radius,
+  color-text,
+  color-text-secondary
+);
+$pill-props: (
+  color-background,
+  color-border,
+  color-text,
+  border-radius
+);
+
+@include style-api.register(style-api.combine($panel-props, $pill-props));
+
+$panel: style-api.resolve($panel-props, carrier);
+$pill: style-api.resolve($pill-props, public);
+
+.panel {
+  @include style-api.carriers($panel-props); // re-anchor on the boundary so descendants can read the tokens
+  box-sizing: border-box;
+  max-inline-size: 360px;
+  background: var(#{style-api.read($panel, color-background)}, #445566);
+  border: var(#{style-api.read($panel, border-width)}, 1px) solid var(#{style-api.read($panel, color-border)}, #879596);
+  border-radius: var(#{style-api.read($panel, border-radius)}, 8px);
+  padding: 16px;
+}
+
+.title {
+  color: var(#{style-api.read($panel, color-text)}, #ffffff);
+  font-weight: 700;
+}
+
+.body {
+  margin-block-start: 8px;
+  color: var(#{style-api.read($panel, color-text-secondary)}, #ffffdd);
+}
+
+.pill {
+  box-sizing: border-box;
+  display: inline-block;
+  background: var(#{style-api.read($pill, color-background)}, #0972d3);
+  color: var(#{style-api.read($pill, color-text)}, #ffffff);
+  border: 1px solid var(#{style-api.read($pill, color-border)}, #0972d3);
+  border-radius: var(#{style-api.read($pill, border-radius)}, 20px);
+  padding: 4px 12px;
+}
+
+// Consumer theme overrides: set the shared public --awsui-style-* tokens.
+.theme-panel {
+  --awsui-style-color-background: #336688;
+  --awsui-style-color-text: #ffffaa;
+  --awsui-style-color-text-secondary: #cccc44;
+  --awsui-style-color-border: #cccc44;
+  --awsui-style-border-width: 2px;
+  --awsui-style-border-radius: 4px;
+}
+
+.theme-pill {
+  --awsui-style-color-background: #c2185b;
+  --awsui-style-color-text: #ffffff;
+  --awsui-style-color-border: #c2185b;
+  --awsui-style-border-radius: 4px;
+}

@@ -57,9 +57,10 @@
   "scripts": {
     "prebuild": "rm -rf lib",
     "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.cjs.json",
-    "postbuild": "npm run postbuild:root && npm run postbuild:focus-visible && node ./scripts/generate-deep-package.js",
+    "postbuild": "npm run postbuild:root && npm run postbuild:focus-visible && npm run postbuild:style-api && node ./scripts/generate-deep-package.js",
     "postbuild:root": "cp package.json README.md LICENSE NOTICE lib",
     "postbuild:focus-visible": "cp ./src/internal/focus-visible/index.scss lib/internal/focus-visible/index.scss",
+    "postbuild:style-api": "mkdir -p lib/internal/style-api && cp ./src/internal/style-api/index.scss lib/internal/style-api/index.scss",
     "test-pages": "vite --config ./test-pages/vite.config.mts",
     "test:unit": "jest -c jest.unit.config.cjs",
     "test:integ": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest -c jest.integ.config.cjs",
