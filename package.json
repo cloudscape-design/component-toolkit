@@ -18,6 +18,13 @@
       "require": "./internal/index.js",
       "default": "./mjs/internal/index.js"
     },
+    "./internal/focus-visible": {
+      "sass": "./internal/focus-visible/index.scss",
+      "style": "./internal/focus-visible/index.scss",
+      "require": "./internal/focus-visible/index.js",
+      "default": "./mjs/internal/focus-visible/index.js"
+    },
+    "./internal/style-api": "./internal/style-api/index.scss",
     "./internal/metrics": {
       "require": "./internal/metrics.js",
       "default": "./mjs/internal/metrics.js"
