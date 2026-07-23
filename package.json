@@ -25,6 +25,10 @@
       "default": "./mjs/internal/focus-visible/index.js"
     },
     "./internal/style-api": "./internal/style-api/index.scss",
+    "./internal/style-api/docs": {
+      "require": "./internal/style-api/docs.js",
+      "default": "./mjs/internal/style-api/docs.js"
+    },
     "./internal/metrics": {
       "require": "./internal/metrics.js",
       "default": "./mjs/internal/metrics.js"

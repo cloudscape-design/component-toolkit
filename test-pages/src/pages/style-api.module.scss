@@ -6,28 +6,16 @@
 // Two demo components exercise the two layers:
 //  - .panel uses the CARRIER layer, so descendants (.title/.body) read the re-anchored tokens.
 //  - .pill uses the PUBLIC layer, reading the tokens directly on the element the consumer themes.
-$panel-props: (
-  color-background,
-  color-border,
-  border-width,
-  border-radius,
-  color-text,
-  color-text-secondary
-);
-$pill-props: (
-  color-background,
-  color-border,
-  color-text,
-  border-radius
-);
+// Token names are written once, in resolve(); register/slot/carriers/read all reuse the same maps.
+$panel: style-api.resolve((color-background, color-border, border-width, border-radius, color-text, color-text-secondary), carrier);
+$pill: style-api.resolve((color-background, color-border, color-text, border-radius), public);
 
-@include style-api.register(style-api.combine($panel-props, $pill-props));
-
-$panel: style-api.resolve($panel-props, carrier);
-$pill: style-api.resolve($pill-props, public);
+@include style-api.register($panel, $pill);
+@include style-api.docs('panel', $panel);
+@include style-api.docs('pill', $pill);
 
 .panel {
-  @include style-api.carriers($panel-props); // re-anchor on the boundary so descendants can read the tokens
+  @include style-api.carriers($panel); // re-anchor on the boundary so descendants can read the tokens
   box-sizing: border-box;
   max-inline-size: 360px;
   background: var(#{style-api.read($panel, color-background)}, #445566);

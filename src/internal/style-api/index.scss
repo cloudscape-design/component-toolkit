@@ -7,53 +7,50 @@
 @use 'sass:list';
 @use 'sass:string';
 
-// Style API v2 authoring utils for shared, component-agnostic style tokens (e.g. --awsui-style-color-text,
-// not --awsui-style-button-color-text). The owning component is implied by where the consumer applies the
-// class, so one abstract token name is reused across components and shared token groups can be composed.
+// Style API v2 authoring utils for shared, component-agnostic style tokens (e.g. color-text,
+// color-background). Each public token is exposed as a `--awsui-style-<token>` custom property,
+// registered as `@property { syntax:'*'; inherits:false }`. A slot can read a token in one of two layers:
+//  - PUBLIC layer: read the public token directly, on the element the consumer themes (single-element slots).
+//  - CARRIER layer: mirror the public token into an inherited internal carrier `--awsui-internal-style-<token>`
+//    re-anchored on the component root (carriers() mixin), so descendants can read it per instance.
 //
-// Model: each public token `--awsui-style-<prop>` is registered `@property { syntax:'*'; inherits:false }`.
-// A component resolves its prop set into a <prop> -> custom-property map for one of two LAYERS, then reads via
-// `var(#{read($tokens, <prop>)}, <default>)` (uniform at every read site):
+// The reusable primitive is a per-slot token map produced by resolve() (`token -> custom-property`). Write
+// each slot's token names once in resolve(); then register(), docs() and read() all consume the same maps —
+// so the docs can never drift from the implementation, and a map can be shared by several slots.
 //
-//  - PUBLIC layer: read the public token directly, on the element the consumer themes. It doesn't inherit, so
-//    it can't pick up an ancestor component's value. Use for single-element components (e.g. a button).
-//  - CARRIER layer: the public token is mirrored into an INHERITED internal carrier `--awsui-internal-style-<prop>`
-//    re-anchored on the component root (carriers() mixin), so descendants can read it. Each root re-anchors from
-//    its own (unset) public token, so values scope to the instance and reset at every nested boundary — no
-//    leakage. Registrations are byte-identical across components, so order-independent.
-//
-// Example:
+// Flow (public layer):
 //
 //   @use '@cloudscape-design/component-toolkit/internal/style-api' as style-api;
 //
-//   $props: style-api.combine((color-background, color-text), (icon-color)); // 1. union token lists (deduped)
-//   $tokens: style-api.resolve($props, carrier);             // 2. map for the carrier layer -> pass to read()
-//   @include style-api.register($props);                     // 3. declare the public @property (top level, once)
+//   $root: style-api.resolve((color-background), public);   // 1. token names written once, per slot
+//   $info: style-api.resolve((color-text), public);
+//   @include style-api.register($root, $text);              // 2. declare @property for every token (once)
 //
-//   .alert-root {
-//     @include style-api.carriers($props);                   // 4. re-anchor public -> internal on the boundary
-//     color: var(#{style-api.read($tokens, color-text)}, #16191f); // 5. apply token (default via awsui.$… in a real component)
-//   }
+//   @include style-api.docs('root', $root);                 // 3. declare the slots (docs only, top level)
+//   @include style-api.docs('info', $info);
 //
-// A consumer themes an instance by setting the public token on a class applied to the component:
-//   .my-alert { --awsui-style-color-text: light-dark(black, white); }
+//   .root  { background: var(#{style-api.read($root, color-background)}, …); }   // 4. apply the tokens
+//   .info { color: var(#{style-api.read($info, color-text)}, …); }
+//
+// Carrier layer: resolve($tokens, carrier) and `@include style-api.carriers($map)` on the boundary element.
 
-// 1. Deduped union of token lists.
+// Deduped union of token lists — for composing shared token groups before resolve().
 @function combine($lists...) {
   $result: ();
   @each $list in $lists {
-    @each $prop in $list {
-      @if not list.index($result, $prop) {
-        $result: list.append($result, $prop);
+    @each $token in $list {
+      @if not list.index($result, $token) {
+        $result: list.append($result, $token);
       }
     }
   }
   @return $result;
 }
 
-// 2. Resolves `$props` into a <prop> -> custom-property map for `$layer` (`public` or `carrier`), consumed by
-// read() at read sites. `$layer` is required so the layer choice is always explicit at the call site.
-@function resolve($props, $layer) {
+// Resolves `$tokens` (a token name or list of token names) into a `token -> custom-property` map for
+// `$layer` (`public` or `carrier`), consumed by docs(), read() and carriers(). `$layer` is required
+// so the layer choice is always explicit at the definition site.
+@function resolve($tokens, $layer) {
   @if $layer != public and $layer != carrier {
     @error 'Unknown layer "#{$layer}". Use `public` or `carrier`.';
   }
@@ -61,36 +58,49 @@
   @if $layer == public {
     $prefix: '--awsui-style-';
   }
-  $tokens: ();
-  @each $prop in $props {
-    $tokens: map.set($tokens, $prop, string.unquote('#{$prefix}#{$prop}'));
+  $map: ();
+  @each $token in $tokens {
+    $map: map.set($map, $token, string.unquote('#{$prefix}#{$token}'));
   }
-  @return $tokens;
+  @return $map;
 }
 
-// 3. Registers the public tokens as non-inheriting @property. Top level only.
-@mixin register($props) {
-  @each $prop in $props {
-    @property --awsui-style-#{$prop} {
-      syntax: '*';
-      inherits: false;
+// Registers the public tokens of the given slot maps as non-inheriting @property. Top level, once.
+// Accepts every slot's map so the registered set is exactly the union of the tokens the slots use.
+@mixin register($maps...) {
+  $seen: ();
+  @each $map in $maps {
+    @each $token in map.keys($map) {
+      @if not list.index($seen, $token) {
+        $seen: list.append($seen, $token);
+        @property --awsui-style-#{$token} {
+          syntax: '*';
+          inherits: false;
+        }
+      }
     }
   }
 }
 
-// 4. Re-anchors each public token into its inherited internal carrier. Include on the component's root; pair
-// with a `resolve($props, carrier)` map so descendants read the re-anchored values.
-@mixin carriers($props) {
-  @each $prop in $props {
-    --awsui-internal-style-#{$prop}: var(--awsui-style-#{$prop});
+// Re-anchors each token of a carrier map into its inherited internal carrier. Include on the
+// component's boundary element; descendants read the re-anchored values via the same map.
+@mixin carriers($map) {
+  @each $token in map.keys($map) {
+    --awsui-internal-style-#{$token}: var(--awsui-style-#{$token});
   }
 }
 
-// 5. The custom-property to read for `$prop`, looked up in the given map. Errors at compile time on an
-// undeclared prop (a typo, or a token the component never composed into its set).
-@function read($tokens, $prop) {
-  @if not map.has-key($tokens, $prop) {
-    @error 'Unknown style token "#{$prop}". Declared: #{map.keys($tokens)}.';
+// The custom-property to read for `$token`, looked up in a slot map. Errors at compile time on an
+// unknown token (a typo, or a token not in this slot's set).
+@function read($map, $token) {
+  @if not map.has-key($map, $token) {
+    @error 'Unknown style token "#{$token}". This slot declares: #{map.keys($map)}.';
   }
-  @return map.get($tokens, $prop);
+  @return map.get($map, $token);
+}
+
+// Documents a themeable slot (emits docs only — no styling effect), from the slot map.
+// The `$name` must match the component's `classNames` property entry.
+@mixin docs($name, $map) {
+  /* awsui:style-api-slot name=#{$name} tokens=#{map.keys($map)} */
 }
