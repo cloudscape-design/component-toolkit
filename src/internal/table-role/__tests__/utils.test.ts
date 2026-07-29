@@ -1,11 +1,12 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
+
 import {
   findClosestCellByAriaColIndex,
   findNextCell,
   findTableRowCellByAriaColIndex,
   getAllCellsInRow,
-} from '../utils';
+} from '../utils.js';
 
 function createCell(colIndex: number, colspan = 1, rowspan = 1): HTMLTableCellElement {
   const cell = document.createElement('td');

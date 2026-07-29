@@ -4,8 +4,8 @@
 import React, { useRef } from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 
-import { KeyCode } from '../../../../lib/components/internal/keycode';
-import { GridNavigationProvider } from '../../../../lib/components/table/table-role';
+import { KeyCode } from '../../keycode.js';
+import { GridNavigationProvider } from '../index.js';
 import { actionsColumn, Button, Cell, idColumn, items, nameColumn, TestTable, valueColumn } from './stubs';
 
 function readActiveElement() {

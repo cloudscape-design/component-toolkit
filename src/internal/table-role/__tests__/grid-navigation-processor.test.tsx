@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { GridNavigationProcessor } from '../../../../lib/components/table/table-role/grid-navigation';
+import { GridNavigationProcessor } from '../grid-navigation.js';
 
 describe('GridNavigationProcessor', () => {
   test('does not throw when not initialized', () => {

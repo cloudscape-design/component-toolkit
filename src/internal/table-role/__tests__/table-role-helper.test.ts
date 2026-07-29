@@ -8,7 +8,7 @@ import {
   getTableRoleProps,
   getTableRowRoleProps,
   getTableWrapperRoleProps,
-} from '../../../../lib/components/table/table-role';
+} from '../index.js';
 
 test('non-scrollable table props', () => {
   const tableRole = 'table';

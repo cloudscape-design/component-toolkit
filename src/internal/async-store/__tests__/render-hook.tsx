@@ -1,29 +1,20 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
+
 import React from 'react';
 import { render } from '@testing-library/react';
 
 export { act } from '@testing-library/react';
 
 /**
- * This file is a port of `renderHook` from @testing-library/react lib
- * The API is only available in v13+, which also requires React v18
+ * Minimal port of `renderHook` from @testing-library/react (native version needs v13+).
+ * Supports the no-options usage exercised by the async-store tests.
  */
-
-export interface RenderHookOptions<Props> {
-  initialProps?: Props;
-  wrapper?: React.JSXElementConstructor<{ children: React.ReactElement }>;
-}
-
-export function renderHook<Result, Props>(
-  renderCallback: (initialProps: Props) => Result,
-  options: RenderHookOptions<Props> = {}
-) {
-  const { initialProps, wrapper } = options;
+export function renderHook<Result>(renderCallback: () => Result) {
   const result = React.createRef<Result>() as React.MutableRefObject<Result>;
 
-  function TestComponent({ renderCallbackProps }: { renderCallbackProps: Props }) {
-    const pendingResult = renderCallback(renderCallbackProps);
+  function TestComponent() {
+    const pendingResult = renderCallback();
 
     React.useEffect(() => {
       result.current = pendingResult;
@@ -32,13 +23,7 @@ export function renderHook<Result, Props>(
     return null;
   }
 
-  const { rerender: baseRerender, unmount } = render(<TestComponent renderCallbackProps={initialProps!} />, {
-    wrapper,
-  });
-
-  function rerender(rerenderCallbackProps: Props) {
-    return baseRerender(<TestComponent renderCallbackProps={rerenderCallbackProps} />);
-  }
+  const { rerender, unmount } = render(<TestComponent />);
 
   return { result, rerender, unmount };
 }

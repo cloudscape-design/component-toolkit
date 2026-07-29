@@ -1,9 +1,10 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
+
 import { useLayoutEffect, useState } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 
-import { usePrevious } from '../../internal/hooks/use-previous';
+import { usePrevious } from './use-previous.js';
 
 type Selector<S, R> = (state: S) => R;
 type Listener<S> = (state: S, prevState: S) => void;

@@ -4,17 +4,14 @@
 import React, { useRef } from 'react';
 import { useEffect, useMemo } from 'react';
 
-import { useStableCallback } from '@cloudscape-design/component-toolkit/internal';
-import {
-  SingleTabStopNavigationAPI,
-  SingleTabStopNavigationProvider,
-} from '@cloudscape-design/component-toolkit/internal';
+import { useStableCallback } from '../stable-callback/index.js';
+import { SingleTabStopNavigationAPI, SingleTabStopNavigationProvider } from '../single-tab-stop/index.js';
 
-import { getAllFocusables } from '../../internal/components/focus-lock/utils';
-import { KeyCode } from '../../internal/keycode';
-import handleKey, { isEventLike } from '../../internal/utils/handle-key';
-import { nodeBelongs } from '../../internal/utils/node-belongs';
-import { FocusedCell, GridNavigationProps } from './interfaces';
+import { getAllFocusables } from '../focus-lock-utils/utils.js';
+import { KeyCode } from '../keycode.js';
+import handleKey, { isEventLike } from '../utils/handle-key.js';
+import nodeBelongs from '../../dom/node-belongs.js';
+import { FocusedCell, GridNavigationProps } from './interfaces.js';
 import {
   defaultIsSuppressed,
   findNextCell,
@@ -23,13 +20,18 @@ import {
   getClosestCell,
   isElementDisabled,
   isTableCell,
-} from './utils';
+} from './utils.js';
 
 /**
  * Makes table navigable with keyboard commands.
  * See grid-navigation.md
  */
-export function GridNavigationProvider({ keyboardNavigation, pageSize, getTable, children }: GridNavigationProps) {
+export function GridNavigationProvider({
+  keyboardNavigation,
+  pageSize,
+  getTable,
+  children,
+}: GridNavigationProps): React.ReactElement {
   const navigationAPI = useRef<SingleTabStopNavigationAPI>(null);
   const gridNavigation = useMemo(() => new GridNavigationProcessor(navigationAPI), []);
 

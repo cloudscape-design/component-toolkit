@@ -3,9 +3,9 @@
 
 import React, { useRef, useState } from 'react';
 
-import { useSingleTabStopNavigation } from '@cloudscape-design/component-toolkit/internal';
+import { useSingleTabStopNavigation } from '../../single-tab-stop/index.js';
 
-import { GridNavigationProvider } from '../../../../lib/components/table/table-role';
+import { GridNavigationProvider } from '../index.js';
 
 export interface Item {
   id: string;
