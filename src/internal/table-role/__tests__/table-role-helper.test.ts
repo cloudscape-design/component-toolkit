@@ -90,6 +90,14 @@ test('table row and cell props', () => {
   expect(bodyCell2).toEqual({});
 });
 
+test('table body row includes aria-rowindex only when windowed (firstIndex set)', () => {
+  const tableRole = 'table';
+  // First frame (no firstIndex): plain tables omit aria-rowindex.
+  expect(getTableRowRoleProps({ tableRole, rowIndex: 0 })).toEqual({});
+  // Windowed frame: aria-rowindex = firstIndex + rowIndex + headerRows(1).
+  expect(getTableRowRoleProps({ tableRole, rowIndex: 2, firstIndex: 100 })).toEqual({ 'aria-rowindex': 103 });
+});
+
 test.each(['grid', 'treegrid'] as const)('%s row and cell props', tableRole => {
   const headerRow = getTableHeaderRowRoleProps({ tableRole });
   const headerCell1 = getTableColHeaderRoleProps({ tableRole, colIndex: 0, sortingStatus: 'ascending' });
