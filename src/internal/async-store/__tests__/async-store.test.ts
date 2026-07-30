@@ -4,7 +4,7 @@
 import { act, renderHook } from './render-hook';
 import AsyncStore, { useReaction, useSelector } from '../index.js';
 
-describe('AreaChart AsyncStore', () => {
+describe('AsyncStore', () => {
   it('notifies listeners when selected state is updated', () => {
     const store = new AsyncStore({ a: 1, b: 2 });
 
