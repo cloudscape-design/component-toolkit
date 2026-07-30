@@ -13,7 +13,7 @@ The list of supported navigation commands is:
 - `Down Arrow`: Moves focus one cell down. The focus does not move if it is already on the bottom row. When the focus is on the nth element inside a cell the element index is maintained (when possible) when moving down.
 - `Up Arrow`: Moves focus one cell up. The focus does not move if it is already on the top row. When the focus is on the nth element inside a cell the element index is maintained (when possible) when moving up.
 - `Page Down`: Moves focus down by one page (the page size is set as 10). The focus does not move if it is already on the bottom row. When the focus is on the nth element inside a cell the element index is maintained (when possible) when moving down.
-- `Page Up`: Moves focus up by one page (the page size is set as 10). The focus does not move if it is already on the top row. When the focus is on the nth element inside a cell the element index is maintained (when possible) when moving down.
+- `Page Up`: Moves focus up by one page (the page size is set as 10). The focus does not move if it is already on the top row. When the focus is on the nth element inside a cell the element index is maintained (when possible) when moving up.
 - `Home`: moves focus to the first cell or element in the row.
 - `End`: moves focus to the last cell or element in the row.
 - `Control + Home`: moves focus to the first cell or element in the first row.
