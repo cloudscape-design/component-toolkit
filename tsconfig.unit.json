@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "lib": ["es2021", "dom", "dom.iterable"],
     "types": ["node", "jest", "@testing-library/jest-dom"],
     "downlevelIteration": true,
     "noEmit": true,
