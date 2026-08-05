@@ -14,6 +14,14 @@
       "require": "./dom/index.js",
       "default": "./mjs/dom/index.js"
     },
+    "./analytics-metadata": {
+      "require": "./analytics-metadata/index.js",
+      "default": "./mjs/analytics-metadata/index.js"
+    },
+    "./analytics-metadata/utils": {
+      "require": "./analytics-metadata/utils.js",
+      "default": "./mjs/analytics-metadata/utils.js"
+    },
     "./internal": {
       "require": "./internal/index.js",
       "default": "./mjs/internal/index.js"
@@ -61,7 +69,9 @@
       "internal": ["./mjs/internal/index.d.ts"],
       "internal/*": ["./mjs/internal/*"],
       "dom": ["./mjs/dom/index.d.ts"],
-      "dom/*": ["./mjs/dom/*"]
+      "dom/*": ["./mjs/dom/*"],
+      "analytics-metadata": ["./mjs/analytics-metadata/index.d.ts"],
+      "analytics-metadata/*": ["./mjs/analytics-metadata/*"]
     }
   },
   "repository": {
