@@ -3,7 +3,7 @@
 
 export type Breakpoint = 'default' | 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl';
 
-const BREAKPOINT_MAPPING: [Breakpoint, number][] = [
+export const breakpoints: [Breakpoint, number][] = [
   ['xl', 1840],
   ['l', 1320],
   ['m', 1120],
@@ -12,5 +12,3 @@ const BREAKPOINT_MAPPING: [Breakpoint, number][] = [
   ['xxs', 465],
   ['default', -1],
 ];
-
-export const mobileBreakpoint = BREAKPOINT_MAPPING.filter(b => b[0] === 'xs')[0][1];
