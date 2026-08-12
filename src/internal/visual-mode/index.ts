@@ -132,8 +132,22 @@ function applyThemeClassName(theme: Theme) {
   }
 }
 
-export function initThemes() {
-  const flaggedThemes = themePrecedence.filter(theme => themeDefinitions[theme].isFlagActive());
+export interface InitThemesOptions {
+  /**
+   * When true, skip applying the visual-refresh body class.
+   * Use this for packages where visual refresh styles are always active (ALWAYS_VISUAL_REFRESH mode),
+   * so the body class is unnecessary — only one-theme class will be applied.
+   */
+  skipVisualRefresh?: boolean;
+}
+
+export function initThemes(options?: InitThemesOptions) {
+  const flaggedThemes = themePrecedence.filter(theme => {
+    if (options?.skipVisualRefresh && theme === Theme.VisualRefresh) {
+      return false;
+    }
+    return themeDefinitions[theme].isFlagActive();
+  });
   if (isDevelopment && flaggedThemes.length > 1) {
     warnOnce(
       'Theme',

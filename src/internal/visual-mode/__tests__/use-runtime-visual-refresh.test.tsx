@@ -158,5 +158,31 @@ describe('useVisualRefresh', () => {
       initThemes();
       expect(console.warn).toHaveBeenCalledWith(expect.stringMatching(/Multiple theme flags are enabled/));
     });
+
+    test('skips visual-refresh class when skipVisualRefresh is true', () => {
+      window[awsuiVisualRefreshFlag] = () => true;
+      initThemes({ skipVisualRefresh: true });
+      expect(document.body).not.toHaveClass('awsui-visual-refresh');
+    });
+
+    test('adds one-theme class when skipVisualRefresh is true and oneTheme flag is set', () => {
+      (window as any)[awsuiGlobalFlagsSymbol] = { oneTheme: true };
+      initThemes({ skipVisualRefresh: true });
+      expect(document.body).toHaveClass('awsui-one-theme');
+    });
+
+    test('adds one-theme class and skips visual-refresh when both flags set and skipVisualRefresh is true', () => {
+      window[awsuiVisualRefreshFlag] = () => true;
+      (window as any)[awsuiGlobalFlagsSymbol] = { oneTheme: true };
+      initThemes({ skipVisualRefresh: true });
+      expect(document.body).toHaveClass('awsui-one-theme');
+      expect(document.body).not.toHaveClass('awsui-visual-refresh');
+    });
+
+    test('does not skip visual-refresh class when skipVisualRefresh is false', () => {
+      window[awsuiVisualRefreshFlag] = () => true;
+      initThemes({ skipVisualRefresh: false });
+      expect(document.body).toHaveClass('awsui-visual-refresh');
+    });
   });
 });
