@@ -18,6 +18,10 @@
       "require": "./analytics-metadata/index.js",
       "default": "./mjs/analytics-metadata/index.js"
     },
+    "./api-gen": {
+      "require": "./api-gen/index.js",
+      "default": "./mjs/api-gen/index.js"
+    },
     "./analytics-metadata/utils": {
       "require": "./analytics-metadata/utils.js",
       "default": "./mjs/analytics-metadata/utils.js"
@@ -75,7 +79,8 @@
       "dom": ["./mjs/dom/index.d.ts"],
       "dom/*": ["./mjs/dom/*"],
       "analytics-metadata": ["./mjs/analytics-metadata/index.d.ts"],
-      "analytics-metadata/*": ["./mjs/analytics-metadata/*"]
+      "analytics-metadata/*": ["./mjs/analytics-metadata/*"],
+      "api-gen": ["./mjs/api-gen/index.d.ts"]
     }
   },
   "repository": {
@@ -98,6 +103,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "ts-morph": "^28.0.0",
     "tslib": "^2.3.1",
     "weekstart": "^2.0.0"
   },
@@ -112,6 +118,7 @@
     "@testing-library/react": "^11.2.7",
     "@tony.ganchev/eslint-plugin-header": "^3.3.1",
     "@types/jest": "^29.5.12",
+    "@types/node": "^26.2.0",
     "@types/react": "^16.14.20",
     "@types/react-dom": "^16.9.14",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
