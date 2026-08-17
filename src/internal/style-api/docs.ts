@@ -16,7 +16,11 @@
 // the docs consumer resolves it to that component's slot, so it never goes stale. This module parses
 // both forms.
 
-const MARKER = /awsui:style-api-slot\s+name=([\w-]+)\s+(?:tokens=([^*]*)|component=([\w-]+)\s+slot=([\w-]+)\s*)\*\//g;
+const MARKER = /awsui:style-api-slot\s+name=([\w-]+)\s+(?:tokens=([^*]*)|component=([\w-]+)\s+slot=([\w-]+)\s*)\*\//;
+
+// Matches any slot marker loosely (just the sentinel up to the comment close). We use this to detect
+// markers that MARKER fails to parse — e.g. a name or token containing a space.
+const MARKER_LOOSE = /awsui:style-api-slot[\s\S]*?\*\//g;
 
 export interface StyleApiDocs {
   /**
@@ -57,7 +61,12 @@ export function extractStyleApiDocs(css: string): StyleApiDocs {
   const slots = new Array<StyleApiSlotDocs>();
   const usedSlots = new Set<string>();
 
-  for (const match of css.matchAll(MARKER)) {
+  for (const looseMatch of css.matchAll(MARKER_LOOSE)) {
+    const raw = looseMatch[0];
+    const match = MARKER.exec(raw);
+    if (!match) {
+      throw new Error(`Found a malformed style-api docs annotation: "${raw}"`);
+    }
     const [, name, tokens, component, slot] = match;
     if (usedSlots.has(name)) {
       throw new Error(`Found multiple style-api docs annotations with the same name: "${name}"`);

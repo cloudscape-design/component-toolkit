@@ -79,6 +79,11 @@ test('reads token slots and forward slots together, preserving order', () => {
   ]);
 });
 
+test('throws on a malformed marker instead of silently ignoring it', () => {
+  const css = `/* awsui:style-api-slot name=column layout tokens=color-text */`;
+  expect(() => extractStyleApiDocs(css)).toThrow(/malformed style-api docs annotation/);
+});
+
 test('throws on a duplicate slot name across token and forward markers', () => {
   const css = `
     ${marker('dismissButton', ['color-text'])}
