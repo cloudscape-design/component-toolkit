@@ -70,24 +70,12 @@
   "types": "./mjs/index.d.ts",
   "typesVersions": {
     "*": {
-      "internal": [
-        "./mjs/internal/index.d.ts"
-      ],
-      "internal/*": [
-        "./mjs/internal/*"
-      ],
-      "dom": [
-        "./mjs/dom/index.d.ts"
-      ],
-      "dom/*": [
-        "./mjs/dom/*"
-      ],
-      "analytics-metadata": [
-        "./mjs/analytics-metadata/index.d.ts"
-      ],
-      "analytics-metadata/*": [
-        "./mjs/analytics-metadata/*"
-      ]
+      "internal": ["./mjs/internal/index.d.ts"],
+      "internal/*": ["./mjs/internal/*"],
+      "dom": ["./mjs/dom/index.d.ts"],
+      "dom/*": ["./mjs/dom/*"],
+      "analytics-metadata": ["./mjs/analytics-metadata/index.d.ts"],
+      "analytics-metadata/*": ["./mjs/analytics-metadata/*"]
     }
   },
   "repository": {
