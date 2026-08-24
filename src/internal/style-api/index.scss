@@ -98,7 +98,15 @@
 }
 
 // Documents a themeable slot (emits docs only — no styling effect), from the slot map.
-// The `$name` must match the component's `classNames` property entry.
+// The `$name` must match the component's `classNames` property entry. Emits docs only.
 @mixin docs($name, $map) {
   /* awsui:style-api-slot name=#{$name} tokens=#{map.keys($map)} */
+}
+
+// Documents a slot that forwards to another component's slot (e.g. a nested Button) instead of
+// owning tokens. `$name` must match the component's `classNames` property entry; `$component` and
+// `$slot` name the target component and its slot. The slot's tokens are whatever that target slot
+// documents — resolved by the docs consumer, so this stays in sync automatically. Emits docs only.
+@mixin docs-forward($name, $component, $slot) {
+  /* awsui:style-api-slot name=#{$name} component=#{$component} slot=#{$slot} */
 }
