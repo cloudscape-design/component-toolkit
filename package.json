@@ -57,14 +57,6 @@
       "require": "./internal/analytics-metadata/utils.js",
       "default": "./mjs/internal/analytics-metadata/utils.js"
     },
-    "./internal/table-role": {
-      "require": "./internal/table-role/index.js",
-      "default": "./mjs/internal/table-role/index.js"
-    },
-    "./internal/async-store": {
-      "require": "./internal/async-store/index.js",
-      "default": "./mjs/internal/async-store/index.js"
-    },
     "./package.json": "./package.json"
   },
   "types": "./mjs/index.d.ts",
