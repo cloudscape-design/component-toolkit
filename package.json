@@ -125,7 +125,6 @@
     "prettier": "^2.4.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
-    "react-router-dom": "^6.30.4",
     "sass": "^1.77.6",
     "ts-jest": "^29.1.5",
     "typescript": "^5.4.5",
@@ -133,7 +132,8 @@
   },
   "overrides": {
     "glob": "^10.5.0",
-    "test-exclude": "^7.0.1"
+    "test-exclude": "^7.0.1",
+    "@puppeteer/browsers": "^3.2.0"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
