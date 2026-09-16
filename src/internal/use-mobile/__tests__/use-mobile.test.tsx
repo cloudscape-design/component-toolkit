@@ -4,7 +4,6 @@
 import React, { useRef } from 'react';
 import { act, render } from '@testing-library/react';
 
-// eslint-disable-next-line import/extensions
 import { useMobile } from '../index';
 import * as safeMatchMediaModule from '../../utils/safe-match-media';
 
