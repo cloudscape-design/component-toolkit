@@ -51,7 +51,7 @@ export function useSingleTabStopNavigation(
 
   let tabIndex = options?.tabIndex;
   if (navigationActive) {
-    tabIndex = !focusTargetActive ? -1 : options?.tabIndex ?? 0;
+    tabIndex = !focusTargetActive ? -1 : (options?.tabIndex ?? 0);
   }
 
   return { navigationActive, tabIndex };
@@ -176,7 +176,6 @@ export const SingleTabStopNavigationProvider = forwardRef(
         resetFocusTarget();
       }
       // The updateFocusTarget and its dependencies must be pure.
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [parentContext.navigationActive]);
 
     return <SingleTabStopNavigationContext.Provider value={value}>{children}</SingleTabStopNavigationContext.Provider>;
