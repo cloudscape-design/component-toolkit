@@ -1,0 +1,19 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+// Makes the wrapped declarations take precedence over Cloudscape component styles. Component selectors
+// carry exactly one id-level part, `:not(#\9)`; this adds two, so the consumer rule wins regardless of
+// how many classes the component selector has. Use it inside a rule that targets a component slot class:
+//
+//   @use '@cloudscape-design/component-toolkit/styling' as styling;
+//
+//   .my-badge {
+//     @include styling.override {
+//       font-weight: 700;
+//     }
+//   }
+@mixin override {
+  &:not(#\9):not(#\9) {
+    @content;
+  }
+}

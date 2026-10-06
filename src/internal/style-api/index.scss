@@ -97,10 +97,42 @@
   @return map.get($map, $token);
 }
 
-// Documents a themeable slot (emits docs only — no styling effect), from the slot map.
-// The `$name` must match the component's `classNames` property entry. Emits docs only.
-@mixin docs($name, $map) {
-  /* awsui:style-api-slot name=#{$name} tokens=#{map.keys($map)} */
+// Formats a list for interpolation into a marker: an empty list would otherwise render as "()".
+@function _marker-list($list) {
+  @if list.length($list) == 0 {
+    @return '';
+  }
+  @return $list;
+}
+
+// Emits a docs-only marker for one token or property description.
+@mixin _description($slot, $kind, $name, $text) {
+  @if $text {
+    @if string.index('#{$text}', '*/') {
+      @error 'The description of "#{$name}" in slot "#{$slot}" must not contain "*/".';
+    }
+    /* awsui:style-api-description slot=#{$slot} kind=#{$kind} name=#{$name} text=#{$text} */
+  }
+}
+
+// Documents a themeable slot (emits docs only — no styling effect). `$name` must match the component's
+// `classNames` property entry. `$tokens` is the slot map from resolve(); omit it for a slot without tokens.
+// `$properties` lists the CSS properties consumers may set directly on the slot element. `$descriptions`
+// is a map with optional keys: `slot` (the slot's description), `tokens` and `properties` (maps of
+// token or property name to its description).
+@mixin docs($name, $tokens: null, $properties: null, $descriptions: null) {
+  $token-names: map.keys($tokens or ());
+  $descriptions: $descriptions or ();
+
+  /* awsui:style-api-slot name=#{$name} tokens=#{_marker-list($token-names)} properties=#{_marker-list($properties or ())} */
+
+  @include _description($name, slot, $name, map.get($descriptions, slot));
+  @each $token, $text in map.get($descriptions, tokens) or () {
+    @include _description($name, token, $token, $text);
+  }
+  @each $property, $text in map.get($descriptions, properties) or () {
+    @include _description($name, property, $property, $text);
+  }
 }
 
 // Documents a slot that forwards to another component's slot (e.g. a nested Button) instead of
