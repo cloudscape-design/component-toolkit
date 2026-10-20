@@ -1,0 +1,98 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generated mixins compile to CSS 1`] = `
+".badge:not(#\\9 ):not(#\\9 ) {
+  background: linear-gradient(red, blue), #fff;
+  border-inline-color: red blue;
+  border-radius: 4px 4px 0 0;
+  border-start-start-radius: 12px;
+  padding: 12px 0 0 2px;
+  padding-inline: 4px;
+  font-family: "Open Sans", sans-serif;
+}
+.badge:hover:not(#\\9 ):not(#\\9 ) {
+  color: red;
+}
+
+.handle {
+  --awsui-style-border-radius: 4px;
+}
+.handle:not(#\\9 ):not(#\\9 ) {
+  color: red;
+}"
+`;
+
+exports[`generates a module per component 1`] = `
+{
+  "badge": "// GENERATED from the badge Style API docs — do not edit.
+@use '@cloudscape-design/component-toolkit/internal/style-api/slot-mixins' as slot-mixins;
+
+@mixin root(
+  $color: null,
+  $background: null,
+  $border-color: null,
+  $border-width: null,
+  $border-style: null,
+  $border-block-color: null,
+  $border-block-width: null,
+  $border-block-style: null,
+  $border-inline-color: null,
+  $border-inline-width: null,
+  $border-inline-style: null,
+  $border-radius: null,
+  $border-start-start-radius: null,
+  $border-start-end-radius: null,
+  $border-end-start-radius: null,
+  $border-end-end-radius: null,
+  $padding: null,
+  $padding-block: null,
+  $padding-inline: null,
+  $font-family: null
+) {
+  @include slot-mixins.apply(
+    'badge.root',
+    $properties: (
+      'color': $color,
+      'background': $background,
+      'border-color': $border-color,
+      'border-width': $border-width,
+      'border-style': $border-style,
+      'border-block-color': $border-block-color,
+      'border-block-width': $border-block-width,
+      'border-block-style': $border-block-style,
+      'border-inline-color': $border-inline-color,
+      'border-inline-width': $border-inline-width,
+      'border-inline-style': $border-inline-style,
+      'border-radius': $border-radius,
+      'border-start-start-radius': $border-start-start-radius,
+      'border-start-end-radius': $border-start-end-radius,
+      'border-end-start-radius': $border-end-start-radius,
+      'border-end-end-radius': $border-end-end-radius,
+      'padding': $padding,
+      'padding-block': $padding-block,
+      'padding-inline': $padding-inline,
+      'font-family': $font-family,
+    ),
+  );
+}
+",
+  "slider": "// GENERATED from the slider Style API docs — do not edit.
+@use '@cloudscape-design/component-toolkit/internal/style-api/slot-mixins' as slot-mixins;
+
+@mixin handle(
+  $border-radius: null,
+  $color: null
+) {
+  @include slot-mixins.apply(
+    'slider.handle',
+    $tokens: (
+      'border-radius': $border-radius,
+    ),
+    $properties: (
+      'color': $color,
+    ),
+  );
+}
+",
+}
+`;
