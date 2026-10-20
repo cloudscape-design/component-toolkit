@@ -34,6 +34,11 @@
       "default": "./mjs/internal/focus-visible/index.js"
     },
     "./internal/style-api": "./internal/style-api/index.scss",
+    "./internal/style-api/slot-mixins": "./internal/style-api/slot-mixins.scss",
+    "./internal/style-api/generate-slot-mixins": {
+      "require": "./internal/style-api/generate-slot-mixins.js",
+      "default": "./mjs/internal/style-api/generate-slot-mixins.js"
+    },
     "./internal/style-api/docs": {
       "require": "./internal/style-api/docs.js",
       "default": "./mjs/internal/style-api/docs.js"
@@ -82,7 +87,7 @@
     "postbuild": "npm run postbuild:root && npm run postbuild:focus-visible && npm run postbuild:style-api && npm run postbuild:styling && node ./scripts/generate-deep-package.js",
     "postbuild:root": "cp package.json README.md LICENSE NOTICE lib",
     "postbuild:focus-visible": "cp ./src/internal/focus-visible/index.scss lib/internal/focus-visible/index.scss",
-    "postbuild:style-api": "mkdir -p lib/internal/style-api && cp ./src/internal/style-api/index.scss lib/internal/style-api/index.scss",
+    "postbuild:style-api": "mkdir -p lib/internal/style-api && cp ./src/internal/style-api/index.scss ./src/internal/style-api/slot-mixins.scss lib/internal/style-api/",
     "postbuild:styling": "mkdir -p lib/styling && cp ./src/styling/index.scss lib/styling/index.scss",
     "test-pages": "vite --config ./test-pages/vite.config.mts",
     "test:unit": "jest -c jest.unit.config.cjs",

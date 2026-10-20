@@ -4,22 +4,13 @@
 /**
  * @jest-environment node
  */
-import fs from 'fs';
-import path from 'path';
-import { compileString } from 'sass';
-
 import { extractStyleApiDocs } from '../docs';
+import { compileWithModules, readStyleApiSource } from './sass-utils';
 
-const styleApiSource = fs.readFileSync(path.resolve(__dirname, '../index.scss'), 'utf8');
-
-// Serves the style-api module through an importer: Sass's own file resolution doesn't work in jest's sandbox.
-const importer = {
-  canonicalize: (url: string) => (url === 'style-api' ? new URL('style-api:index') : null),
-  load: () => ({ contents: styleApiSource, syntax: 'scss' as const }),
-};
+const modules = { 'style-api': readStyleApiSource('index.scss') };
 
 function compile(scss: string) {
-  return compileString(`@use 'style-api';\n${scss}`, { importers: [importer] }).css;
+  return compileWithModules(modules, `@use 'style-api';\n${scss}`);
 }
 
 test('docs produces markers that the extractor reads back', () => {
