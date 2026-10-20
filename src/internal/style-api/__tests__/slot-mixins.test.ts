@@ -19,11 +19,7 @@ const tokenSlot = (name: string, tokens: string[], properties: string[] = []) =>
 const docs: Record<string, StyleApiDocs> = {
   badge: {
     slots: [
-      tokenSlot(
-        'root',
-        [],
-        ['color', 'background', 'border', 'border-radius', 'padding', 'padding-inline', 'font-family']
-      ),
+      tokenSlot('root', [], ['color', 'background', 'border', 'border-radius', 'padding', 'font-family']),
       tokenSlot('hook', []),
       { name: 'dismissButton', forwardsTo: { component: 'button', slot: 'root' } },
     ],
@@ -85,6 +81,12 @@ test.each([
   ['use outside of a rule', `@include badge.root($color: red);`, 'badge.root must be included inside a rule'],
 ])('fails the build for %s', (_, scss, error) => {
   expect(() => compile(scss)).toThrow(error);
+});
+
+test('fails generation when a slot allowlists a specific argument instead of its shorthand', () => {
+  expect(() =>
+    generateSlotMixins({ component: 'x', docs: { slots: [tokenSlot('root', [], ['padding-inline'])] } })
+  ).toThrow('Slot "x.root" allowlists "padding-inline". Allow "padding" instead.');
 });
 
 test('fails generation when a token and a property argument share a name', () => {
