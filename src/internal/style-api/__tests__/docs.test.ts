@@ -130,23 +130,29 @@ test('attaches token descriptions to their slot', () => {
 
 test('reads allowlisted properties and their descriptions', () => {
   const css = `
-    ${marker('root', ['color'], ['padding-inline', 'font-weight'])}
-    ${description('root', 'property', 'padding-inline', 'Horizontal padding')}
+    ${marker('root', ['color'], ['font-weight', 'box-shadow'])}
+    ${description('root', 'property', 'font-weight', 'Weight')}
   `;
   expect(extractStyleApiDocs(css).slots).toEqual([
     tokenSlot({
       name: 'root',
       tokens: ['color'],
-      properties: ['padding-inline', 'font-weight'],
-      propertyDescriptions: { 'padding-inline': 'Horizontal padding' },
+      properties: ['font-weight', 'box-shadow'],
+      propertyDescriptions: { 'font-weight': 'Weight' },
     }),
   ]);
 });
 
-test('reads allowlisted properties on a slot without tokens', () => {
-  expect(extractStyleApiDocs(marker('root', [], ['padding-block'])).slots).toEqual([
-    tokenSlot({ name: 'root', properties: ['padding-block'] }),
-  ]);
+test('throws when a slot allowlists an expansion instead of its shorthand', () => {
+  expect(() => extractStyleApiDocs(marker('root', [], ['padding-inline']))).toThrow(
+    'Slot "root" allowlists "padding-inline". Allow "padding" instead.'
+  );
+});
+
+test('throws when a token and a property share a name', () => {
+  expect(() => extractStyleApiDocs(marker('root', ['border-color'], ['border']))).toThrow(
+    'declares "border-color" as both a token and a property'
+  );
 });
 
 test('throws when a description refers to an undeclared or forwarding slot', () => {

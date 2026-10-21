@@ -18,6 +18,31 @@
 // docs() also emits one description marker per described slot, token or property:
 //     /* awsui:style-api-description slot=<slot> kind=<slot|token|property> name=<name> text=<text> */
 
+// The properties an allowlisted shorthand expands to. Allowlists name the shorthand, never one of its
+// expansions. The order is general to specific: the slot mixins emit declarations in this order, so
+// a more specific one wins.
+const PROPERTY_EXPANSIONS: Record<string, string[]> = {
+  padding: ['padding', 'padding-block', 'padding-inline'],
+  border: [
+    'border-color',
+    'border-width',
+    'border-style',
+    'border-block-color',
+    'border-block-width',
+    'border-block-style',
+    'border-inline-color',
+    'border-inline-width',
+    'border-inline-style',
+  ],
+  'border-radius': [
+    'border-radius',
+    'border-start-start-radius',
+    'border-start-end-radius',
+    'border-end-start-radius',
+    'border-end-end-radius',
+  ],
+};
+
 const MARKER =
   /awsui:style-api-slot\s+name=([\w-]+)\s+(?:tokens=([^*]*?)\s+properties=([^*]*)|component=([\w-]+)\s+slot=([\w-]+)\s*)\*\//;
 
@@ -60,7 +85,8 @@ export interface StyleApiTokenSlotDocs extends StyleApiSlotDocsBase {
    */
   tokenDescriptions: Record<string, string>;
   /**
-   * The CSS properties consumers may set directly on the slot element.
+   * The CSS properties consumers may set directly on the slot element. Allowlisted shorthands
+   * (`padding`, `border`, `border-radius`) are expanded to the longhands consumers may set as well.
    */
   properties: string[];
   /**
@@ -92,13 +118,18 @@ export function extractStyleApiDocs(css: string): StyleApiDocs {
     }
     let slotDocs: StyleApiSlotDocs;
     if (tokens !== undefined) {
-      slotDocs = {
+      const tokenSlot: StyleApiTokenSlotDocs = {
         name,
         tokens: splitList(tokens),
         tokenDescriptions: {},
-        properties: splitList(properties),
+        properties: expandProperties(name, splitList(properties)),
         propertyDescriptions: {},
       };
+      const clash = tokenSlot.tokens.find(token => tokenSlot.properties.includes(token));
+      if (clash) {
+        throw new Error(`Slot "${name}" declares "${clash}" as both a token and a property.`);
+      }
+      slotDocs = tokenSlot;
     } else {
       slotDocs = { name, forwardsTo: { component, slot } };
     }
@@ -134,6 +165,16 @@ function parse(raw: string, pattern: RegExp): RegExpExecArray {
     throw new Error(`Found a malformed style-api docs annotation: "${raw}"`);
   }
   return match;
+}
+
+function expandProperties(slot: string, properties: string[]): string[] {
+  for (const property of properties) {
+    const shorthand = Object.keys(PROPERTY_EXPANSIONS).find(key => PROPERTY_EXPANSIONS[key].includes(property));
+    if (shorthand && shorthand !== property) {
+      throw new Error(`Slot "${slot}" allowlists "${property}". Allow "${shorthand}" instead.`);
+    }
+  }
+  return properties.flatMap(property => PROPERTY_EXPANSIONS[property] ?? [property]);
 }
 
 function splitList(list: string): string[] {
