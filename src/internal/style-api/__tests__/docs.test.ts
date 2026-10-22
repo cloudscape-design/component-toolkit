@@ -8,8 +8,8 @@ const marker = (name: string, tokens: string[], properties: string[] = []) =>
   `/* awsui:style-api-slot name=${name} tokens=${tokens.join(', ')} properties=${properties.join(', ')} */`;
 
 // Emulates the compiled output of `@include style-api.docs-forward($name, $component, $slot)`.
-const forwardMarker = (name: string, component: string, slot: string) =>
-  `/* awsui:style-api-slot name=${name} component=${component} slot=${slot} */`;
+const forwardMarker = (name: string, component: string, slot?: string) =>
+  `/* awsui:style-api-slot name=${name} component=${component}${slot ? ` slot=${slot}` : ''} */`;
 
 // The expected docs of a token slot, with the always-present fields defaulted to empty.
 const tokenSlot = (
@@ -80,6 +80,12 @@ test('reads a forward slot that points to another component slot', () => {
   `;
   expect(extractStyleApiDocs(css).slots).toEqual([
     { name: 'dismissButton', forwardsTo: { component: 'button', slot: 'button' } },
+  ]);
+});
+
+test('reads a forward slot that points to a whole component', () => {
+  expect(extractStyleApiDocs(forwardMarker('statusPopover', 'popover')).slots).toEqual([
+    { name: 'statusPopover', forwardsTo: { component: 'popover' } },
   ]);
 });
 

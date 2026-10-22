@@ -137,8 +137,12 @@
 
 // Documents a slot that forwards to another component's slot (e.g. a nested Button) instead of
 // owning tokens. `$name` must match the component's `classNames` property entry; `$component` and
-// `$slot` name the target component and its slot. The slot's tokens are whatever that target slot
-// documents — resolved by the docs consumer, so this stays in sync automatically. Emits docs only.
-@mixin docs-forward($name, $component, $slot) {
-  /* awsui:style-api-slot name=#{$name} component=#{$component} slot=#{$slot} */
+// `$slot` name the target component and, optionally, its slot; without a slot the forward covers the
+// whole component. Resolved by the docs consumer, so this stays in sync automatically. Emits docs only.
+@mixin docs-forward($name, $component, $slot: null) {
+  @if $slot {
+    /* awsui:style-api-slot name=#{$name} component=#{$component} slot=#{$slot} */
+  } @else {
+    /* awsui:style-api-slot name=#{$name} component=#{$component} */
+  }
 }
