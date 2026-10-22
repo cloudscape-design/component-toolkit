@@ -19,13 +19,13 @@ test('docs produces markers that the extractor reads back', () => {
     @include style-api.docs(
       'root',
       $root,
-      $properties: (padding-inline, font-weight),
+      $properties: (padding, font-weight),
       $descriptions: (
         tokens: (color: 'Text color, also used for the icon'),
-        properties: (padding-inline: 'Horizontal padding'),
+        properties: (padding: 'Inner spacing'),
       )
     );
-    @include style-api.docs('hook', $properties: padding-block, $descriptions: (slot: 'Class hook for state selectors'));
+    @include style-api.docs('hook', $properties: font-size, $descriptions: (slot: 'Class hook for state selectors'));
     @include style-api.docs('plain', $root);
   `);
   expect(extractStyleApiDocs(css).slots).toEqual([
@@ -33,14 +33,14 @@ test('docs produces markers that the extractor reads back', () => {
       name: 'root',
       tokens: ['color', 'background-color'],
       tokenDescriptions: { color: 'Text color, also used for the icon' },
-      properties: ['padding-inline', 'font-weight'],
-      propertyDescriptions: { 'padding-inline': 'Horizontal padding' },
+      properties: ['padding', 'padding-block', 'padding-inline', 'font-weight'],
+      propertyDescriptions: { padding: 'Inner spacing' },
     },
     {
       name: 'hook',
       tokens: [],
       tokenDescriptions: {},
-      properties: ['padding-block'],
+      properties: ['font-size'],
       propertyDescriptions: {},
       description: 'Class hook for state selectors',
     },

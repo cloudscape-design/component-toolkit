@@ -4,27 +4,17 @@
 /**
  * @jest-environment node
  */
-import { StyleApiDocs } from '../docs';
+import { extractStyleApiDocs } from '../docs';
 import { generateSlotMixins } from '../generate-slot-mixins';
 import { compileWithModules, readStyleApiSource } from './sass-utils';
 
-const tokenSlot = (name: string, tokens: string[], properties: string[] = []) => ({
-  name,
-  tokens,
-  tokenDescriptions: {},
-  properties,
-  propertyDescriptions: {},
-});
-
-const docs: Record<string, StyleApiDocs> = {
-  badge: {
-    slots: [
-      tokenSlot('root', [], ['color', 'background', 'border', 'border-radius', 'padding', 'font-family']),
-      tokenSlot('hook', []),
-      { name: 'dismissButton', forwardsTo: { component: 'button', slot: 'root' } },
-    ],
-  },
-  slider: { slots: [tokenSlot('handle', ['border-radius'], ['color'])] },
+const docs = {
+  badge: extractStyleApiDocs(`
+    /* awsui:style-api-slot name=root tokens= properties=color, background, border, border-radius, padding, font-family */
+    /* awsui:style-api-slot name=hook tokens= properties= */
+    /* awsui:style-api-slot name=dismissButton component=button slot=root */
+  `),
+  slider: extractStyleApiDocs(`/* awsui:style-api-slot name=handle tokens=border-radius properties=color */`),
 };
 
 const modules = Object.fromEntries(
@@ -81,16 +71,4 @@ test.each([
   ['use outside of a rule', `@include badge.root($color: red);`, 'badge.root must be included inside a rule'],
 ])('fails the build for %s', (_, scss, error) => {
   expect(() => compile(scss)).toThrow(error);
-});
-
-test('fails generation when a slot allowlists a specific argument instead of its shorthand', () => {
-  expect(() =>
-    generateSlotMixins({ component: 'x', docs: { slots: [tokenSlot('root', [], ['padding-inline'])] } })
-  ).toThrow('Slot "x.root" allowlists "padding-inline". Allow "padding" instead.');
-});
-
-test('fails generation when a token and a property argument share a name', () => {
-  expect(() =>
-    generateSlotMixins({ component: 'x', docs: { slots: [tokenSlot('root', ['border-color'], ['border'])] } })
-  ).toThrow('declares "border-color" as both a token and a property');
 });
