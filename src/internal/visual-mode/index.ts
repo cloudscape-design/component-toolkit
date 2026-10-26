@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { findUpUntil } from '../../dom/index.js';
+import { isHTMLElement } from '../../dom/element-types.js';
 import { createSingletonHandler } from '../singleton-handler/index.js';
 import { useStableCallback } from '../stable-callback/index.js';
 import { isDevelopment } from '../is-development.js';
@@ -10,9 +11,87 @@ import { warnOnce } from '../logging.js';
 import { awsuiVisualRefreshFlag, getGlobal, getGlobalFlag } from '../global-flags/index.js';
 import { safeMatchMedia } from '../utils/safe-match-media.js';
 
+/**
+ * Ancestor-chain lookups resolved during the current mutation flush, keyed by mode and then
+ * by element. Only populated while the singleton observer is fanning out to its subscribers
+ * (see `useMutationSingleton`), and `null` at all other times.
+ *
+ * Only the detectors below read it. Callers outside the fan-out must not, because React can
+ * run effects while it is populated: an effect that mutates a mode class and then queries
+ * synchronously has to see the DOM as it is, not as the flush found it. The detectors
+ * themselves are unaffected, since they all run before any effect in the batch and any
+ * mutation an effect makes schedules a fresh flush.
+ */
+let flushCache: null | Map<string, Map<HTMLElement, boolean>> = null;
+
+function getParentHTMLElement(element: HTMLElement): HTMLElement | null {
+  let parent: HTMLElement | null = element.parentElement;
+  // If a component is used within an svg (i.e. as foreignObject), then it will have some
+  // ancestor nodes that are SVGElement. We want to skip those, as they have very different
+  // properties to HTMLElements.
+  while (parent && !isHTMLElement(parent)) {
+    parent = (parent as Element).parentElement;
+  }
+  return parent;
+}
+
+/**
+ * Whether `element` or any of its ancestors satisfies `test`.
+ *
+ * Within a mutation flush every element on the traversed path is memoized, so subscribers
+ * that share ancestors resolve in constant time instead of each re-walking to the document
+ * root. Pages with many mode detectors mounted (for example a table with a popover in every
+ * cell) are dominated by those redundant walks: cost per flush goes from
+ * O(subscribers x depth) to O(distinct paths).
+ */
+function hasMatchingAncestor(mode: string, element: HTMLElement, test: (node: HTMLElement) => boolean): boolean {
+  if (!flushCache) {
+    return !!findUpUntil(element, test);
+  }
+  let cache = flushCache.get(mode);
+  if (!cache) {
+    cache = new Map();
+    flushCache.set(mode, cache);
+  }
+
+  const path: Array<HTMLElement> = [];
+  let current: HTMLElement | null = element;
+  let result: boolean | undefined = undefined;
+
+  while (current) {
+    const cached = cache.get(current);
+    if (cached !== undefined) {
+      result = cached;
+      break;
+    }
+    path.push(current);
+    if (test(current)) {
+      result = true;
+      break;
+    }
+    current = getParentHTMLElement(current);
+  }
+
+  const resolved = result ?? false;
+  for (const visited of path) {
+    cache.set(visited, resolved);
+  }
+  return resolved;
+}
+
+function hasMotionDisabledAncestor(element: HTMLElement): boolean {
+  return !!findUpUntil(element, node => node.classList.contains('awsui-motion-disabled'));
+}
+
+// Public API, callable at any time, so it always reads the live DOM rather than the flush cache.
 export function isMotionDisabled(element: HTMLElement): boolean {
+  return hasMotionDisabledAncestor(element) || safeMatchMedia(element, '(prefers-reduced-motion: reduce)');
+}
+
+// Equivalent to `isMotionDisabled`, but shares ancestor lookups across subscribers in a flush.
+function detectReducedMotion(element: HTMLElement): boolean {
   return (
-    !!findUpUntil(element, node => node.classList.contains('awsui-motion-disabled')) ||
+    hasMatchingAncestor('motion', element, node => node.classList.contains('awsui-motion-disabled')) ||
     safeMatchMedia(element, '(prefers-reduced-motion: reduce)')
   );
 }
@@ -43,19 +122,21 @@ function useModeDetector<T>(
 }
 
 function detectCurrentMode(node: HTMLElement): 'light' | 'dark' {
-  const darkModeParent = findUpUntil(
+  const isDark = hasMatchingAncestor(
+    'dark',
     node,
     node => node.classList.contains('awsui-polaris-dark-mode') || node.classList.contains('awsui-dark-mode')
   );
-  return darkModeParent ? 'dark' : 'light';
+  return isDark ? 'dark' : 'light';
 }
 
 function detectDensityMode(node: HTMLElement): 'comfortable' | 'compact' {
-  const compactModeParent = findUpUntil(
+  const isCompact = hasMatchingAncestor(
+    'compact',
     node,
     node => node.classList.contains('awsui-polaris-compact-mode') || node.classList.contains('awsui-compact-mode')
   );
-  return compactModeParent ? 'compact' : 'comfortable';
+  return isCompact ? 'compact' : 'comfortable';
 }
 
 // Note that this hook doesn't take into consideration @media print (unlike the dark mode CSS),
@@ -70,13 +151,160 @@ export function useDensityMode(elementRef: React.RefObject<HTMLElement>) {
 }
 
 export function useReducedMotion(elementRef: React.RefObject<HTMLElement>) {
-  return useModeDetector(elementRef, isMotionDisabled, false);
+  return useModeDetector(elementRef, detectReducedMotion, false);
+}
+
+/**
+ * How many subscribers each ref backs. Counted rather than a set, because the hooks take a
+ * ref instead of owning one, so a component may detect one mode on an element and pass the
+ * same ref to a child that detects another. Unmounting one of those must not discard the
+ * bookkeeping the other still relies on.
+ */
+const subscriberCountsByRef = new Map<React.RefObject<HTMLElement>, number>();
+
+/**
+ * Every node on some subscriber's ancestor chain, including the subscribed elements
+ * themselves, with a count of how many chains pass through each.
+ *
+ * This is what makes the `childList` filter cheap. A `childList` change can only alter a mode
+ * if a subscriber sits at or below one of the moved nodes, which is true exactly when a moved
+ * node is on some subscriber's chain. Testing that costs one map lookup per moved node, where
+ * walking every subscriber's chain per mutation would cost O(subscribers x depth) — and
+ * unrelated churn, which is most of what `childList` reports, is all worst case for such a
+ * walk, since it can only conclude "no subscriber moved" after walking all of them.
+ *
+ * Counting, rather than a plain set, is what lets a subscriber be added to an existing map:
+ * detectors on one page share most of their chain, so the shared nodes must survive until the
+ * last chain through them is gone.
+ */
+const chainNodeCounts = new Map<Node, number>();
+
+/**
+ * Whether `chainNodeCounts` still describes the live DOM. It is derived from ancestor chains,
+ * so anything that reshapes one invalidates it. Rebuilding is deferred to the next read, so a
+ * burst of mutations costs one rebuild rather than one per mutation.
+ */
+let chainsNeedRebuild = false;
+
+function addChain(elementRef: React.RefObject<HTMLElement>) {
+  for (let node: Node | null = elementRef.current; node; node = node.parentNode) {
+    chainNodeCounts.set(node, (chainNodeCounts.get(node) ?? 0) + 1);
+  }
+}
+
+function rebuildChains() {
+  chainNodeCounts.clear();
+  for (const [ref, subscriberCount] of subscriberCountsByRef) {
+    for (let i = 0; i < subscriberCount; i++) {
+      addChain(ref);
+    }
+  }
+  chainsNeedRebuild = false;
+}
+
+function subscribeChain(elementRef: React.RefObject<HTMLElement>) {
+  subscriberCountsByRef.set(elementRef, (subscriberCountsByRef.get(elementRef) ?? 0) + 1);
+  if (!chainsNeedRebuild) {
+    addChain(elementRef);
+  }
+}
+
+function unsubscribeChain(elementRef: React.RefObject<HTMLElement>) {
+  const remaining = (subscriberCountsByRef.get(elementRef) ?? 1) - 1;
+  if (remaining > 0) {
+    subscriberCountsByRef.set(elementRef, remaining);
+  } else {
+    subscriberCountsByRef.delete(elementRef);
+  }
+  // The chain is not unwound incrementally: by cleanup time the element may already have been
+  // detached or moved, so the chain walked here need not be the one that was counted.
+  chainsNeedRebuild = true;
+}
+
+/**
+ * Whether these records moved a subscriber, and so changed which ancestors it inherits a mode
+ * from.
+ *
+ * Both added and removed nodes count, because a move reports the two halves separately and
+ * they can land in different records when it spans flushes: re-attaching an element that was
+ * detached in an earlier flush is reported only as an addition.
+ *
+ * Chain membership is by node identity, so an `<svg>` between a `foreignObject` and its
+ * subscriber is on the chain like any other node and needs no special handling.
+ */
+function movesSubscriber(records: Array<MutationRecord>): boolean {
+  if (chainsNeedRebuild) {
+    rebuildChains();
+  }
+  for (const record of records) {
+    if (record.type !== 'childList') {
+      continue;
+    }
+    for (let i = 0; i < record.removedNodes.length; i++) {
+      if (chainNodeCounts.has(record.removedNodes[i])) {
+        return true;
+      }
+    }
+    for (let i = 0; i < record.addedNodes.length; i++) {
+      if (chainNodeCounts.has(record.addedNodes[i])) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function hasClassChange(records: Array<MutationRecord>): boolean {
+  for (const record of records) {
+    if (record.type !== 'childList') {
+      return true;
+    }
+  }
+  return false;
 }
 
 const useMutationSingleton = createSingletonHandler<void>(handler => {
-  const observer = new MutationObserver(() => handler());
-  observer.observe(document.body, { attributes: true, subtree: true });
-  return () => observer.disconnect();
+  const fanOut = () => {
+    // Memoize ancestor lookups for the duration of this fan-out only. Every subscriber runs
+    // synchronously inside handler(), before React processes any effect in the batch, so all
+    // of them see one consistent view of the DOM.
+    flushCache = new Map();
+    try {
+      handler();
+    } finally {
+      flushCache = null;
+    }
+  };
+  const observer = new MutationObserver(records => {
+    // A moved subscriber has a new ancestor chain, so the counts must be rebuilt. A class
+    // change moves nothing and leaves them valid, so it only wakes the subscribers.
+    const moved = movesSubscriber(records);
+    if (moved) {
+      chainsNeedRebuild = true;
+    }
+    if (moved || hasClassChange(records)) {
+      fanOut();
+    }
+  });
+  const htmlObserver = new MutationObserver(fanOut);
+  // A mode is only ever expressed as a class name, so watching `class` is what detects a mode
+  // change. Filtering to it avoids waking every subscriber for unrelated attribute changes
+  // anywhere in the document, such as the `data-awsui-focus-visible` toggle that
+  // focus-visible writes to `<body>` on every keydown and mousedown.
+  //
+  // `childList` is watched as well because moving an element between subtrees changes its
+  // ancestor chain, and therefore its mode, without any class changing. Previously such
+  // moves were only picked up incidentally, by whatever unrelated attribute mutation
+  // happened to follow. Because that covers every node insertion on the page, and most of
+  // them are ordinary rendering that moves no subscriber, `movesSubscriber` discards them
+  // before waking anyone.
+  observer.observe(document.body, { attributes: true, subtree: true, childList: true, attributeFilter: ['class'] });
+  // Modes are also honoured above `<body>`, which the observer above does not cover.
+  htmlObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  return () => {
+    observer.disconnect();
+    htmlObserver.disconnect();
+  };
 });
 
 function useMutationObserver(elementRef: React.RefObject<HTMLElement>, onChange: (element: HTMLElement) => void) {
@@ -86,6 +314,13 @@ function useMutationObserver(elementRef: React.RefObject<HTMLElement>, onChange:
     }
   });
   useMutationSingleton(handler);
+
+  useEffect(() => {
+    subscribeChain(elementRef);
+    return () => {
+      unsubscribeChain(elementRef);
+    };
+  }, [elementRef]);
 
   useEffect(() => {
     handler();
