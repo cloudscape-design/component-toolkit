@@ -80,13 +80,13 @@ exports[`generates a module per component 1`] = `
 @use '@cloudscape-design/component-toolkit/internal/style-api/slot-mixins' as slot-mixins;
 
 @mixin handle(
-  $border-radius: null,
+  $awsui-border-radius: null,
   $color: null
 ) {
   @include slot-mixins.apply(
     'slider.handle',
     $tokens: (
-      'border-radius': $border-radius,
+      'border-radius': $awsui-border-radius,
     ),
     $properties: (
       'color': $color,

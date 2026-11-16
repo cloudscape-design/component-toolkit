@@ -60,7 +60,7 @@ test('generated mixins compile to CSS', () => {
         }
       }
       .handle {
-        @include slider.handle($color: red, $border-radius: 4px);
+        @include slider.handle($color: red, $awsui-border-radius: 4px);
       }
     `)
   ).toMatchSnapshot();
@@ -68,6 +68,11 @@ test('generated mixins compile to CSS', () => {
 
 test.each([
   ['an unknown argument', `.x { @include badge.root($letter-spacing: 1px); }`, 'No parameter named $letter-spacing'],
+  [
+    'a token without the awsui- prefix',
+    `.x { @include slider.handle($border-radius: 4px); }`,
+    'No parameter named $border-radius',
+  ],
   ['use outside of a rule', `@include badge.root($color: red);`, 'badge.root must be included inside a rule'],
 ])('fails the build for %s', (_, scss, error) => {
   expect(() => compile(scss)).toThrow(error);

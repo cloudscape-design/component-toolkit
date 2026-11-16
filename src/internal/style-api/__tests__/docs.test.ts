@@ -75,11 +75,11 @@ test('tolerates whitespaces inside the marker', () => {
 
 test('reads a forward slot that points to another component slot', () => {
   const css = `
-    ${forwardMarker('dismissButton', 'button', 'button')}
+    ${forwardMarker('dismissButton', 'button', 'root')}
     .root { padding-inline: var(--awsui-style-padding-inline, 8px); }
   `;
   expect(extractStyleApiDocs(css).slots).toEqual([
-    { name: 'dismissButton', forwardsTo: { component: 'button', slot: 'button' } },
+    { name: 'dismissButton', forwardsTo: { component: 'button', slot: 'root' } },
   ]);
 });
 
@@ -92,11 +92,11 @@ test('reads a forward slot that points to a whole component', () => {
 test('reads token slots and forward slots together, preserving order', () => {
   const css = `
     ${marker('root', ['color-text', 'color-background'])}
-    ${forwardMarker('dismissButton', 'button', 'button')}
+    ${forwardMarker('dismissButton', 'button', 'root')}
   `;
   expect(extractStyleApiDocs(css).slots).toEqual([
     tokenSlot({ name: 'root', tokens: ['color-text', 'color-background'] }),
-    { name: 'dismissButton', forwardsTo: { component: 'button', slot: 'button' } },
+    { name: 'dismissButton', forwardsTo: { component: 'button', slot: 'root' } },
   ]);
 });
 
@@ -111,7 +111,7 @@ test('throws on a malformed marker instead of silently ignoring it', () => {
 test('throws on a duplicate slot name across token and forward markers', () => {
   const css = `
     ${marker('dismissButton', ['color-text'])}
-    ${forwardMarker('dismissButton', 'button', 'button')}
+    ${forwardMarker('dismissButton', 'button', 'root')}
   `;
   expect(() => extractStyleApiDocs(css)).toThrow(/multiple .+ annotations with the same name: "dismissButton"/);
 });
