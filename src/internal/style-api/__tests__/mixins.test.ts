@@ -62,3 +62,9 @@ test('docs fails the build when a description contains a comment terminator', ()
     compile(`@include style-api.docs('root', $properties: (color), $descriptions: (properties: (color: 'a */ b')));`)
   ).toThrow('must not contain "*/"');
 });
+
+test('docs-forward fails the build for a target slot other than root', () => {
+  expect(() => compile(`@include style-api.docs-forward('dropdown', 'dropdown', 'container');`)).toThrow(
+    'can only forward to the root slot'
+  );
+});

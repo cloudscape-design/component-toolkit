@@ -14,7 +14,8 @@ const RUNTIME_MODULE = '@cloudscape-design/component-toolkit/internal/style-api/
 
 /**
  * Generates a Sass module with one mixin per slot of a component. A mixin takes one keyword argument per token and
- * CSS property of the slot, named after it, e.g. `@include badge.root($color: red, $padding-inline: 12px)`. Slots
+ * CSS property of the slot, named after it; token arguments carry the `awsui-` prefix so they can't be mistaken for
+ * CSS properties, e.g. `@include slider.handle($awsui-fill-color: red, $color: blue)`. Slots
  * without tokens or properties, including forwarding slots, get no mixin: a forwarding slot is styled with the
  * mixin of the slot it forwards to.
  */
@@ -33,12 +34,14 @@ export function generateSlotMixins({ component, docs }: GenerateSlotMixinsOption
 
 function generateMixin(component: string, slot: StyleApiTokenSlotDocs): string {
   const properties = slot.properties;
-  const parameters = [...slot.tokens, ...properties].map(name => `  $${name}: null`);
-  const argumentMap = (names: string[]) => names.map(name => `      '${name}': $${name},`);
+  const tokenParameter = (token: string) => `awsui-${token}`;
+  const parameters = [...slot.tokens.map(tokenParameter), ...properties].map(name => `  $${name}: null`);
+  const argumentMap = (names: string[], parameter = (name: string) => name) =>
+    names.map(name => `      '${name}': $${parameter(name)},`);
 
   const call = [`    '${component}.${slot.name}',`];
   if (slot.tokens.length > 0) {
-    call.push('    $tokens: (', ...argumentMap(slot.tokens), '    ),');
+    call.push('    $tokens: (', ...argumentMap(slot.tokens, tokenParameter), '    ),');
   }
   if (properties.length > 0) {
     call.push('    $properties: (', ...argumentMap(properties), '    ),');
