@@ -33,6 +33,17 @@ describe('Theme.VisualRefresh', () => {
     expect(isThemeActive(Theme.VisualRefresh)).toBe(false);
   });
 
+  test('ignores the awsui-visual-refresh class on elements other than body', () => {
+    const element = document.createElement('div');
+    element.className = 'awsui-visual-refresh';
+    document.body.appendChild(element);
+    try {
+      expect(isThemeActive(Theme.VisualRefresh)).toBe(false);
+    } finally {
+      element.remove();
+    }
+  });
+
   test('class presence wins over a flag returning false', () => {
     document.body.classList.add('awsui-visual-refresh');
     window[awsuiVisualRefreshFlag] = () => false;

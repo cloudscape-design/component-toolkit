@@ -118,7 +118,8 @@ const themeDefinitions: Record<Theme, ThemeDefinition> = {
 const allThemes = Object.values(Theme);
 
 function hasThemeClassName(theme: Theme) {
-  return typeof document !== 'undefined' && !!document.querySelector(`.${themeDefinitions[theme].className}`);
+  // Checked on every render in development, so avoid a document-wide query (slow in jsdom).
+  return typeof document !== 'undefined' && !!document.body?.classList.contains(themeDefinitions[theme].className);
 }
 
 // A theme is active if its body class or its global flag is set.
