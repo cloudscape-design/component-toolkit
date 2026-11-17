@@ -6,7 +6,7 @@ exports[`generated mixins compile to CSS 1`] = `
   border-inline-color: red blue;
   border-radius: 4px 4px 0 0;
   border-start-start-radius: 12px;
-  padding: 12px 0 0 2px;
+  padding-block: 12px 0;
   padding-inline: 4px;
   font-family: "Open Sans", sans-serif;
 }
@@ -44,7 +44,6 @@ exports[`generates a module per component 1`] = `
   $border-start-end-radius: null,
   $border-end-start-radius: null,
   $border-end-end-radius: null,
-  $padding: null,
   $padding-block: null,
   $padding-inline: null,
   $font-family: null
@@ -68,7 +67,6 @@ exports[`generates a module per component 1`] = `
       'border-start-end-radius': $border-start-end-radius,
       'border-end-start-radius': $border-end-start-radius,
       'border-end-end-radius': $border-end-end-radius,
-      'padding': $padding,
       'padding-block': $padding-block,
       'padding-inline': $padding-inline,
       'font-family': $font-family,
