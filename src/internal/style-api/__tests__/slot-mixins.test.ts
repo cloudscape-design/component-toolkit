@@ -48,7 +48,7 @@ test('generated mixins compile to CSS', () => {
       .badge {
         @include badge.root(
           $padding-inline: 4px,
-          $padding: 12px 0 0 2px,
+          $padding-block: 12px 0,
           $border-start-start-radius: 12px,
           $border-radius: 4px 4px 0 0,
           $border-inline-color: red blue,

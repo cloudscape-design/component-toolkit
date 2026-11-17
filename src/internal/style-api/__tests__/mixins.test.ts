@@ -22,7 +22,7 @@ test('docs produces markers that the extractor reads back', () => {
       $properties: (padding, font-weight),
       $descriptions: (
         tokens: (color: 'Text color, also used for the icon'),
-        properties: (padding: 'Inner spacing'),
+        properties: (padding-inline: 'Inner spacing'),
       )
     );
     @include style-api.docs('hook', $properties: font-size, $descriptions: (slot: 'Class hook for state selectors'));
@@ -33,8 +33,8 @@ test('docs produces markers that the extractor reads back', () => {
       name: 'root',
       tokens: ['color', 'background-color'],
       tokenDescriptions: { color: 'Text color, also used for the icon' },
-      properties: ['padding', 'padding-block', 'padding-inline', 'font-weight'],
-      propertyDescriptions: { padding: 'Inner spacing' },
+      properties: ['padding-block', 'padding-inline', 'font-weight'],
+      propertyDescriptions: { 'padding-inline': 'Inner spacing' },
     },
     {
       name: 'hook',

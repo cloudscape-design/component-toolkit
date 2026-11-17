@@ -23,7 +23,7 @@
 // expansions. The order is general to specific: the slot mixins emit declarations in this order, so
 // a more specific one wins.
 const PROPERTY_EXPANSIONS: Record<string, string[]> = {
-  padding: ['padding', 'padding-block', 'padding-inline'],
+  padding: ['padding-block', 'padding-inline'],
   border: [
     'border-color',
     'border-width',
@@ -87,7 +87,7 @@ export interface StyleApiTokenSlotDocs extends StyleApiSlotDocsBase {
   tokenDescriptions: Record<string, string>;
   /**
    * The CSS properties consumers may set directly on the slot element. Allowlisted shorthands
-   * (`padding`, `border`, `border-radius`) are expanded to the longhands consumers may set as well.
+   * (`padding`, `border`, `border-radius`) are expanded to the longhands consumers may set.
    */
   properties: string[];
   /**
