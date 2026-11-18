@@ -11,7 +11,7 @@ interface GlobalFlags {
   oneTheme?: boolean;
   appLayoutHideToolbarBreadcrumbs?: boolean;
   appLayoutHideToolbar?: boolean;
-  appLayoutStarterHome?: boolean;
+  appLayoutSimplifiedView?: boolean;
 }
 
 export interface FlagsHolder {
