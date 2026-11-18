@@ -10,6 +10,8 @@ interface GlobalFlags {
   analyticsMetadata?: boolean;
   oneTheme?: boolean;
   appLayoutHideToolbarBreadcrumbs?: boolean;
+  appLayoutHideToolbar?: boolean;
+  appLayoutSimplifiedView?: boolean;
 }
 
 export interface FlagsHolder {
